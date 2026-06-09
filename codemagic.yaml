@@ -13,10 +13,6 @@ workflows:
       node: 22.12.0
       xcode: latest
       cocoapods: default
-      # 自動署名。プロファイルは前回の fetch-signing-files --create で生成済みのものを使用
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.champcalc.app
 
     scripts:
       - name: Install dependencies
@@ -35,8 +31,18 @@ workflows:
           LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number "$APP_APPLE_ID" 2>/dev/null || echo "0")
           agvtool new-version -all $(($LATEST_BUILD + 1))
 
+      - name: Set up code signing
+        # profile は手動作成済み。fetch で取得し use-profiles で App.xcodeproj に適用
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files \
+            "com.champcalc.app" \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
+          xcode-project use-profiles
+
       - name: Build iOS (App Store)
-        # Codemagic標準。use-profilesが用意した手動署名/export設定を使ってarchive→export一括
         script: |
           xcode-project build-ipa \
             --project "ios/App/App.xcodeproj" \
