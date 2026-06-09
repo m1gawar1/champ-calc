@@ -1,22 +1,26 @@
 workflows:
   # ── iOS (App Store / TestFlight) ──────────────────────────────
+  # Substrack の ios-workflow を bundle ID 以外そっくり再現（実績構成）
   ios-workflow:
     name: iOS Build (champcalc)
     max_build_duration: 60
     integrations:
-      # Substrack と同じ App Store Connect 連携を流用（同一 Apple アカウント）
       app_store_connect: SubsTracker
     environment:
+      groups:
+        - ios_credential   # Substrack と同じ署名 credential / 環境変数グループを流用
       vars:
-        # App Store Connect のアプリ「Apple ID」(com.champcalc.app / ダメージ計算のみがわり)
-        APP_APPLE_ID: "6778301151"
+        APP_APPLE_ID: "6778301151"   # champcalc アプリの Apple ID（ios_credential の値を上書き）
       node: 22.12.0
       xcode: latest
       cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.champcalc.app
 
     scripts:
       - name: Install dependencies
-        # npm ci ではなく npm install（Windows生成のlockに無いmacOS/Linux用optional依存をCIで解決）
+        # Windows生成lockのクロスプラットフォーム差を避けるため npm install
         script: npm install
 
       - name: Build web assets
@@ -31,25 +35,29 @@ workflows:
           LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number "$APP_APPLE_ID" 2>/dev/null || echo "0")
           agvtool new-version -all $(($LATEST_BUILD + 1))
 
-      - name: Set up code signing
-        # profile は手動作成済み。fetch で取得し use-profiles で App.xcodeproj に適用
-        script: |
-          keychain initialize
-          app-store-connect fetch-signing-files \
-            "com.champcalc.app" \
-            --type IOS_APP_STORE \
-            --create
-          keychain add-certificates
-          xcode-project use-profiles
-
       - name: Build iOS (App Store)
         script: |
-          xcode-project build-ipa \
-            --project "ios/App/App.xcodeproj" \
-            --scheme "App"
+          xcode-project use-profiles
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -archivePath ios/App.xcarchive \
+            archive \
+            CODE_SIGN_STYLE=Manual
+          app-store-connect fetch-signing-files \
+            com.champcalc.app \
+            --type IOS_APP_STORE \
+            --create
+          xcode-project use-profiles
+          xcodebuild \
+            -exportArchive \
+            -archivePath ios/App.xcarchive \
+            -exportPath ios/ipa \
+            -exportOptionsPlist /Users/builder/export_options.plist
 
     artifacts:
-      - build/ios/ipa/*.ipa
+      - ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
 
     publishing:
