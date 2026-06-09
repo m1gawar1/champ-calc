@@ -8,9 +8,8 @@ workflows:
       app_store_connect: SubsTracker
     environment:
       vars:
-        # ★ App Store Connect で新規アプリ(com.champcalc.app)を作成後、
-        #    そのアプリの「Apple ID」(数字)に差し替える
-        APP_APPLE_ID: "0000000000"
+        # App Store Connect のアプリ「Apple ID」(com.champcalc.app / ダメージ計算のみがわり)
+        APP_APPLE_ID: "6778301151"
       node: 22.12.0
       xcode: latest
       cocoapods: default
