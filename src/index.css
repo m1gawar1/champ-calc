@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, "SF Pro Text", "Noto Sans JP", "Hiragino Kaku Gothic ProN", system-ui, sans-serif;
+  background: #0a0a1a; /* ダークフォールバック（テーマ読み込み前） */
+  -webkit-font-smoothing: antialiased;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  line-break: strict;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* range input のデフォルトスタイルをリセット（SpSlider用） */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+}
+input[type="range"]::-moz-range-thumb {
+  border: none;
+  background: transparent;
+}

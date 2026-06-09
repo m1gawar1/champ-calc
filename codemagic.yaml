@@ -1,0 +1,71 @@
+workflows:
+  # ── iOS (App Store / TestFlight) ──────────────────────────────
+  ios-workflow:
+    name: iOS Build (champcalc)
+    max_build_duration: 60
+    integrations:
+      # Substrack と同じ App Store Connect 連携を流用（同一 Apple アカウント）
+      app_store_connect: SubsTracker
+    environment:
+      vars:
+        # ★ App Store Connect で新規アプリ(com.champcalc.app)を作成後、
+        #    そのアプリの「Apple ID」(数字)に差し替える
+        APP_APPLE_ID: "0000000000"
+      node: 22.12.0
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.champcalc.app
+
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+
+      - name: Build web assets
+        script: npm run build
+
+      - name: Sync Capacitor
+        script: npx cap sync ios
+
+      - name: Set build number
+        script: |
+          cd ios/App
+          LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number "$APP_APPLE_ID" 2>/dev/null || echo "0")
+          agvtool new-version -all $(($LATEST_BUILD + 1))
+
+      - name: Build iOS (App Store)
+        script: |
+          xcode-project use-profiles
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -archivePath ios/App.xcarchive \
+            archive \
+            CODE_SIGN_STYLE=Manual
+          app-store-connect fetch-signing-files \
+            com.champcalc.app \
+            --type IOS_APP_STORE \
+            --create
+          xcode-project use-profiles
+          xcodebuild \
+            -exportArchive \
+            -archivePath ios/App.xcarchive \
+            -exportPath ios/ipa \
+            -exportOptionsPlist /Users/builder/export_options.plist
+
+    artifacts:
+      - ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+      email:
+        recipients:
+          - tim1209136@gmail.com
+        notify:
+          success: true
+          failure: true

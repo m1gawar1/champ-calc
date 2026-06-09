@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<title>ダメ計アプリ — Liquid Glass</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&family=SF+Mono&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0;
+    font-family: -apple-system, "SF Pro Text", "Noto Sans JP", system-ui, sans-serif;
+    background: #f4f4f6; color: #111; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+
+<script type="text/babel">
+const { useState, createContext, useContext } = React;
+
+/* ====================================================================
+   テーマシステム
+   --------------------------------------------------------------------
+   light/dark 両方ともLiquid Glass の要諦は同じ:
+     1) 背景に色のあるグラデやモチーフ
+     2) ガラスは半透明 + blur
+     3) 内側ハイライト + 細いリム
+   light は背景を高彩度パステル+白寄せ、ガラスのtintを白系に、テキストを濃色に。
+   ==================================================================== */
+const ThemeCtx = createContext('dark');
+
+const TH = {
+  dark: {
+    text:        '#fff',
+    textMuted:   'rgba(255,255,255,0.55)',
+    textWeak:    'rgba(255,255,255,0.4)',
+    accentAtk:   'rgba(120,210,255,0.95)',
+    accentDef:   'rgba(255,150,150,0.95)',
+    glassTint:   'rgba(34,30,55,0.4)',
+    glassTint2:  'rgba(28,30,48,0.38)',
+    glassDeep:   'rgba(34,40,68,0.45)',
+    glassNest:   'rgba(255,255,255,0.07)',
+    glassChip:   'rgba(255,255,255,0.1)',
+    glassChip2:  'rgba(255,255,255,0.06)',
+    rim:         'rgba(255,255,255,0.18)',
+    rimAccent:   'rgba(120,220,255,0.55)',
+    rimActive:   'rgba(120,220,255,0.6)',
+    sheenTop:    0.32,
+    sheenBottom: 0.04,
+    track:       'rgba(255,255,255,0.1)',
+    track2:      'rgba(255,255,255,0.08)',
+    tabTint:     'rgba(20,18,30,0.42)',
+    tabRim:      'rgba(255,255,255,0.22)',
+    tabActiveBg: 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 100%)',
+    tabActiveShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.4), inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 12px rgba(0,0,0,0.2)',
+    tabInactive: 'rgba(255,255,255,0.6)',
+    tabIconInactive: 'rgba(255,255,255,0.55)',
+    badgeAtkBg: 'linear-gradient(180deg, rgba(120,220,255,0.95), rgba(70,180,250,0.85))',
+    badgeAtkFg: '#0b1d2a',
+    btnSoft:    'rgba(255,255,255,0.08)',
+    btnSoftRim: 'rgba(255,255,255,0.18)',
+    dashedRim:  'rgba(255,255,255,0.25)',
+    statusDark: true, // status bar/home indicator
+  },
+  light: {
+    text:        '#0d0f1a',
+    textMuted:   'rgba(20,22,40,0.55)',
+    textWeak:    'rgba(20,22,40,0.38)',
+    accentAtk:   '#0a84d8',
+    accentDef:   '#d23a4a',
+    glassTint:   'rgba(255,255,255,0.55)',
+    glassTint2:  'rgba(255,255,255,0.5)',
+    glassDeep:   'rgba(255,255,255,0.62)',
+    glassNest:   'rgba(255,255,255,0.55)',
+    glassChip:   'rgba(255,255,255,0.6)',
+    glassChip2:  'rgba(255,255,255,0.45)',
+    rim:         'rgba(255,255,255,0.95)',
+    rimAccent:   'rgba(60,160,240,0.7)',
+    rimActive:   'rgba(60,160,240,0.85)',
+    sheenTop:    0.7,
+    sheenBottom: 0.05,
+    track:       'rgba(20,22,40,0.08)',
+    track2:      'rgba(20,22,40,0.06)',
+    tabTint:     'rgba(255,255,255,0.55)',
+    tabRim:      'rgba(255,255,255,0.95)',
+    tabActiveBg: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.65) 100%)',
+    tabActiveShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.95), inset 0 1px 0 rgba(255,255,255,1), 0 4px 12px rgba(0,40,90,0.12)',
+    tabInactive: 'rgba(20,22,40,0.6)',
+    tabIconInactive: 'rgba(20,22,40,0.5)',
+    badgeAtkBg: 'linear-gradient(180deg, #5AC8FA, #1a9fef)',
+    badgeAtkFg: '#fff',
+    btnSoft:    'rgba(255,255,255,0.7)',
+    btnSoftRim: 'rgba(255,255,255,0.95)',
+    dashedRim:  'rgba(20,22,40,0.18)',
+    statusDark: false,
+  },
+};
+const useTheme = () => TH[useContext(ThemeCtx)];
+
+/* ─── Liquid Glass primitives ─────────────────────────────── */
+function GlassLayers({ tint, radius = 24, blur = 28, rim, sheenTop, sheenBottom }) {
+  const t = useTheme();
+  return (
+    <>
+      <div style={{ position: 'absolute', inset: 0, borderRadius: radius,
+        backdropFilter: `blur(${blur}px) saturate(190%)`,
+        WebkitBackdropFilter: `blur(${blur}px) saturate(190%)`,
+        background: tint || t.glassTint, zIndex: 0 }} />
+      <div style={{ position: 'absolute', inset: 0, borderRadius: radius,
+        background: `linear-gradient(180deg, rgba(255,255,255,${sheenTop ?? t.sheenTop}) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 70%, rgba(255,255,255,${sheenBottom ?? t.sheenBottom}) 100%)`,
+        zIndex: 1, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', inset: 0, borderRadius: radius,
+        boxShadow: `inset 0 0 0 0.5px ${rim || t.rim}, inset 0 1px 0 rgba(255,255,255,${useContext(ThemeCtx) === 'dark' ? 0.22 : 0.85})`,
+        zIndex: 2, pointerEvents: 'none' }} />
+    </>
+  );
+}
+function Glass({ children, radius = 24, tint, style, blur, rim, padding = 16, sheenTop, sheenBottom }) {
+  return (
+    <div style={{ position: 'relative', borderRadius: radius, overflow: 'hidden', isolation: 'isolate', ...style }}>
+      <GlassLayers tint={tint} radius={radius} blur={blur} rim={rim} sheenTop={sheenTop} sheenBottom={sheenBottom} />
+      <div style={{ position: 'relative', zIndex: 3, padding }}>{children}</div>
+    </div>
+  );
+}
+
+/* ─── Backdrops per (theme, screen) ─────────────────────────── */
+const BACKDROPS = {
+  dark: {
+    calc: (
+      <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(120% 80% at 80% 10%, #4f3a8a 0%, #2a2152 45%, #0e0b24 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(50% 30% at 18% 22%, rgba(90,200,250,0.55) 0%, rgba(90,200,250,0) 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(40% 28% at 78% 70%, rgba(255,110,130,0.5) 0%, rgba(255,110,130,0) 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(30% 22% at 30% 75%, rgba(120,255,180,0.35) 0%, rgba(120,255,180,0) 70%)' }} />
+        {Array.from({ length: 40 }).map((_, i) => {
+          const x = (i * 137) % 100, y = (i * 73) % 100, s = (i % 3) ? 1 : 1.6;
+          return <div key={i} style={{ position: 'absolute', left: `${x}%`, top: `${y}%`, width: s, height: s, borderRadius: 99, background: 'rgba(255,255,255,0.7)' }} />;
+        })}
+      </div>
+    ),
+    party: (
+      <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, #0c2d3a 0%, #0a1d2e 60%, #050a1a 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(60% 40% at 20% 15%, rgba(40,210,200,0.55) 0%, rgba(40,210,200,0) 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(50% 32% at 85% 60%, rgba(170,120,255,0.5) 0%, rgba(170,120,255,0) 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(40% 28% at 50% 90%, rgba(90,200,250,0.42) 0%, rgba(90,200,250,0) 70%)' }} />
+      </div>
+    ),
+    history: (
+      <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, #2c0e3d 0%, #1a0a2c 55%, #07051a 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(55% 36% at 80% 18%, rgba(255,150,90,0.55) 0%, rgba(255,150,90,0) 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(45% 30% at 18% 75%, rgba(120,90,255,0.55) 0%, rgba(120,90,255,0) 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(40% 28% at 60% 50%, rgba(255,90,160,0.4) 0%, rgba(255,90,160,0) 70%)' }} />
+      </div>
+    ),
+  },
+  light: {
+    calc: (
+      <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, #d8ecff 0%, #f5e9ff 50%, #ffeaf2 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(55% 36% at 18% 18%, rgba(120,200,255,0.95) 0%, rgba(120,200,255,0) 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(45% 30% at 82% 28%, rgba(255,180,200,0.85) 0%, rgba(255,180,200,0) 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(40% 28% at 50% 85%, rgba(180,230,210,0.85) 0%, rgba(180,230,210,0) 70%)' }} />
+      </div>
+    ),
+    party: (
+      <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, #e6f5ff 0%, #d6eef5 60%, #fff5e0 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(60% 40% at 25% 18%, rgba(140,220,255,0.95) 0%, rgba(140,220,255,0) 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(48% 32% at 85% 65%, rgba(220,200,255,0.9) 0%, rgba(220,200,255,0) 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(40% 28% at 50% 90%, rgba(255,220,180,0.8) 0%, rgba(255,220,180,0) 70%)' }} />
+      </div>
+    ),
+    history: (
+      <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, #fff0e8 0%, #f6e8ff 55%, #e8edff 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(55% 36% at 80% 18%, rgba(255,200,160,0.9) 0%, rgba(255,200,160,0) 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(45% 30% at 18% 78%, rgba(200,180,255,0.85) 0%, rgba(200,180,255,0) 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(40% 28% at 60% 50%, rgba(255,180,210,0.7) 0%, rgba(255,180,210,0) 70%)' }} />
+      </div>
+    ),
+  },
+};
+
+/* ─── Type pill ─────────────────────────────── */
+const TYPE_COLORS = {
+  でんき: { bg: 'rgba(255,210,0,0.85)', fg: '#3a2a00' },
+  ほのお: { bg: 'rgba(255,120,60,0.85)', fg: '#fff' },
+  みず: { bg: 'rgba(80,160,255,0.85)', fg: '#fff' },
+  くさ: { bg: 'rgba(90,210,130,0.85)', fg: '#0d2a18' },
+  こおり: { bg: 'rgba(140,230,255,0.85)', fg: '#0a2734' },
+  はがね: { bg: 'rgba(180,190,210,0.85)', fg: '#1a2030' },
+  フェアリー: { bg: 'rgba(255,170,210,0.9)', fg: '#3a0a24' },
+  ドラゴン: { bg: 'rgba(120,90,230,0.85)', fg: '#fff' },
+  あく: { bg: 'rgba(70,55,55,0.92)', fg: '#fff' },
+  じめん: { bg: 'rgba(200,160,90,0.9)', fg: '#33240a' },
+  ひこう: { bg: 'rgba(150,170,230,0.9)', fg: '#1a2050' },
+  エスパー: { bg: 'rgba(255,110,170,0.88)', fg: '#fff' },
+  ノーマル: { bg: 'rgba(180,180,170,0.88)', fg: '#1a1a14' },
+  ゴースト: { bg: 'rgba(120,90,160,0.88)', fg: '#fff' },
+  どく: { bg: 'rgba(170,90,180,0.88)', fg: '#fff' },
+  むし: { bg: 'rgba(170,200,80,0.88)', fg: '#1a2008' },
+  いわ: { bg: 'rgba(180,160,110,0.9)', fg: '#1a1208' },
+};
+function TypePill({ t, size = 11 }) {
+  const c = TYPE_COLORS[t] || { bg: 'rgba(120,120,120,0.6)', fg: '#fff' };
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      padding: '3px 9px', borderRadius: 999, fontSize: size, fontWeight: 700,
+      background: c.bg, color: c.fg, letterSpacing: 0.2,
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.15)' }}>{t}</span>
+  );
+}
+
+/* ─── Floating Tab Bar ─────────────────────────────── */
+function TabBar({ active, onChange }) {
+  const t = useTheme();
+  const tabs = [
+    { key: 'calc', label: 'ダメ計', icon: (c) => (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <rect x="3" y="2.5" width="16" height="17" rx="3.4" stroke={c} strokeWidth="1.6"/>
+        <rect x="6" y="5.5" width="10" height="3.4" rx="1.2" fill={c} opacity="0.45"/>
+        <circle cx="7.2" cy="12.2" r="1.1" fill={c}/><circle cx="11" cy="12.2" r="1.1" fill={c}/>
+        <circle cx="14.8" cy="12.2" r="1.1" fill={c}/><circle cx="7.2" cy="15.8" r="1.1" fill={c}/>
+        <circle cx="11" cy="15.8" r="1.1" fill={c}/>
+        <rect x="13.7" y="14.7" width="2.2" height="2.2" rx="0.6" fill={c}/>
+      </svg>
+    ) },
+    { key: 'party', label: 'パーティ', icon: (c) => (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <circle cx="7.5" cy="8" r="3.2" stroke={c} strokeWidth="1.6"/>
+        <circle cx="14.5" cy="8" r="3.2" stroke={c} strokeWidth="1.6"/>
+        <path d="M2 18.5c0-2.6 2.5-4.4 5.5-4.4s5.5 1.8 5.5 4.4" stroke={c} strokeWidth="1.6" strokeLinecap="round"/>
+        <path d="M11.2 14.4c.95-.2 2.05-.3 3.3-.3 3 0 5.5 1.8 5.5 4.4" stroke={c} strokeWidth="1.6" strokeLinecap="round"/>
+      </svg>
+    ) },
+    { key: 'history', label: '履歴', icon: (c) => (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M11 3.5a7.5 7.5 0 1 1-7.4 8.6" stroke={c} strokeWidth="1.6" strokeLinecap="round"/>
+        <path d="M3.5 4.2v3.6h3.6" stroke={c} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M11 7v4.2l2.8 1.7" stroke={c} strokeWidth="1.6" strokeLinecap="round"/>
+      </svg>
+    ) },
+  ];
+  return (
+    <div style={{ position: 'absolute', left: 18, right: 18, bottom: 26, zIndex: 80,
+      borderRadius: 30, overflow: 'hidden' }}>
+      <GlassLayers tint={t.tabTint} radius={30} blur={30} rim={t.tabRim} />
+      <div style={{ position: 'relative', zIndex: 3, display: 'flex', height: 60, padding: 6, gap: 4 }}>
+        {tabs.map(tb => {
+          const isActive = active === tb.key;
+          return (
+            <button key={tb.key} onClick={() => onChange(tb.key)}
+              style={{ flex: isActive ? 1.4 : 1, position: 'relative',
+                background: 'transparent', border: 0, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: 7, color: isActive ? t.text : t.tabInactive,
+                fontFamily: '-apple-system, "Noto Sans JP", system-ui',
+                fontSize: 13, fontWeight: 700, letterSpacing: 0.2,
+                borderRadius: 24, padding: '0 10px',
+                transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)' }}>
+              {isActive && (
+                <span style={{ position: 'absolute', inset: 0, borderRadius: 24,
+                  background: t.tabActiveBg, boxShadow: t.tabActiveShadow, zIndex: -1 }} />
+              )}
+              {tb.icon(isActive ? t.text : t.tabIconInactive)}
+              {isActive && <span>{tb.label}</span>}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ─── ダメ計画面 ─────────────────────────────── */
+function CalcScreen() {
+  const t = useTheme();
+  return (
+    <div style={{ padding: '70px 16px 130px', position: 'relative', zIndex: 5 }}>
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: t.textMuted, letterSpacing: 0.4, marginBottom: 2 }}>POKÉMON CHAMPIONS</div>
+        <div style={{ fontSize: 30, fontWeight: 800, color: t.text, letterSpacing: 0.2, lineHeight: 1.1 }}>ダメ計</div>
+      </div>
+
+      <Glass tint={t.glassTint2} radius={22} padding={12} style={{ marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: t.accentAtk, letterSpacing: 0.6 }}>自分</span>
+          <div style={{ display: 'flex', gap: 6, flex: 1, flexWrap: 'wrap' }}>
+            {['ガブリアス','カイリュー','ボルトロス','ゲンガー','ハッサム','ミミッキュ'].map((p, i) => (
+              <span key={p} style={{ fontSize: 11, fontWeight: 600, padding: '5px 9px', borderRadius: 999,
+                background: i === 0 ? 'rgba(90,200,250,0.85)' : t.glassChip,
+                color: i === 0 ? '#0a1828' : t.text,
+                boxShadow: i === 0 ? 'inset 0 1px 0 rgba(255,255,255,0.5)' : `inset 0 0 0 0.5px ${t.btnSoftRim}` }}>{p}</span>
+            ))}
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: t.accentDef, letterSpacing: 0.6 }}>相手</span>
+          <div style={{ display: 'flex', gap: 6, flex: 1, flexWrap: 'wrap' }}>
+            {['ランドロス','カイオーガ','ザシアン','レジエレキ'].map((p, i) => (
+              <span key={p} style={{ fontSize: 11, fontWeight: 600, padding: '5px 9px', borderRadius: 999,
+                background: i === 0 ? 'rgba(255,110,110,0.85)' : t.glassChip,
+                color: i === 0 ? '#2a0a0a' : t.text,
+                boxShadow: i === 0 ? 'inset 0 1px 0 rgba(255,255,255,0.5)' : `inset 0 0 0 0.5px ${t.btnSoftRim}` }}>{p}</span>
+            ))}
+          </div>
+        </div>
+      </Glass>
+
+      <Glass tint={t.glassTint} radius={26} padding={16} style={{ marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: t.accentAtk, letterSpacing: 1.4 }}>ATTACKER</span>
+            <span style={{ fontSize: 19, fontWeight: 800, color: t.text }}>ガブリアス</span>
+          </div>
+          <span style={{ fontFamily: '"SF Mono", monospace', fontSize: 11, color: t.textMuted }}>A:194  C:104</span>
+        </div>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+          <TypePill t="ドラゴン" /><TypePill t="じめん" />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
+          <Glass tint={t.glassNest} radius={14} padding={10} blur={14}>
+            <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 2, fontWeight: 600 }}>持ち物</div>
+            <div style={{ fontSize: 13, color: t.text, fontWeight: 600 }}>こだわりハチマキ</div>
+          </Glass>
+          <Glass tint={t.glassNest} radius={14} padding={10} blur={14}>
+            <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 2, fontWeight: 600 }}>特性</div>
+            <div style={{ fontSize: 13, color: t.text, fontWeight: 600 }}>サメハダ</div>
+          </Glass>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {[{l:'攻撃 (A)', v:32, max:32},{l:'特攻 (C)', v:0, max:32}].map((s,i) => (
+            <div key={i}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600 }}>{s.l}</span>
+                <span style={{ fontFamily: '"SF Mono", monospace', fontSize: 11, color: t.text, fontWeight: 700 }}>{s.v} / {s.max}</span>
+              </div>
+              <div style={{ height: 4, borderRadius: 99, background: t.track, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${(s.v/s.max)*100}%`, background: 'linear-gradient(90deg, #5AC8FA 0%, #74E0FF 100%)', borderRadius: 99, boxShadow: '0 0 8px rgba(90,200,250,0.5)' }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Glass>
+
+      <Glass tint={t.glassTint} radius={26} padding={16} style={{ marginBottom: 10 }}>
+        <div style={{ fontSize: 10, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4, marginBottom: 10 }}>技</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {[
+            { n: 'じしん', t: 'じめん', cat: '物理', p: 100, on: true },
+            { n: 'ドラゴンクロー', t: 'ドラゴン', cat: '物理', p: 80, on: true },
+            { n: 'アイアンヘッド', t: 'はがね', cat: '物理', p: 80, on: true },
+            { n: 'ストーンエッジ', t: 'いわ', cat: '物理', p: 100, on: false },
+          ].map((m, i) => (
+            <Glass key={i} tint={m.on ? 'rgba(90,200,250,0.18)' : t.glassChip2} radius={14} padding={10} blur={14}
+              rim={m.on ? t.rimAccent : t.btnSoftRim}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: t.text, marginBottom: 4 }}>{m.n}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <TypePill t={m.t} size={9} />
+                <span style={{ fontSize: 9, color: t.textMuted }}>{m.cat}</span>
+                <span style={{ fontFamily: '"SF Mono", monospace', fontSize: 10, color: t.text, marginLeft: 'auto', fontWeight: 700 }}>{m.p}</span>
+              </div>
+            </Glass>
+          ))}
+        </div>
+      </Glass>
+
+      <Glass tint={t.glassTint} radius={26} padding={16} style={{ marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: t.accentDef, letterSpacing: 1.4 }}>DEFENDER</span>
+            <span style={{ fontSize: 19, fontWeight: 800, color: t.text }}>ランドロス</span>
+          </div>
+          <span style={{ fontFamily: '"SF Mono", monospace', fontSize: 11, color: t.textMuted }}>H:181  B:111  D:101</span>
+        </div>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <TypePill t="じめん" /><TypePill t="ひこう" />
+        </div>
+      </Glass>
+
+      <div style={{ fontSize: 10, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4, padding: '0 4px 8px' }}>計算結果</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {[
+          { n: 'じしん', t: 'じめん', eff: '×1', range: '52.4% 〜 61.8%', rolls: '95〜112', ko: '確定2発', koColor: useContext(ThemeCtx) === 'dark' ? '#FFD460' : '#c97a00', remaining: 38 },
+          { n: 'アイアンヘッド', t: 'はがね', eff: '×0.5', range: '21.2% 〜 25.4%', rolls: '38〜46', ko: '確定5発', koColor: t.textMuted, remaining: 75 },
+          { n: 'ドラゴンクロー', t: 'ドラゴン', eff: '×1', range: '38.6% 〜 45.8%', rolls: '70〜83', ko: '確定3発', koColor: t.text, remaining: 54 },
+        ].map((r, i) => (
+          <Glass key={i} tint={t.glassTint} radius={20} padding={14} blur={26}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <TypePill t={r.t} size={10} />
+              <span style={{ fontSize: 14, fontWeight: 700, color: t.text, flex: 1 }}>{r.n}</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: t.accentAtk }}>{r.eff}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span style={{ fontFamily: '"SF Mono", monospace', fontSize: 16, fontWeight: 800, color: t.text }}>{r.range}</span>
+              <span style={{ fontFamily: '"SF Mono", monospace', fontSize: 10, color: t.textMuted }}>{r.rolls}</span>
+            </div>
+            <div style={{ height: 6, borderRadius: 99, background: t.track2, overflow: 'hidden', position: 'relative', marginBottom: 6 }}>
+              <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: `${r.remaining}%`,
+                background: r.remaining <= 20 ? 'linear-gradient(90deg,#FF6E6E,#FF3B30)' : r.remaining <= 49 ? 'linear-gradient(90deg,#FFD460,#FFA630)' : 'linear-gradient(90deg,#5AC8FA,#34C759)',
+                borderRadius: 99, boxShadow: '0 0 8px rgba(90,200,250,0.4)' }} />
+            </div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: r.koColor, letterSpacing: 0.3 }}>{r.ko}</div>
+          </Glass>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── パーティ画面 ─────────────────────────────── */
+function PartyScreen() {
+  const t = useTheme();
+  const myParty = [
+    { n: 'ガブリアス', t1: 'ドラゴン', t2: 'じめん', mega: false, item: 'こだわりハチマキ' },
+    { n: 'カイリュー', t1: 'ドラゴン', t2: 'ひこう', mega: false, item: 'マルチスケイル' },
+    { n: 'ボルトロス', t1: 'でんき', t2: 'ひこう', mega: false, item: 'いのちのたま' },
+    { n: 'ゲンガー', t1: 'ゴースト', t2: 'どく', mega: true, item: 'ゲンガナイト' },
+    { n: 'ハッサム', t1: 'むし', t2: 'はがね', mega: false, item: 'こだわりスカーフ' },
+    { n: 'ミミッキュ', t1: 'ゴースト', t2: 'フェアリー', mega: false, item: 'いのちのたま' },
+  ];
+  return (
+    <div style={{ padding: '70px 16px 130px', position: 'relative', zIndex: 5 }}>
+      <div style={{ marginBottom: 18 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: t.textMuted, letterSpacing: 0.4, marginBottom: 2 }}>MY TEAMS</div>
+        <div style={{ fontSize: 30, fontWeight: 800, color: t.text, letterSpacing: 0.2, lineHeight: 1.1 }}>パーティ</div>
+      </div>
+      <Glass tint={t.tabTint} radius={14} padding={4} style={{ marginBottom: 16 }} blur={20}>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {['マイパーティ','相手パーティ'].map((s, i) => (
+            <div key={s} style={{ flex: 1, padding: '8px 0', textAlign: 'center', borderRadius: 11,
+              background: i === 0 ? t.tabActiveBg : 'transparent',
+              boxShadow: i === 0 ? t.tabActiveShadow : 'none',
+              color: i === 0 ? t.text : t.tabInactive,
+              fontSize: 13, fontWeight: 700 }}>{s}</div>
+          ))}
+        </div>
+      </Glass>
+      <Glass tint={t.glassDeep} radius={26} padding={16} style={{ marginBottom: 14 }} rim={t.rimActive}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: t.text }}>レンタルキマワリ</div>
+            <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>S20 マスボ級・更新 5/4</div>
+          </div>
+          <div style={{ fontSize: 10, fontWeight: 800, padding: '4px 10px', borderRadius: 99,
+            background: t.badgeAtkBg, color: t.badgeAtkFg, letterSpacing: 0.4,
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 8px rgba(90,200,250,0.5)' }}>使用中</div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {myParty.map((m, i) => (
+            <div key={i} style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', padding: 11,
+              background: t.glassChip2,
+              boxShadow: `inset 0 0 0 0.5px ${t.btnSoftRim}, inset 0 1px 0 rgba(255,255,255,0.18)`,
+              backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: t.text }}>{m.n}</span>
+                {m.mega && <span style={{ fontSize: 8, fontWeight: 800, padding: '2px 6px', borderRadius: 99,
+                  background: 'linear-gradient(180deg, rgba(190,130,255,0.95), rgba(140,90,220,0.9))',
+                  color: '#fff', letterSpacing: 0.4,
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.5), 0 1px 4px rgba(150,80,255,0.5)' }}>MEGA</span>}
+              </div>
+              <div style={{ display: 'flex', gap: 4, marginBottom: 7 }}>
+                <TypePill t={m.t1} size={9} />{m.t2 && <TypePill t={m.t2} size={9} />}
+              </div>
+              <div style={{ fontSize: 10, color: t.textMuted, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 6, height: 6, borderRadius: 99, background: 'rgba(255,180,80,0.95)' }} />
+                {m.item}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Glass>
+      {[
+        { n: 'カバドリュ受け', sub: '6/30 起用率42%' },
+        { n: '日食ナス対策軸', sub: '6/30 起用率18%' },
+      ].map((p, i) => (
+        <Glass key={i} tint={t.glassTint2} radius={22} padding={14} style={{ marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: t.text }}>{p.n}</div>
+              <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{p.sub}</div>
+            </div>
+            <div style={{ padding: '6px 12px', borderRadius: 99, background: t.btnSoft,
+              boxShadow: `inset 0 0 0 0.5px ${t.btnSoftRim}`,
+              fontSize: 11, color: t.text, fontWeight: 600 }}>使用する</div>
+          </div>
+        </Glass>
+      ))}
+      <div style={{ marginTop: 6, padding: '14px', borderRadius: 22, textAlign: 'center',
+        border: `1px dashed ${t.dashedRim}`, color: t.textMuted, fontSize: 13, fontWeight: 600 }}>＋ 新しいパーティを作成</div>
+    </div>
+  );
+}
+
+/* ─── 履歴画面 ─────────────────────────────── */
+function HistoryScreen() {
+  const t = useTheme();
+  const isDark = useContext(ThemeCtx) === 'dark';
+  const items = [
+    { atk: 'ガブリアス', def: 'ランドロス', when: 'たった今',
+      moves: [
+        { n: 'じしん', range: '52.4–61.8%', ko: '確定2発', col: isDark ? '#FFD460' : '#c97a00' },
+        { n: 'ドラゴンクロー', range: '38.6–45.8%', ko: '確定3発', col: t.text },
+      ]},
+    { atk: 'カイオーガ', def: 'カイリュー', when: '4分前',
+      moves: [
+        { n: 'しおふき', range: '94.2–112.0%', ko: '乱数1発 81%', col: isDark ? '#FF6E6E' : '#c92a2a' },
+        { n: 'れいとうビーム', range: '76.8–91.4%', ko: '確定2発', col: isDark ? '#FFD460' : '#c97a00' },
+      ]},
+    { atk: 'ザシアン', def: 'ミミッキュ', when: '12分前',
+      moves: [{ n: 'きょじゅうざん', range: '108.6–128.4%', ko: '確定1発', col: '#FF3B30' }]},
+    { atk: 'ボルトロス', def: 'カイオーガ', when: '昨日',
+      moves: [
+        { n: '10まんボルト', range: '88.4–104.2%', ko: '乱数1発 31%', col: isDark ? '#FF9F40' : '#c95a00' },
+        { n: 'くさむすび', range: '104.2–123.6%', ko: '確定1発', col: '#FF3B30' },
+      ]},
+  ];
+  return (
+    <div style={{ padding: '70px 16px 130px', position: 'relative', zIndex: 5 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 18 }}>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: t.textMuted, letterSpacing: 0.4, marginBottom: 2 }}>RECENT CALCULATIONS</div>
+          <div style={{ fontSize: 30, fontWeight: 800, color: t.text, letterSpacing: 0.2, lineHeight: 1.1 }}>計算履歴</div>
+        </div>
+        <div style={{ padding: '6px 12px', borderRadius: 99, background: t.btnSoft,
+          boxShadow: `inset 0 0 0 0.5px ${t.btnSoftRim}`,
+          fontSize: 11, color: t.textMuted, fontWeight: 600 }}>すべて削除</div>
+      </div>
+      <Glass tint={t.tabTint} radius={14} padding={11} blur={20} style={{ marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: t.textMuted, fontSize: 14 }}>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M9.5 9.5L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          ポケモン名・技名で検索
+        </div>
+      </Glass>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {items.map((it, i) => (
+          <Glass key={i} tint={t.glassTint} radius={22} padding={14}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: 14, fontWeight: 800, color: t.accentAtk }}>{it.atk}</span>
+                <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+                  <path d="M1 5h13m0 0L10 1m4 4l-4 4" stroke={t.textWeak} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span style={{ fontSize: 14, fontWeight: 800, color: t.accentDef }}>{it.def}</span>
+              </div>
+              <button style={{ background: t.tabActiveBg, boxShadow: t.tabActiveShadow,
+                border: 0, borderRadius: 99, padding: '5px 10px',
+                color: t.text, fontSize: 10, fontWeight: 700, letterSpacing: 0.3 }}>再ロード</button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              {it.moves.map((m, j) => (
+                <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 12, color: t.text, flex: 1, fontWeight: 600 }}>{m.n}</span>
+                  <span style={{ fontFamily: '"SF Mono", monospace', fontSize: 11, color: t.textMuted }}>{m.range}</span>
+                  <span style={{ fontSize: 10, fontWeight: 800, color: m.col, minWidth: 78, textAlign: 'right', letterSpacing: 0.2 }}>{m.ko}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize: 10, color: t.textWeak, marginTop: 8 }}>{it.when}</div>
+          </Glass>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Phone shell ─────────────────────────────── */
+function Phone({ initialTab = 'calc', theme = 'dark' }) {
+  const [tab, setTab] = useState(initialTab);
+  const Screen = tab === 'calc' ? CalcScreen : tab === 'party' ? PartyScreen : HistoryScreen;
+  return (
+    <ThemeCtx.Provider value={theme}>
+      <IOSDevice width={390} height={844} dark={theme === 'dark'}>
+        <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden' }}>
+          {BACKDROPS[theme][tab]}
+          <div style={{ position: 'absolute', inset: 0, overflow: 'auto' }}>
+            <Screen />
+          </div>
+          <TabBar active={tab} onChange={setTab} />
+        </div>
+      </IOSDevice>
+    </ThemeCtx.Provider>
+  );
+}
+
+function App() {
+  return (
+    <DesignCanvas title="ダメ計アプリ — Liquid Glass" subtitle="Light + Dark / フローティングタブ / 6画面">
+      <DCSection id="dark" title="Dark — 夜景・オーロラ調">
+        <DCArtboard id="dark-calc" label="ダメ計" width={390} height={844}><Phone initialTab="calc" theme="dark" /></DCArtboard>
+        <DCArtboard id="dark-party" label="パーティ" width={390} height={844}><Phone initialTab="party" theme="dark" /></DCArtboard>
+        <DCArtboard id="dark-history" label="履歴" width={390} height={844}><Phone initialTab="history" theme="dark" /></DCArtboard>
+      </DCSection>
+      <DCSection id="light" title="Light — 春霞・パステル調">
+        <DCArtboard id="light-calc" label="ダメ計" width={390} height={844}><Phone initialTab="calc" theme="light" /></DCArtboard>
+        <DCArtboard id="light-party" label="パーティ" width={390} height={844}><Phone initialTab="party" theme="light" /></DCArtboard>
+        <DCArtboard id="light-history" label="履歴" width={390} height={844}><Phone initialTab="history" theme="light" /></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
