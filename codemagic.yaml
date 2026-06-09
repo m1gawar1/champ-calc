@@ -43,22 +43,14 @@ workflows:
           xcode-project use-profiles
 
       - name: Build iOS (App Store)
+        # Codemagic標準。use-profilesが用意した手動署名/export設定を使ってarchive→export一括
         script: |
-          xcodebuild \
-            -project ios/App/App.xcodeproj \
-            -scheme App \
-            -configuration Release \
-            -archivePath ios/App.xcarchive \
-            archive \
-            CODE_SIGN_STYLE=Manual
-          xcodebuild \
-            -exportArchive \
-            -archivePath ios/App.xcarchive \
-            -exportPath ios/ipa \
-            -exportOptionsPlist /Users/builder/export_options.plist
+          xcode-project build-ipa \
+            --project "ios/App/App.xcodeproj" \
+            --scheme "App"
 
     artifacts:
-      - ios/ipa/*.ipa
+      - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
 
     publishing:
