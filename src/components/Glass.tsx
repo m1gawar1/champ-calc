@@ -1,6 +1,8 @@
 import { useRef } from 'react';
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 import { useTheme, useThemeName } from '../theme';
+import { computeStats } from '../engine/stats';
+import type { BaseStats, IvAlloc, SpAlloc, Nature } from '../types';
 
 interface GlassLayersProps {
   tint?: string;
@@ -164,6 +166,46 @@ export function SpSlider({ label, value, onChange }: {
           transition: 'left 0.1s ease',
         }} />
       </div>
+    </div>
+  );
+}
+
+// SP振り後の実数値を6つ並べて表示（Calculator / PartyPage 共用）
+export function StatRow({ bs, ivs, sp, nature }: {
+  bs: BaseStats;
+  ivs: IvAlloc;
+  sp: SpAlloc;
+  nature: Nature;
+}) {
+  const t = useTheme();
+  const s = computeStats(bs, ivs, sp, nature);
+  const cells: { label: string; val: number; key: keyof SpAlloc }[] = [
+    { label: 'H', val: s.hp, key: 'hp' },
+    { label: 'A', val: s.atk, key: 'atk' },
+    { label: 'B', val: s.def, key: 'def' },
+    { label: 'C', val: s.spa, key: 'spa' },
+    { label: 'D', val: s.spd, key: 'spd' },
+    { label: 'S', val: s.spe, key: 'spe' },
+  ];
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 5 }}>
+      {cells.map(c => {
+        const invested = sp[c.key] > 0;
+        return (
+          <div key={c.label} style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
+            padding: '4px 0', borderRadius: 8,
+            background: invested ? 'rgba(90,200,250,0.12)' : t.glassChip,
+            boxShadow: `inset 0 0 0 0.5px ${invested ? t.rimAccent : t.rim}`,
+          }}>
+            <span style={{ fontSize: 9, fontWeight: 700, color: t.textMuted }}>{c.label}</span>
+            <span style={{
+              fontFamily: '"SF Mono", "SFMono-Regular", Consolas, monospace',
+              fontSize: 13, fontWeight: 700, color: invested ? t.accentAtk : t.text,
+            }}>{c.val}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }

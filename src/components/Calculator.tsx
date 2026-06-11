@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { NatureModal } from './NatureModal';
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { SelectModal } from './SelectModal';
-import { Glass, GlassLayers, SpSlider } from './Glass';
+import { Glass, GlassLayers, SpSlider, StatRow } from './Glass';
 import { useTheme, useThemeName, TYPE_COLORS } from '../theme';
 import type { ChampionsData, PokemonBuild, SpAlloc, BattleConditions } from '../types';
 import { DEFAULT_IVS, DEFAULT_SP, DEFAULT_CONDITIONS } from '../types';
@@ -314,6 +314,13 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
             </>
           )}
         </div>
+        {/* SP振り後の実数値 */}
+        {bs && (
+          <div style={{ marginTop: 12 }}>
+            <div style={{ fontSize: 10, color: t.textMuted, fontWeight: 600, marginBottom: 6 }}>実数値（Lv50）</div>
+            <StatRow bs={bs} ivs={build.ivs} sp={build.sp} nature={nature} />
+          </div>
+        )}
       </div>
 
       {showNatureModal && (

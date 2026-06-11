@@ -2,14 +2,14 @@ import { useState, useMemo } from 'react';
 import { Combobox } from './Combobox';
 import { NatureModal } from './NatureModal';
 import { Glass } from './Glass';
-import { SpSlider } from './Glass';
+import { SpSlider, StatRow } from './Glass';
 import { useTheme, TYPE_COLORS } from '../theme';
 import { SelectModal } from './SelectModal';
 import type { ChampionsData, PokemonBuild, SpAlloc } from '../types';
 import { DEFAULT_IVS, DEFAULT_SP } from '../types';
 import type { AppStore, SavedParty } from '../store';
 import { newParty, opponentBuild, addPokemonToHistory, addBattleHistory, addBoxPokemon } from '../store';
-import { getMegaForms, getSelectableRoster, getPokemonLearnset } from '../data';
+import { getMegaForms, getSelectableRoster, getPokemonLearnset, findBaseStats } from '../data';
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { getPokemonJaList, displayPokemonName, moveJa, NATURE_JA, STAT_JA, TYPE_JA } from '../i18n';
 import { getSpriteUrl, getFallbackSpriteUrl } from '../sprites';
@@ -64,6 +64,9 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
     [data.roster, build.isMega, build.megaFormName],
   );
   const activeEntry = megaRosterEntry ?? rosterEntry;
+  const bs = useMemo(() => build.rosterName ? findBaseStats(data.baseStats, build.rosterName, build.isMega, build.megaFormName) : undefined,
+    [data.baseStats, build.rosterName, build.isMega, build.megaFormName]);
+  const nature = data.natures.find(n => n.name === build.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
   const learnset = useMemo(() => build.rosterName ? getPokemonLearnset(data.learnsets, build.rosterName) : null, [data.learnsets, build.rosterName]);
   const moveCandidates = useMemo(() => {
     const all = data.moves.filter(m => m.inChampions !== false);
@@ -276,6 +279,13 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
                 />
               ))}
             </div>
+            {/* SP振り後の実数値 */}
+            {bs && (
+              <div style={{ marginTop: 12 }}>
+                <div style={{ fontSize: 10, color: t.textMuted, fontWeight: 600, marginBottom: 6 }}>実数値（Lv50）</div>
+                <StatRow bs={bs} ivs={build.ivs} sp={build.sp} nature={nature} />
+              </div>
+            )}
           </div>
         </div>
       )}
