@@ -50,13 +50,16 @@ export function computeStats(
   ivs: IvAlloc,
   sp: SpAlloc,
   nature: Nature,
+  multOverride?: Partial<Record<keyof Omit<SpAlloc, 'hp'>, number>>,
 ): ComputedStats {
+  // 倍率: オーバーライドがあれば優先、なければ性格から算出
+  const m = (stat: keyof Omit<SpAlloc, 'hp'>) => multOverride?.[stat] ?? getNatureMult(nature, stat);
   return {
     hp:  calcHp(bs.hp, ivs.hp, sp.hp),
-    atk: calcStat(bs.atk, ivs.atk, sp.atk, getNatureMult(nature, 'atk')),
-    def: calcStat(bs.def, ivs.def, sp.def, getNatureMult(nature, 'def')),
-    spa: calcStat(bs.spa, ivs.spa, sp.spa, getNatureMult(nature, 'spa')),
-    spd: calcStat(bs.spd, ivs.spd, sp.spd, getNatureMult(nature, 'spd')),
-    spe: calcStat(bs.spe, ivs.spe, sp.spe, getNatureMult(nature, 'spe')),
+    atk: calcStat(bs.atk, ivs.atk, sp.atk, m('atk')),
+    def: calcStat(bs.def, ivs.def, sp.def, m('def')),
+    spa: calcStat(bs.spa, ivs.spa, sp.spa, m('spa')),
+    spd: calcStat(bs.spd, ivs.spd, sp.spd, m('spd')),
+    spe: calcStat(bs.spe, ivs.spe, sp.spe, m('spe')),
   };
 }

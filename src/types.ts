@@ -62,6 +62,9 @@ export interface PokemonBuild {
   item: string;       // 英語アイテム名（なし = ''）
   ability: string;    // 英語特性名（なし = ''）
   moves: string[];    // 英語技名（最大4つ）
+  // 計算タブ用: ステータス別の性格補正倍率（0.9/1.0/1.1）を直接指定。
+  // 未指定のステータスは nature から算出（後方互換）。相手の性格不明時の予測計算用。
+  statMult?: Partial<Record<keyof Omit<SpAlloc, 'hp'>, number>>;
 }
 
 // バトル状況（計算オプション）

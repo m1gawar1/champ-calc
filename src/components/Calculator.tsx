@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { NatureModal } from './NatureModal';
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { SelectModal } from './SelectModal';
 import { Glass, GlassLayers, SpSlider } from './Glass';
@@ -8,11 +7,11 @@ import type { ChampionsData, PokemonBuild, SpAlloc, BattleConditions } from '../
 import { DEFAULT_IVS, DEFAULT_SP, DEFAULT_CONDITIONS } from '../types';
 import type { CalcHistoryEntry } from '../store';
 import { findBaseStats, getMegaForms, getSelectableRoster, getSelectableMoves, getPokemonLearnset } from '../data';
-import { computeStats } from '../engine/stats';
+import { computeStats, getNatureMult } from '../engine/stats';
 import { calcDamageRolls, buildResult, calcHazardDamage } from '../engine/damage';
 import { reverseCalcDefense } from '../engine/reverseCalc';
 import { getTypeEffectiveness, effectivenessLabel } from '../engine/typeChart';
-import { getPokemonJaList, getMoveJaList, displayPokemonName, moveJa, TYPE_JA, NATURE_JA, STAT_JA } from '../i18n';
+import { getPokemonJaList, getMoveJaList, displayPokemonName, moveJa, TYPE_JA } from '../i18n';
 import { getSpriteUrl, getFallbackSpriteUrl } from '../sprites';
 import { getAbilityItems, getItemItems, ABILITY_JA } from '../engine/competitive';
 import { MULTI_HIT_MOVES, ESCALATING_POWER_MOVES } from '../engine/moveFlags';
@@ -119,7 +118,6 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
   onHistoryAdd?: (name: string) => void;
 }) {
   const t = useTheme();
-  const [showNatureModal, setShowNatureModal] = useState(false);
   const [showPokemonModal, setShowPokemonModal] = useState(false);
   const [showItemModal, setShowItemModal] = useState(false);
   const roster = useMemo(() => getSelectableRoster(data.roster), [data.roster]);
@@ -133,7 +131,12 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
   const bs = useMemo(() => findBaseStats(data.baseStats, build.rosterName, build.isMega, build.megaFormName),
     [data.baseStats, build.rosterName, build.isMega, build.megaFormName]);
   const nature = data.natures.find(n => n.name === build.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
-  const computed = bs ? computeStats(bs, build.ivs, build.sp, nature) : null;
+  const computed = bs ? computeStats(bs, build.ivs, build.sp, nature, build.statMult) : null;
+  // 現在の補正倍率（statMult 優先、なければ性格から）
+  const multOf = (stat: 'atk' | 'def' | 'spa' | 'spd' | 'spe') => build.statMult?.[stat] ?? getNatureMult(nature, stat);
+  function setMult(stat: 'atk' | 'def' | 'spa' | 'spd' | 'spe', v: number) {
+    onChange({ ...build, statMult: { ...build.statMult, [stat]: v } });
+  }
   const itemItems = useMemo(() => getItemItems(), []);
   const abilityItems = useMemo(() => getAbilityItems(activeEntry?.abilities ?? {}), [activeEntry]);
 
@@ -265,25 +268,39 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
         </Glass>
       </div>
 
-      {/* 性格 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600, width: 28 }}>性格</span>
-        <button
-          onClick={() => setShowNatureModal(true)}
-          style={{
-            flex: 1, background: t.glassNest, border: `1px solid ${t.rim}`,
-            borderRadius: 10, padding: '8px 12px', fontSize: 13, fontWeight: 600,
-            color: t.text, textAlign: 'left', cursor: 'pointer',
-          }}
-        >
-          {NATURE_JA[build.nature] ?? build.nature}
-          {nature.increasedStat && (
-            <span style={{ color: 'rgba(90,200,250,0.9)', fontSize: 11, marginLeft: 6 }}>({STAT_JA[nature.increasedStat]}↑)</span>
-          )}
-          {nature.decreasedStat && (
-            <span style={{ color: 'rgba(255,100,100,0.9)', fontSize: 11, marginLeft: 4 }}>({STAT_JA[nature.decreasedStat]}↓)</span>
-          )}
-        </button>
+      {/* 性格補正（倍率を直接指定。相手の性格不明時の予測用） */}
+      <div style={{ marginBottom: 14 }}>
+        <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600 }}>性格補正</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+          {(showAtkSp ? ['atk', 'spa'] : ['def', 'spd'] as const).map(stat => {
+            const cur = multOf(stat as 'atk' | 'def' | 'spa' | 'spd' | 'spe');
+            const statLabel = { atk: '攻撃(A)', spa: '特攻(C)', def: '防御(B)', spd: '特防(D)' }[stat as 'atk' | 'spa' | 'def' | 'spd'];
+            return (
+              <div key={stat} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600, width: 52 }}>{statLabel}</span>
+                <div style={{ display: 'flex', gap: 5, flex: 1 }}>
+                  {([0.9, 1.0, 1.1] as const).map(v => {
+                    const active = Math.abs(cur - v) < 0.001;
+                    const color = v < 1 ? 'rgba(255,100,100,0.9)' : v > 1 ? 'rgba(90,200,250,0.9)' : t.text;
+                    return (
+                      <button key={v} onClick={() => setMult(stat as 'atk' | 'def' | 'spa' | 'spd' | 'spe', v)}
+                        style={{
+                          flex: 1, padding: '6px 0', borderRadius: 8,
+                          fontFamily: '"SF Mono", "SFMono-Regular", Consolas, monospace', fontSize: 12, fontWeight: 700,
+                          background: active ? (v < 1 ? 'rgba(255,100,100,0.16)' : v > 1 ? 'rgba(90,200,250,0.16)' : t.glassChip) : t.glassChip,
+                          boxShadow: `inset 0 0 0 0.5px ${active ? (v !== 1 ? t.rimAccent : t.rim) : t.rim}`,
+                          color: active ? color : t.textMuted,
+                          border: 'none', cursor: 'pointer',
+                        }}>
+                        {v.toFixed(1)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* SP振り */}
@@ -317,9 +334,6 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
         </div>
       </div>
 
-      {showNatureModal && (
-        <NatureModal value={build.nature} onChange={n => onChange({ ...build, nature: n })} onClose={() => setShowNatureModal(false)} />
-      )}
       {showPokemonModal && (
         <PokemonSelectModal
           data={data} pokemonHistory={pokemonHistory}
@@ -595,8 +609,8 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
     if (!move || !atkBs || !defBs) return null;
     const atkNature = data.natures.find(n => n.name === attacker.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
     const defNature = data.natures.find(n => n.name === defender.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
-    const atkStats = computeStats(atkBs, attacker.ivs, attacker.sp, atkNature);
-    const defStats = computeStats(defBs, defender.ivs, defender.sp, defNature);
+    const atkStats = computeStats(atkBs, attacker.ivs, attacker.sp, atkNature, attacker.statMult);
+    const defStats = computeStats(defBs, defender.ivs, defender.sp, defNature, defender.statMult);
     const atkEntry = attacker.isMega && attacker.megaFormName
       ? data.roster.find(r => r.name === attacker.megaFormName)
       : getSelectableRoster(data.roster).find(r => r.name === attacker.rosterName);
@@ -615,13 +629,13 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
     if (result.ko1Chance > 0) {
       for (let sp = 0; sp <= 32; sp++) {
         const testSp = { ...defender.sp, [defStatKey]: sp };
-        const testStats = computeStats(defBs, defender.ivs, testSp, defNature);
+        const testStats = computeStats(defBs, defender.ivs, testSp, defNature, defender.statMult);
         const testRolls = calcDamageRolls(atkStats, testStats, atkTypes, defTypes, move, cond, attacker.item, defender.item, attacker.ability, defender.ability);
         if (testRolls[0] < testStats.hp) { minDefSp = sp; break; }
       }
       for (let sp = 0; sp <= 32; sp++) {
         const testSp = { ...defender.sp, hp: sp };
-        const testStats = computeStats(defBs, defender.ivs, testSp, defNature);
+        const testStats = computeStats(defBs, defender.ivs, testSp, defNature, defender.statMult);
         const testRolls = calcDamageRolls(atkStats, testStats, atkTypes, defTypes, move, cond, attacker.item, defender.item, attacker.ability, defender.ability);
         if (testRolls[0] < testStats.hp) { minHpSp = sp; break; }
       }
@@ -1045,8 +1059,8 @@ function ResultsSection({ data, attacker, defender, moveSlots, cond, onCalcHisto
       if (!atkBs || !defBs) return null;
       const atkNature = data.natures.find(n => n.name === attacker.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
       const defNature = data.natures.find(n => n.name === defender.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
-      const atkStats = computeStats(atkBs, attacker.ivs, attacker.sp, atkNature);
-      const defStats = computeStats(defBs, defender.ivs, defender.sp, defNature);
+      const atkStats = computeStats(atkBs, attacker.ivs, attacker.sp, atkNature, attacker.statMult);
+      const defStats = computeStats(defBs, defender.ivs, defender.sp, defNature, defender.statMult);
       const atkEntry = attacker.isMega && attacker.megaFormName
         ? data.roster.find(r => r.name === attacker.megaFormName)
         : getSelectableRoster(data.roster).find(r => r.name === attacker.rosterName);

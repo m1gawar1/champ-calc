@@ -66,7 +66,7 @@ export function reverseCalcDefense(
 
   // 攻撃側の実数値（逆算中は固定）
   const atkNature = data.natures.find(n => n.name === attacker.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
-  const atkStats = computeStats(atkBs, attacker.ivs, attacker.sp, atkNature);
+  const atkStats = computeStats(atkBs, attacker.ivs, attacker.sp, atkNature, attacker.statMult);
 
   // 補正区分ごとの代表性格を選ぶ
   // up: その能力を上げる性格 / down: 下げる性格 / neutral: 無補正(Hardy相当)
