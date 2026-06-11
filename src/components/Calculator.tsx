@@ -133,7 +133,6 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
   const bs = useMemo(() => findBaseStats(data.baseStats, build.rosterName, build.isMega, build.megaFormName),
     [data.baseStats, build.rosterName, build.isMega, build.megaFormName]);
   const nature = data.natures.find(n => n.name === build.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
-  const computed = bs ? computeStats(bs, build.ivs, build.sp, nature) : null;
   const itemItems = useMemo(() => getItemItems(), []);
   const abilityItems = useMemo(() => getAbilityItems(activeEntry?.abilities ?? {}), [activeEntry]);
 
@@ -181,9 +180,9 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
               {displayName}
             </span>
           )}
-          {computed && (
+          {bs && (
             <span style={{ fontFamily: '"SF Mono", "SFMono-Regular", Consolas, monospace', fontSize: 11, color: t.textMuted, flexShrink: 0 }}>
-              {showAtkSp ? `A:${computed.atk}  C:${computed.spa}` : `H:${computed.hp}  B:${computed.def}  D:${computed.spd}`}
+              {showAtkSp ? `A:${bs.atk}  C:${bs.spa}` : `H:${bs.hp}  B:${bs.def}  D:${bs.spd}`}
             </span>
           )}
         </div>
