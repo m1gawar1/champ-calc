@@ -301,6 +301,22 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
             </button>
           </div>
         </div>
+        {/* SP振り後の実数値（全6ステータス） */}
+        {computed && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 5, marginBottom: 12 }}>
+            {([['H', computed.hp, build.sp.hp], ['A', computed.atk, build.sp.atk], ['B', computed.def, build.sp.def], ['C', computed.spa, build.sp.spa], ['D', computed.spd, build.sp.spd], ['S', computed.spe, build.sp.spe]] as const).map(([lbl, val, spv]) => (
+              <div key={lbl} style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
+                padding: '4px 0', borderRadius: 8,
+                background: spv > 0 ? 'rgba(90,200,250,0.12)' : t.glassChip,
+                boxShadow: `inset 0 0 0 0.5px ${spv > 0 ? t.rimAccent : t.rim}`,
+              }}>
+                <span style={{ fontSize: 9, fontWeight: 700, color: t.textMuted }}>{lbl}</span>
+                <span style={{ fontFamily: '"SF Mono", "SFMono-Regular", Consolas, monospace', fontSize: 13, fontWeight: 700, color: spv > 0 ? t.accentAtk : t.text }}>{val}</span>
+              </div>
+            ))}
+          </div>
+        )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {showAtkSp ? (
             <>
