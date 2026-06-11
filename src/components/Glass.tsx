@@ -1,4 +1,5 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { useRef } from 'react';
+import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 import { useTheme, useThemeName } from '../theme';
 
 interface GlassLayersProps {
@@ -70,6 +71,28 @@ export function SpSlider({ label, value, onChange }: {
   onChange: (v: number) => void;
 }) {
   const t = useTheme();
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  // 指/カーソルの X 座標から 0〜32 の値を算出（つまみ16pxの両端補正込み）
+  function valueFromClientX(clientX: number): number {
+    const el = trackRef.current;
+    if (!el) return value;
+    const rect = el.getBoundingClientRect();
+    const ratio = (clientX - rect.left - 8) / (rect.width - 16);
+    return Math.max(0, Math.min(32, Math.round(ratio * 32)));
+  }
+
+  function handlePointerDown(e: ReactPointerEvent<HTMLDivElement>) {
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    onChange(valueFromClientX(e.clientX));
+  }
+
+  function handlePointerMove(e: ReactPointerEvent<HTMLDivElement>) {
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+    onChange(valueFromClientX(e.clientX));
+  }
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
@@ -108,8 +131,16 @@ export function SpSlider({ label, value, onChange }: {
           >MAX</button>
         </div>
       </div>
-      {/* プログレスバー + 丸いつまみ（不可視rangeInputをオーバーレイして操作） */}
-      <div style={{ position: 'relative', height: 20, display: 'flex', alignItems: 'center' }}>
+      {/* プログレスバー + 丸いつまみ（Pointer Events で直接操作。touch-action:none でスクロールと競合しない） */}
+      <div
+        ref={trackRef}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        style={{
+          position: 'relative', height: 28, display: 'flex', alignItems: 'center',
+          touchAction: 'none', cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none',
+        }}
+      >
         {/* トラック */}
         <div style={{ position: 'absolute', left: 0, right: 0, height: 4, borderRadius: 99, background: t.track, overflow: 'hidden' }}>
           <div style={{
@@ -132,14 +163,6 @@ export function SpSlider({ label, value, onChange }: {
           pointerEvents: 'none',
           transition: 'left 0.1s ease',
         }} />
-        <input
-          type="range" min={0} max={32} value={value}
-          onChange={e => onChange(Number(e.target.value))}
-          style={{
-            position: 'absolute', inset: 0, width: '100%', height: '100%',
-            opacity: 0, cursor: 'pointer', margin: 0, padding: 0,
-          }}
-        />
       </div>
     </div>
   );
