@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { NatureModal } from './NatureModal';
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { SelectModal } from './SelectModal';
-import { Glass, GlassLayers, SpSlider, StatRow } from './Glass';
+import { Glass, GlassLayers, SpSlider } from './Glass';
 import { useTheme, useThemeName, TYPE_COLORS } from '../theme';
 import type { ChampionsData, PokemonBuild, SpAlloc, BattleConditions } from '../types';
 import { DEFAULT_IVS, DEFAULT_SP, DEFAULT_CONDITIONS } from '../types';
@@ -133,6 +133,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
   const bs = useMemo(() => findBaseStats(data.baseStats, build.rosterName, build.isMega, build.megaFormName),
     [data.baseStats, build.rosterName, build.isMega, build.megaFormName]);
   const nature = data.natures.find(n => n.name === build.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
+  const computed = bs ? computeStats(bs, build.ivs, build.sp, nature) : null;
   const itemItems = useMemo(() => getItemItems(), []);
   const abilityItems = useMemo(() => getAbilityItems(activeEntry?.abilities ?? {}), [activeEntry]);
 
@@ -303,24 +304,17 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {showAtkSp ? (
             <>
-              <SpSlider label="攻撃(A)" value={build.sp.atk} onChange={v => setSp('atk', v)} />
-              <SpSlider label="特攻(C)" value={build.sp.spa} onChange={v => setSp('spa', v)} />
+              <SpSlider label="攻撃(A)" value={build.sp.atk} onChange={v => setSp('atk', v)} actual={computed?.atk} />
+              <SpSlider label="特攻(C)" value={build.sp.spa} onChange={v => setSp('spa', v)} actual={computed?.spa} />
             </>
           ) : (
             <>
-              <SpSlider label="HP(H)" value={build.sp.hp} onChange={v => setSp('hp', v)} />
-              <SpSlider label="防御(B)" value={build.sp.def} onChange={v => setSp('def', v)} />
-              <SpSlider label="特防(D)" value={build.sp.spd} onChange={v => setSp('spd', v)} />
+              <SpSlider label="HP(H)" value={build.sp.hp} onChange={v => setSp('hp', v)} actual={computed?.hp} />
+              <SpSlider label="防御(B)" value={build.sp.def} onChange={v => setSp('def', v)} actual={computed?.def} />
+              <SpSlider label="特防(D)" value={build.sp.spd} onChange={v => setSp('spd', v)} actual={computed?.spd} />
             </>
           )}
         </div>
-        {/* SP振り後の実数値 */}
-        {bs && (
-          <div style={{ marginTop: 12 }}>
-            <div style={{ fontSize: 10, color: t.textMuted, fontWeight: 600, marginBottom: 6 }}>実数値（Lv50）</div>
-            <StatRow bs={bs} ivs={build.ivs} sp={build.sp} nature={nature} />
-          </div>
-        )}
       </div>
 
       {showNatureModal && (

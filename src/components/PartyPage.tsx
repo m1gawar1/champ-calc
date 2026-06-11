@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react';
 import { Combobox } from './Combobox';
 import { NatureModal } from './NatureModal';
 import { Glass } from './Glass';
-import { SpSlider, StatRow } from './Glass';
+import { SpSlider } from './Glass';
+import { computeStats } from '../engine/stats';
 import { useTheme, TYPE_COLORS } from '../theme';
 import { SelectModal } from './SelectModal';
 import type { ChampionsData, PokemonBuild, SpAlloc } from '../types';
@@ -67,6 +68,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
   const bs = useMemo(() => build.rosterName ? findBaseStats(data.baseStats, build.rosterName, build.isMega, build.megaFormName) : undefined,
     [data.baseStats, build.rosterName, build.isMega, build.megaFormName]);
   const nature = data.natures.find(n => n.name === build.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
+  const computed = bs ? computeStats(bs, build.ivs, build.sp, nature) : null;
   const learnset = useMemo(() => build.rosterName ? getPokemonLearnset(data.learnsets, build.rosterName) : null, [data.learnsets, build.rosterName]);
   const moveCandidates = useMemo(() => {
     const all = data.moves.filter(m => m.inChampions !== false);
@@ -276,16 +278,10 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
                   label={{ hp: 'HP(H)', atk: '攻撃(A)', def: '防御(B)', spa: '特攻(C)', spd: '特防(D)', spe: '素早さ(S)' }[k]}
                   value={build.sp[k]}
                   onChange={v => setSp(k, v)}
+                  actual={computed?.[k]}
                 />
               ))}
             </div>
-            {/* SP振り後の実数値 */}
-            {bs && (
-              <div style={{ marginTop: 12 }}>
-                <div style={{ fontSize: 10, color: t.textMuted, fontWeight: 600, marginBottom: 6 }}>実数値（Lv50）</div>
-                <StatRow bs={bs} ivs={build.ivs} sp={build.sp} nature={nature} />
-              </div>
-            )}
           </div>
         </div>
       )}
