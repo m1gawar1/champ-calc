@@ -268,29 +268,30 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
         </Glass>
       </div>
 
-      {/* 性格補正（倍率を直接指定。相手の性格不明時の予測用） */}
+      {/* 性格補正（倍率を直接指定。相手の性格不明時の予測用）。タブバー風セグメントで1行表示 */}
       <div style={{ marginBottom: 14 }}>
         <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600 }}>性格補正</span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
-          {(showAtkSp ? ['atk', 'spa'] : ['def', 'spd'] as const).map(stat => {
-            const cur = multOf(stat as 'atk' | 'def' | 'spa' | 'spd' | 'spe');
-            const statLabel = { atk: '攻撃(A)', spa: '特攻(C)', def: '防御(B)', spd: '特防(D)' }[stat as 'atk' | 'spa' | 'def' | 'spd'];
+        <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+          {(showAtkSp ? (['atk', 'spa'] as const) : (['def', 'spd'] as const)).map(stat => {
+            const cur = multOf(stat);
+            const statLabel = { atk: 'A', spa: 'C', def: 'B', spd: 'D' }[stat];
             return (
-              <div key={stat} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600, width: 52 }}>{statLabel}</span>
-                <div style={{ display: 'flex', gap: 5, flex: 1 }}>
+              <div key={stat} style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: 12, color: t.textMuted, fontWeight: 700, width: 14, textAlign: 'center', flexShrink: 0 }}>{statLabel}</span>
+                {/* ピル型コンテナ（下タブバーと同じノリ） */}
+                <div style={{ display: 'flex', flex: 1, minWidth: 0, background: t.track, borderRadius: 99, padding: 3, gap: 2 }}>
                   {([0.9, 1.0, 1.1] as const).map(v => {
                     const active = Math.abs(cur - v) < 0.001;
-                    const color = v < 1 ? 'rgba(255,100,100,0.9)' : v > 1 ? 'rgba(90,200,250,0.9)' : t.text;
+                    const accent = v < 1 ? 'rgba(255,100,100,0.95)' : v > 1 ? 'rgba(90,200,250,0.95)' : t.text;
                     return (
-                      <button key={v} onClick={() => setMult(stat as 'atk' | 'def' | 'spa' | 'spd' | 'spe', v)}
+                      <button key={v} onClick={() => setMult(stat, v)}
                         style={{
-                          flex: 1, padding: '6px 0', borderRadius: 8,
-                          fontFamily: '"SF Mono", "SFMono-Regular", Consolas, monospace', fontSize: 12, fontWeight: 700,
-                          background: active ? (v < 1 ? 'rgba(255,100,100,0.16)' : v > 1 ? 'rgba(90,200,250,0.16)' : t.glassChip) : t.glassChip,
-                          boxShadow: `inset 0 0 0 0.5px ${active ? (v !== 1 ? t.rimAccent : t.rim) : t.rim}`,
-                          color: active ? color : t.textMuted,
-                          border: 'none', cursor: 'pointer',
+                          flex: 1, minWidth: 0, padding: '5px 0', borderRadius: 99, border: 0, cursor: 'pointer',
+                          fontFamily: '"SF Mono", "SFMono-Regular", Consolas, monospace', fontSize: 11, fontWeight: 700,
+                          background: active ? t.tabActiveBg : 'transparent',
+                          boxShadow: active ? t.tabActiveShadow : 'none',
+                          color: active ? accent : t.textMuted,
+                          transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
                         }}>
                         {v.toFixed(1)}
                       </button>
