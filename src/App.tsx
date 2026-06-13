@@ -11,6 +11,7 @@ import { Calculator } from './components/Calculator';
 import { PartyPage } from './components/PartyPage';
 import { HistoryPage } from './components/HistoryPage';
 import { SettingsPage } from './components/SettingsPage';
+import { SpeedPage } from './components/SpeedPage';
 
 // ─── フローティングタブバー ───
 function TabBar({ active, onChange, store }: {
@@ -41,6 +42,15 @@ function TabBar({ active, onChange, store }: {
           <circle cx="14.5" cy="8" r="3.2" stroke={c} strokeWidth="1.6"/>
           <path d="M2 18.5c0-2.6 2.5-4.4 5.5-4.4s5.5 1.8 5.5 4.4" stroke={c} strokeWidth="1.6" strokeLinecap="round"/>
           <path d="M11.2 14.4c.95-.2 2.05-.3 3.3-.3 3 0 5.5 1.8 5.5 4.4" stroke={c} strokeWidth="1.6" strokeLinecap="round"/>
+        </svg>
+      ),
+    },
+    {
+      key: 'speed', label: '素早さ',
+      icon: (c) => (
+        // 稲妻アイコン（素早さタブ用）
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M13 2.5L5.5 12.5h5.5L8.5 19.5l9-10h-5.5L13 2.5z" stroke={c} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       ),
     },
@@ -230,6 +240,14 @@ export default function App({ themeOverride, forcedTheme }: AppProps = {}) {
           </div>
           {tab === 'party' && (
             <PartyPage data={data} store={store} onUpdate={updateStore} />
+          )}
+          {tab === 'speed' && (
+            <SpeedPage
+              data={data}
+              myPartyMembers={activeParty?.members ?? []}
+              box={store.box}
+              opponentMembers={store.opponentParty}
+            />
           )}
           {tab === 'history' && (
             <HistoryPage

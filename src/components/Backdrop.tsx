@@ -1,6 +1,6 @@
 import type { ThemeName } from '../theme';
 
-export type TabKey = 'calc' | 'party' | 'history' | 'settings';
+export type TabKey = 'calc' | 'party' | 'speed' | 'history' | 'settings';
 
 // タブ×テーマ別の背景アート（Liquid Glass の透過感の土台）
 const BACKDROPS: Record<ThemeName, Record<TabKey, JSX.Element>> = {
@@ -25,6 +25,18 @@ const BACKDROPS: Record<ThemeName, Record<TabKey, JSX.Element>> = {
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(60% 40% at 20% 15%, rgba(40,210,200,0.55) 0%, transparent 70%)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(50% 32% at 85% 60%, rgba(170,120,255,0.5) 0%, transparent 70%)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(40% 28% at 50% 90%, rgba(90,200,250,0.42) 0%, transparent 70%)' }} />
+      </div>
+    ),
+    speed: (
+      <div style={{ position: 'absolute', inset: 0 }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #042a2a 0%, #0a1e28 50%, #03150f 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(60% 38% at 15% 20%, rgba(0,220,200,0.52) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(48% 32% at 88% 55%, rgba(100,255,160,0.45) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(36% 26% at 50% 88%, rgba(0,200,255,0.38) 0%, transparent 70%)' }} />
+        {/* スピード感を演出するラインエフェクト */}
+        {[20, 40, 60, 80].map(y => (
+          <div key={y} style={{ position: 'absolute', left: '5%', right: '5%', top: `${y}%`, height: 1, background: `rgba(0,255,200,0.08)` }} />
+        ))}
       </div>
     ),
     history: (
@@ -58,6 +70,14 @@ const BACKDROPS: Record<ThemeName, Record<TabKey, JSX.Element>> = {
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(60% 40% at 25% 18%, rgba(140,220,255,0.95) 0%, transparent 70%)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(48% 32% at 85% 65%, rgba(220,200,255,0.9) 0%, transparent 70%)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(40% 28% at 50% 90%, rgba(255,220,180,0.8) 0%, transparent 70%)' }} />
+      </div>
+    ),
+    speed: (
+      <div style={{ position: 'absolute', inset: 0 }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #d6f5f0 0%, #e8fff5 50%, #d0f0e0 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(60% 38% at 15% 20%, rgba(80,220,200,0.75) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(48% 32% at 88% 55%, rgba(100,230,160,0.7) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(36% 26% at 50% 88%, rgba(60,200,240,0.6) 0%, transparent 70%)' }} />
       </div>
     ),
     history: (
