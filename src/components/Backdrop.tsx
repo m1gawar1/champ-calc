@@ -14,7 +14,7 @@ export function Backdrop({ theme }: { tab: TabKey; theme: ThemeName }) {
   return (
     <div style={{
       position: 'absolute', inset: 0, overflow: 'hidden',
-      background: base,
+      backgroundColor: base,
       backgroundImage: `linear-gradient(${line} 1px, transparent 1px), linear-gradient(90deg, ${line} 1px, transparent 1px)`,
       backgroundSize: '26px 26px',
     } as CSSProperties} />
