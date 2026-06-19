@@ -6,7 +6,7 @@ export type TabKey = 'calc' | 'party' | 'speed' | 'history' | 'settings';
 // 分析ツール調の背景: 単色 + 薄いグリッド線（26px セル）。タブ共通。
 const BG: Record<ThemeName, { base: string; line: string }> = {
   dark:  { base: '#14171b', line: '#2f363e' },
-  light: { base: '#e9ecef', line: '#cfd6dc' },
+  light: { base: '#edf0f2', line: '#bcc6cf' },
 };
 
 export function Backdrop({ theme }: { tab: TabKey; theme: ThemeName }) {
