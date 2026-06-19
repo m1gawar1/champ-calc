@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>デザイン案プレビュー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;500;700;900&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Noto Sans JP", system-ui, sans-serif;
+    background: #2a2c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 12px 60px;
+    color: #fff;
+  }
+
+  /* ── 上部の案切替バー ── */
+  .switcher {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .switcher button {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .switcher button.active {
+    background: #fff;
+    color: #111;
+    border-color: #fff;
+  }
+  .hint { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 22px; }
+
+  /* ── スマホ枠 ── */
+  .phone {
+    width: 393px;
+    height: 800px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 12px #050505, 0 30px 80px rgba(0,0,0,0.6);
+    flex-shrink: 0;
+  }
+  .screen {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    padding: 56px 16px 100px;
+  }
+
+  /* ============================================================
+     共通レイアウト（中身の骨格は同じ。見た目だけ案ごとに変える）
+     ============================================================ */
+  .title { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+  .matchup { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .mon { flex: 1; padding: 14px; text-align: center; }
+  .mon-name { font-size: 16px; font-weight: 700; }
+  .mon-types { display: flex; gap: 4px; justify-content: center; margin-top: 6px; }
+  .type { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+  .arrow { font-size: 20px; opacity: 0.6; }
+  .move { padding: 12px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+  .move-name { font-size: 15px; font-weight: 700; }
+  .move-meta { font-size: 11px; opacity: 0.6; }
+  .result { padding: 16px; margin-bottom: 14px; }
+  .result-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .result-num { font-size: 24px; font-weight: 900; font-family: "SF Mono", Consolas, monospace; }
+  .result-pct { font-size: 18px; font-weight: 700; }
+  .result-verdict { font-size: 12px; }
+  .bar { height: 12px; border-radius: 99px; overflow: hidden; }
+  .bar-fill { height: 100%; }
+  .sliders { padding: 14px; }
+  .slider-row { margin-bottom: 16px; }
+  .slider-row:last-child { margin-bottom: 0; }
+  .slider-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 7px; }
+  .slider-val { font-family: "SF Mono", Consolas, monospace; font-weight: 700; }
+  .track { height: 5px; border-radius: 99px; position: relative; }
+  .track-fill { height: 100%; border-radius: 99px; }
+  .knob { width: 16px; height: 16px; border-radius: 99px; background: #fff; position: absolute; top: 50%; transform: translateY(-50%); box-shadow: 0 1px 4px rgba(0,0,0,0.35); }
+
+  /* タブバー */
+  .tabbar { position: absolute; left: 16px; right: 16px; bottom: 22px; height: 58px; border-radius: 28px; display: flex; align-items: center; padding: 6px; gap: 4px; z-index: 5; }
+  .tab { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; height: 100%; border-radius: 22px; font-size: 12px; font-weight: 700; }
+  .tab.active { flex: 1.5; }
+  .tab .dot { width: 18px; height: 18px; }
+
+  .card { margin-bottom: 14px; }
+
+  /* ============================================================
+     案A: クール / ミニマル
+     ============================================================ */
+  [data-theme="cool"] { background: #0a0a0b; }
+  [data-theme="cool"] .screen { color: #f2f2f4; }
+  [data-theme="cool"] .title { letter-spacing: 0.02em; }
+  [data-theme="cool"] .mon, [data-theme="cool"] .move, [data-theme="cool"] .result, [data-theme="cool"] .sliders {
+    background: #161618; border: 1px solid #262629; border-radius: 16px;
+  }
+  [data-theme="cool"] .type { background: #262629; color: #a8a8b0; }
+  [data-theme="cool"] .result-pct, [data-theme="cool"] .slider-val { color: #3b82f6; }
+  [data-theme="cool"] .result-verdict { color: #888; }
+  [data-theme="cool"] .bar, [data-theme="cool"] .track { background: #262629; }
+  [data-theme="cool"] .bar-fill, [data-theme="cool"] .track-fill { background: #3b82f6; }
+  [data-theme="cool"] .tabbar { background: #161618; border: 1px solid #262629; }
+  [data-theme="cool"] .tab { color: #6b6b72; }
+  [data-theme="cool"] .tab.active { background: #262629; color: #f2f2f4; }
+  [data-theme="cool"] .arrow { color: #555; }
+
+  /* ============================================================
+     案B: ポップ / カラフル
+     ============================================================ */
+  [data-theme="pop"] { background: linear-gradient(160deg, #ffe4f0 0%, #e0f0ff 50%, #e8fff0 100%); }
+  [data-theme="pop"] .screen { color: #3a2a4a; font-family: "M PLUS Rounded 1c", sans-serif; }
+  [data-theme="pop"] .title { font-weight: 800; color: #ff5fa2; }
+  [data-theme="pop"] .mon, [data-theme="pop"] .move, [data-theme="pop"] .result, [data-theme="pop"] .sliders {
+    background: rgba(255,255,255,0.85); border-radius: 22px; box-shadow: 0 6px 18px rgba(255,150,200,0.25); border: 2px solid #fff;
+  }
+  [data-theme="pop"] .type { color: #fff; }
+  [data-theme="pop"] .type.dragon { background: #7c5cff; }
+  [data-theme="pop"] .type.ground { background: #e0a23c; }
+  [data-theme="pop"] .type.steel { background: #8aa2b8; }
+  [data-theme="pop"] .result-num { color: #3a2a4a; }
+  [data-theme="pop"] .result-pct { color: #ff5fa2; }
+  [data-theme="pop"] .result-verdict { color: #ff8c42; font-weight: 700; }
+  [data-theme="pop"] .bar, [data-theme="pop"] .track { background: #ffe0ee; }
+  [data-theme="pop"] .bar-fill, [data-theme="pop"] .track-fill { background: linear-gradient(90deg, #ff5fa2, #ffaa5f); }
+  [data-theme="pop"] .knob { box-shadow: 0 1px 4px rgba(255,95,162,0.5), inset 0 0 0 2px #ff5fa2; }
+  [data-theme="pop"] .tabbar { background: rgba(255,255,255,0.9); box-shadow: 0 8px 24px rgba(255,150,200,0.3); }
+  [data-theme="pop"] .tab { color: #c0a8c8; }
+  [data-theme="pop"] .tab.active { background: linear-gradient(135deg, #ff5fa2, #ffaa5f); color: #fff; }
+  [data-theme="pop"] .arrow { color: #ff8c42; }
+
+  /* ============================================================
+     案C: レトロ / ドット絵
+     ============================================================ */
+  [data-theme="retro"] { background: #101840; }
+  [data-theme="retro"] .screen { color: #f0f0e0; font-family: "DotGothic16", monospace; }
+  [data-theme="retro"] .title { color: #ffe14d; text-shadow: 2px 2px 0 #c43a3a; }
+  [data-theme="retro"] .mon, [data-theme="retro"] .move, [data-theme="retro"] .result, [data-theme="retro"] .sliders {
+    background: #1c2a5c; border: 3px solid #f0f0e0; border-radius: 0; box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+  }
+  [data-theme="retro"] .type { border-radius: 0; border: 2px solid #f0f0e0; }
+  [data-theme="retro"] .type.dragon { background: #7c5cff; color: #fff; }
+  [data-theme="retro"] .type.ground { background: #e0a23c; color: #201000; }
+  [data-theme="retro"] .type.steel { background: #8aa2b8; color: #201000; }
+  [data-theme="retro"] .result-pct { color: #ffe14d; }
+  [data-theme="retro"] .result-verdict { color: #5fe06a; }
+  [data-theme="retro"] .bar, [data-theme="retro"] .track { background: #0a1230; border: 2px solid #f0f0e0; border-radius: 0; height: 16px; }
+  [data-theme="retro"] .bar-fill { background: repeating-linear-gradient(90deg, #ffe14d 0 10px, #ffc83a 10px 12px); }
+  [data-theme="retro"] .track-fill { background: #5fe06a; }
+  [data-theme="retro"] .knob { border-radius: 0; background: #ffe14d; border: 2px solid #f0f0e0; }
+  [data-theme="retro"] .tabbar { background: #1c2a5c; border: 3px solid #f0f0e0; border-radius: 0; box-shadow: 4px 4px 0 rgba(0,0,0,0.4); }
+  [data-theme="retro"] .tab { color: #8a96c8; border-radius: 0; }
+  [data-theme="retro"] .tab.active { background: #ffe14d; color: #201000; }
+  [data-theme="retro"] .arrow { color: #ffe14d; }
+</style>
+</head>
+<body>
+  <div class="switcher">
+    <button data-set="cool" class="active">クール / ミニマル</button>
+    <button data-set="pop">ポップ / カラフル</button>
+    <button data-set="retro">レトロ / ドット絵</button>
+  </div>
+  <div class="hint">↑ ボタンで切り替え（同じダメ計画面を3スタイルで再現）</div>
+
+  <div class="phone" id="phone" data-theme="cool">
+    <div class="screen">
+      <div class="title">ダメージ計算</div>
+
+      <!-- 対面 -->
+      <div class="matchup">
+        <div class="mon card">
+          <div class="mon-name">ガブリアス</div>
+          <div class="mon-types">
+            <span class="type dragon">ドラゴン</span>
+            <span class="type ground">じめん</span>
+          </div>
+        </div>
+        <div class="arrow">▶</div>
+        <div class="mon card">
+          <div class="mon-name">サーフゴー</div>
+          <div class="mon-types">
+            <span class="type steel">はがね</span>
+            <span class="type ground" style="visibility:hidden">x</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 技 -->
+      <div class="move card">
+        <span class="move-name">じしん</span>
+        <span class="move-meta">じめん ・ 威力100 ・ 物理</span>
+      </div>
+
+      <!-- 結果 -->
+      <div class="result card">
+        <div class="result-top">
+          <span class="result-num">185 – 218</span>
+          <span class="result-pct">92.0%</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="width:92%"></div></div>
+        <div class="result-verdict" style="margin-top:8px">確定2発（乱数で1発: 18.7%）</div>
+      </div>
+
+      <!-- SPスライダー -->
+      <div class="sliders card">
+        <div class="slider-row">
+          <div class="slider-label"><span>こうげき <span class="slider-val">182</span></span><span class="slider-val">32 / 32</span></div>
+          <div class="track"><div class="track-fill" style="width:100%"></div><div class="knob" style="left:calc(100% - 16px)"></div></div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>すばやさ <span class="slider-val">169</span></span><span class="slider-val">20 / 32</span></div>
+          <div class="track"><div class="track-fill" style="width:62%"></div><div class="knob" style="left:calc(62% - 8px)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- タブバー -->
+    <div class="tabbar">
+      <div class="tab active"><span class="dot">▦</span>ダメ計</div>
+      <div class="tab"><span class="dot">◍</span></div>
+      <div class="tab"><span class="dot">⚡</span></div>
+      <div class="tab"><span class="dot">↻</span></div>
+      <div class="tab"><span class="dot">⚙</span></div>
+    </div>
+  </div>
+
+  <script>
+    const phone = document.getElementById('phone');
+    document.querySelectorAll('.switcher button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.switcher button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        phone.setAttribute('data-theme', btn.dataset.set);
+      });
+    });
+  </script>
+</body>
+</html>
