@@ -1,7 +1,12 @@
 import type { RosterEntry, BaseStats, Move, Nature, ChampionsData, LearnsetEntry } from './types';
+import seasonMb from './data/season-mb.json';
 
 const BASE_URL =
   'https://raw.githubusercontent.com/otterlyclueless/pokemon-champions-data/main';
+
+// season-mb.json を typed として扱う（JSON import は unknown になるため）
+const MB_ROSTER = (seasonMb as { roster: RosterEntry[]; baseStats: BaseStats[] }).roster;
+const MB_BASE_STATS = (seasonMb as { roster: RosterEntry[]; baseStats: BaseStats[] }).baseStats;
 
 let cache: ChampionsData | null = null;
 
@@ -20,6 +25,16 @@ export async function loadData(): Promise<ChampionsData> {
     fetchJson<Nature[]>('natures/natures.json'),
     fetchJson<Record<string, LearnsetEntry>>('learnsets/learnsets.json'),
   ]);
+  // ローカル補完: season-mb.json のエントリのうち、上流に同名が無いものを追記
+  const rosterNames = new Set(roster.map(r => r.name));
+  for (const entry of MB_ROSTER) {
+    if (!rosterNames.has(entry.name)) roster.push(entry);
+  }
+  const baseStatsNames = new Set(baseStats.map(b => b.name));
+  for (const entry of MB_BASE_STATS) {
+    if (!baseStatsNames.has(entry.name)) baseStats.push(entry);
+  }
+
   cache = { roster, baseStats, moves, natures, learnsets };
   return cache;
 }

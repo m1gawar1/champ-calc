@@ -20,6 +20,8 @@ export const COMPETITIVE_ITEMS: CompetitiveItem[] = [
   { en: 'TypeBoost',   ja: 'タイプ強化アイテム', note: 'タイプ一致技×1.2' },
   // 半減きのみ18種を集約（防御側・受けた該当タイプ×0.5。ノーマル以外は効果抜群時）
   { en: 'ResistBerry', ja: '半減きのみ',         note: '該当タイプ×0.5' },
+  // Regulation M-B（2026-06）で追加。全技ダメージ×1.3（エンジンは damage.ts で対応済み）
+  { en: 'Life Orb',    ja: 'いのちのたま',       note: '全技×1.3' },
 ];
 
 // タイプ強化アイテム（英語名 → タイプ）
