@@ -4,7 +4,6 @@ import type { AppStore, CalcHistoryEntry } from './store';
 import { loadData } from './data';
 import { loadStore, saveStore, addPokemonToHistory, addCalcHistory } from './store';
 import { ThemeCtx, resolveTheme, loadCustomTheme, type ThemeName, type ThemeOverrides } from './theme';
-import { GlassLayers } from './components/Glass';
 import { useTheme } from './theme';
 import { Backdrop, type TabKey } from './components/Backdrop';
 import { Calculator } from './components/Calculator';
@@ -76,43 +75,39 @@ function TabBar({ active, onChange, store }: {
   ];
 
   return (
-    <div style={{ position: 'absolute', left: 18, right: 18, bottom: 'calc(26px + env(safe-area-inset-bottom, 0px))', zIndex: 80, borderRadius: 30, overflow: 'hidden' }}>
-      <GlassLayers tint={t.tabTint} radius={30} blur={30} rim={t.tabRim} />
-      <div style={{ position: 'relative', zIndex: 3, display: 'flex', height: 60, padding: 6, gap: 4 }}>
+    // 分析ツール調: フラットな固定フッター（上罫線・単色背景・浮遊なし）
+    <div style={{
+      position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 80,
+      background: t.tabTint, borderTop: `1px solid ${t.tabRim}`,
+      paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 24px 14px' }}>
         {tabs.map(tb => {
           const isActive = active === tb.key;
-          const iconColor = isActive ? t.text : t.tabIconInactive;
+          const iconColor = isActive ? t.accentAtk : t.tabIconInactive;
           return (
             <button
               key={tb.key}
               onClick={() => onChange(tb.key)}
               style={{
-                flex: isActive ? 1.4 : 1,
                 position: 'relative',
                 background: 'transparent', border: 0, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                gap: 7, color: isActive ? t.text : t.tabInactive,
-                fontFamily: '-apple-system, "Noto Sans JP", system-ui, sans-serif',
-                fontSize: 13, fontWeight: 700, letterSpacing: 0.2,
-                borderRadius: 24, padding: '0 10px',
-                transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                gap: 4, color: isActive ? t.accentAtk : t.tabInactive,
+                fontFamily: '"Hanken Grotesk", -apple-system, "Noto Sans JP", system-ui, sans-serif',
+                fontSize: 9, fontWeight: 800, letterSpacing: 0.2,
+                minWidth: 44, minHeight: 44, padding: '2px 4px',
+                transition: 'color 0.2s',
               }}
             >
-              {isActive && (
-                <span style={{
-                  position: 'absolute', inset: 0, borderRadius: 24,
-                  background: t.tabActiveBg, boxShadow: t.tabActiveShadow,
-                  zIndex: -1,
-                }} />
-              )}
               {tb.icon(iconColor)}
               {isActive && <span style={{ whiteSpace: 'nowrap' }}>{tb.label}</span>}
               {/* 履歴件数インジケーター（非アクティブ時） */}
               {tb.key === 'history' && (store.calcHistory.length + store.battleHistory.length) > 0 && !isActive && (
                 <span style={{
-                  position: 'absolute', top: 7, right: 7,
+                  position: 'absolute', top: 2, right: 6,
                   width: 6, height: 6, borderRadius: 99,
-                  background: 'rgba(90,200,250,0.9)',
+                  background: t.accentAtk,
                 }} />
               )}
             </button>

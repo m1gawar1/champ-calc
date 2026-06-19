@@ -164,7 +164,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
   }
 
   return (
-    <Glass tint={t.glassTint} radius={26} padding={16} style={{ marginBottom: 10 }}>
+    <Glass tint={t.glassTint} radius={8} padding={16} style={{ marginBottom: 10 }}>
       {/* ヘッダー */}
       <div style={{ marginBottom: 10 }}>
         <span style={{ fontSize: 10, fontWeight: 800, color: accentColor, letterSpacing: 1.4 }}>{headerLabel}</span>
@@ -185,7 +185,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
             </span>
           )}
           {bs && (
-            <span style={{ fontFamily: '"SF Mono", "SFMono-Regular", Consolas, monospace', fontSize: 11, color: t.textMuted, flexShrink: 0 }}>
+            <span style={{ fontFamily: '"DM Mono", "SF Mono", "SFMono-Regular", Consolas, monospace', fontSize: 11, color: t.textMuted, flexShrink: 0 }}>
               {showAtkSp ? `A:${bs.atk}  C:${bs.spa}` : `H:${bs.hp}  B:${bs.def}  D:${bs.spd}`}
             </span>
           )}
@@ -237,7 +237,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
 
       {/* 持ち物 + 特性 */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
-        <Glass tint={t.glassNest} radius={14} padding={10} blur={14}>
+        <Glass tint={t.glassNest} radius={6} padding={10} blur={14}>
           <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 5, fontWeight: 600 }}>持ち物</div>
           <button
             onClick={() => setShowItemModal(true)}
@@ -252,7 +252,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
             {itemItems.find(i => i.value === build.item)?.label ?? 'なし'}
           </button>
         </Glass>
-        <Glass tint={t.glassNest} radius={14} padding={10} blur={14}>
+        <Glass tint={t.glassNest} radius={6} padding={10} blur={14}>
           <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 5, fontWeight: 600 }}>特性</div>
           <select
             value={build.ability}
@@ -287,7 +287,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
                       <button key={v} onClick={() => setMult(stat, v)}
                         style={{
                           flex: 1, minWidth: 0, padding: '5px 0', borderRadius: 99, border: 0, cursor: 'pointer',
-                          fontFamily: '"SF Mono", "SFMono-Regular", Consolas, monospace', fontSize: 11, fontWeight: 700,
+                          fontFamily: '"DM Mono", "SF Mono", "SFMono-Regular", Consolas, monospace', fontSize: 11, fontWeight: 700,
                           background: active ? t.tabActiveBg : 'transparent',
                           boxShadow: active ? t.tabActiveShadow : 'none',
                           color: active ? accent : t.textMuted,
@@ -407,7 +407,7 @@ function ConditionsPanel({ cond, onChange }: { cond: BattleConditions; onChange:
   }
 
   return (
-    <Glass tint={t.glassTint2} radius={22} padding={0} style={{ overflow: 'hidden', marginBottom: 10 }}>
+    <Glass tint={t.glassTint2} radius={8} padding={0} style={{ overflow: 'hidden', marginBottom: 10 }}>
       <button onClick={() => setOpen(o => !o)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -522,7 +522,7 @@ function MoveSlots({ slots, onChange, data, rosterName, learnsetFilter, onToggle
   const [openSlot, setOpenSlot] = useState<number | null>(null);
 
   return (
-    <Glass tint={t.glassTint} radius={26} padding={16} style={{ marginBottom: 10 }}>
+    <Glass tint={t.glassTint} radius={8} padding={16} style={{ marginBottom: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <span style={{ fontSize: 11, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4 }}>技</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -546,7 +546,7 @@ function MoveSlots({ slots, onChange, data, rosterName, learnsetFilter, onToggle
             <Glass
               key={i}
               tint={isActive ? 'rgba(90,200,250,0.12)' : t.glassChip2}
-              radius={14}
+              radius={6}
               padding={10}
               blur={14}
               rim={isActive ? t.rimAccent : t.btnSoftRim}
@@ -718,7 +718,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
     : 'linear-gradient(90deg,#5AC8FA,#34C759)';
 
   return (
-    <Glass tint={t.glassTint} radius={20} padding={14}>
+    <Glass tint={t.glassTint} radius={8} padding={14}>
       {/* ヘッダー行 */}
       <button
         style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 8 }}
@@ -739,7 +739,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
               {isVariable ? `${displayHits}ヒット（期待値）` : `${displayHits}ヒット累積`}
             </div>
           )}
-          <div style={{ fontFamily: '"SF Mono", monospace', fontSize: 15, fontWeight: 800, color: t.text }}>
+          <div style={{ fontFamily: '"DM Mono", "SF Mono", monospace', fontSize: 15, fontWeight: 800, color: t.text }}>
             {mhMinPct}%〜{mhMaxPct}%
           </div>
           <div style={{ fontSize: 10, fontWeight: 700, color: kCol }}>{koText}</div>
@@ -811,7 +811,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
                   <span style={{ fontSize: 11, color: isExpected ? t.text : t.textMuted, fontWeight: isExpected ? 700 : 500, width: 52 }}>
                     {n}ヒット{isExpected ? '★' : ''}
                   </span>
-                  <span style={{ fontFamily: '"SF Mono", monospace', fontSize: 11, color: t.text, flex: 1 }}>
+                  <span style={{ fontFamily: '"DM Mono", "SF Mono", monospace', fontSize: 11, color: t.text, flex: 1 }}>
                     {minPct.toFixed(1)}%〜{maxPct.toFixed(1)}%
                   </span>
                   <span style={{ fontSize: 11, fontWeight: 700, color: nKoColor, minWidth: 80, textAlign: 'right' }}>
@@ -862,7 +862,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
                           <span style={{ fontSize: 10, color: isExpected ? t.text : t.textMuted, fontWeight: isExpected ? 700 : 500 }}>
                             {n}ヒット{isExpected ? '（期待値）' : ''}
                           </span>
-                          <span style={{ fontFamily: '"SF Mono", monospace', fontSize: 10, color: t.text }}>
+                          <span style={{ fontFamily: '"DM Mono", "SF Mono", monospace', fontSize: 10, color: t.text }}>
                             残 {nRemMin.toFixed(1)}〜{nRemMax.toFixed(1)}%
                           </span>
                         </div>
@@ -885,7 +885,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
 
           {/* 消耗ダメージ */}
           {hasHazard && (
-            <Glass tint={t.glassNest} radius={12} padding={10} blur={12}>
+            <Glass tint={t.glassNest} radius={6} padding={10} blur={12}>
               <div style={{ fontSize: 11, color: t.textMuted, fontWeight: 700, marginBottom: 4 }}>消耗ダメージ</div>
               {hazard.stealthRock > 0 && <div style={{ fontSize: 11, color: 'rgba(255,120,100,0.9)' }}>ステルスロック: {hazard.stealthRock} ({(hazard.stealthRock / result.defenderHp * 100).toFixed(1)}%)</div>}
               {hazard.spikes > 0 && <div style={{ fontSize: 11, color: 'rgba(255,160,80,0.9)' }}>まきびし: {hazard.spikes} ({(hazard.spikes / result.defenderHp * 100).toFixed(1)}%)</div>}
@@ -901,7 +901,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
 
           {/* 確定1発を防ぐ最小SP */}
           {(minDefSp !== null || minHpSp !== null) && (
-            <Glass tint={t.glassNest} radius={12} padding={10} blur={12}>
+            <Glass tint={t.glassNest} radius={6} padding={10} blur={12}>
               <div style={{ fontSize: 11, color: t.textMuted, fontWeight: 700, marginBottom: 4 }}>確定1発を防ぐ最小SP</div>
               {minDefSp !== null && (
                 <div style={{ fontSize: 11, color: 'rgba(90,200,250,0.9)' }}>{defStatKey === 'def' ? '防御(B)' : '特防(D)'}: SP {minDefSp} 以上</div>
@@ -926,7 +926,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
           </div>
 
           {/* ダメージから逆算 */}
-          <Glass tint={t.glassNest} radius={12} padding={10} blur={12}>
+          <Glass tint={t.glassNest} radius={6} padding={10} blur={12}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
               <div style={{ fontSize: 11, color: t.textMuted, fontWeight: 700 }}>▼ ダメージから相手の型を逆算</div>
               <div style={{ display: 'flex', gap: 4 }}>
@@ -1167,7 +1167,7 @@ export function Calculator({ data, myPartyMembers = [], opponentMembers = [], po
 
       {/* パーティクイック選択 */}
       {(myPartyMembers.some(Boolean) || opponentMembers.some(m => m?.rosterName)) && (
-        <Glass tint={t.glassTint2} radius={22} padding={12} style={{ marginBottom: 12 }}>
+        <Glass tint={t.glassTint2} radius={8} padding={12} style={{ marginBottom: 12 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <PartyQuickBar label="自" accentColor={t.accentAtk} members={myPartyMembers}
               selectedName={swapped ? defender.rosterName : attacker.rosterName}
@@ -1211,7 +1211,7 @@ export function Calculator({ data, myPartyMembers = [], opponentMembers = [], po
       {activeMoves.length > 0 ? (
         <ResultsSection data={data} attacker={attacker} defender={defender} moveSlots={moveSlots} cond={cond} onCalcHistory={onCalcHistory} />
       ) : (
-        <Glass tint={t.glassTint2} radius={20} padding={16}>
+        <Glass tint={t.glassTint2} radius={8} padding={16}>
           <p style={{ textAlign: 'center', color: t.textMuted, fontSize: 14, margin: 0 }}>ポケモンと技を選択してください</p>
         </Glass>
       )}

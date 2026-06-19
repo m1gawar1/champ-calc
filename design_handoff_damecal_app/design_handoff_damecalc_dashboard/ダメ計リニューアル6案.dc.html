@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700;900&family=Shippori+Mincho:wght@500;700;800&family=Space+Mono:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{ box-sizing:border-box; }
+  body{ margin:0; }
+</style>
+</helmet>
+
+<div style="width:max-content; min-width:100%; min-height:100vh; box-sizing:border-box; padding:48px; background:#e7e5df; font-family:'Hanken Grotesk',-apple-system,'Noto Sans JP',sans-serif;">
+
+  <div style="margin-bottom:36px; max-width:520px;">
+    <div style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:#94918a; font-weight:700;">Pokémon Champions · ダメージ計算機</div>
+    <div style="font-size:24px; font-weight:800; color:#1a1a1a; margin-top:8px; line-height:1.3;">リニューアル方向 6案</div>
+    <div style="font-size:14px; color:#6b6960; margin-top:8px; line-height:1.6;">メイン「ダメ計」画面・ライトテーマ・iPhone 393×852。同じ対面データ（ガブリアス → じしん → パオジアン）で描き分け。①ミニマル ②ポップ ③大胆 ④和 ⑤分析ツール ⑥カード。</div>
+  </div>
+
+  <div style="display:flex; gap:56px; align-items:flex-start;">
+
+    <!-- ===================== 案① ミニマル / エディトリアル ===================== -->
+    <div style="flex:none; width:393px;">
+      <div style="margin-bottom:14px;">
+        <div style="font-size:15px; font-weight:800; color:#1a1a1a;">案①　ミニマル / エディトリアル</div>
+        <div style="font-size:12.5px; color:#6b6960; margin-top:3px; line-height:1.5;">余白と等幅数字で魅せる。背景アートを廃し、タイプ色は小さなアクセントだけに。最も速く読める。</div>
+      </div>
+      <div style="width:393px; height:852px; border-radius:46px; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.16); background:#f7f6f3; position:relative; display:flex; flex-direction:column;">
+        <!-- status bar -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 30px 0; font-family:'Space Mono',monospace; font-size:13px; color:#1a1a1a; font-weight:700;">
+          <span>21:30</span>
+          <span style="letter-spacing:2px; opacity:0.85;">●●● ▮</span>
+        </div>
+        <!-- content -->
+        <div style="flex:1; padding:22px 26px 0; overflow:hidden;">
+          <div style="display:flex; align-items:baseline; justify-content:space-between;">
+            <div style="font-size:26px; font-weight:800; color:#18181b; letter-spacing:-0.01em;">ダメージ計算</div>
+            <div style="font-family:'Space Mono',monospace; font-size:11px; color:#9b9a95; letter-spacing:0.04em;">SINGLE</div>
+          </div>
+          <div style="height:1px; background:#e4e2dc; margin:18px 0 20px;"></div>
+
+          <!-- matchup -->
+          <div style="display:flex; align-items:center; gap:14px;">
+            <div style="flex:1;">
+              <div style="font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.12em; color:#a8a69f; text-transform:uppercase;">Attacker</div>
+              <div style="font-size:19px; font-weight:800; color:#18181b; margin-top:5px;">ガブリアス</div>
+              <div style="display:flex; gap:5px; margin-top:8px;">
+                <span style="font-size:10px; font-weight:700; letter-spacing:0.04em; padding:3px 8px; border-radius:4px; color:#fff; background:#6B4FE0;">ドラゴン</span>
+                <span style="font-size:10px; font-weight:700; letter-spacing:0.04em; padding:3px 8px; border-radius:4px; color:#4a3410; background:#D9B873;">じめん</span>
+              </div>
+            </div>
+            <div style="font-size:18px; color:#c7c5be; font-weight:700;">▶</div>
+            <div style="flex:1; text-align:right;">
+              <div style="font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.12em; color:#a8a69f; text-transform:uppercase;">Defender</div>
+              <div style="font-size:19px; font-weight:800; color:#18181b; margin-top:5px;">パオジアン</div>
+              <div style="display:flex; gap:5px; margin-top:8px; justify-content:flex-end;">
+                <span style="font-size:10px; font-weight:700; letter-spacing:0.04em; padding:3px 8px; border-radius:4px; color:#fff; background:#4A4655;">あく</span>
+                <span style="font-size:10px; font-weight:700; letter-spacing:0.04em; padding:3px 8px; border-radius:4px; color:#15494f; background:#9BDAE3;">こおり</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="height:1px; background:#e4e2dc; margin:20px 0;"></div>
+
+          <!-- move -->
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="font-size:16px; font-weight:800; color:#18181b;">じしん</div>
+              <div style="display:flex; gap:8px; margin-top:6px; align-items:center;">
+                <span style="font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px; color:#4a3410; background:#D9B873;">じめん</span>
+                <span style="font-family:'Space Mono',monospace; font-size:11px; color:#6b6960;">威力 100 · 物理</span>
+              </div>
+            </div>
+            <div style="font-size:13px; color:#a8a69f;">変更</div>
+          </div>
+
+          <!-- result -->
+          <div style="margin-top:26px;">
+            <div style="font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.12em; color:#a8a69f; text-transform:uppercase;">Damage</div>
+            <div style="display:flex; align-items:baseline; gap:12px; margin-top:6px;">
+              <div style="font-family:'Space Mono',monospace; font-size:46px; font-weight:700; color:#18181b; letter-spacing:-0.02em; line-height:1;">185<span style="color:#c7c5be;">–</span>218</div>
+            </div>
+            <div style="display:flex; align-items:baseline; gap:14px; margin-top:12px;">
+              <div style="font-family:'Space Mono',monospace; font-size:18px; font-weight:700; color:#18181b;">92.0<span style="font-size:12px; color:#9b9a95;">%</span></div>
+              <div style="font-size:13px; font-weight:700; color:#18181b; border:1.5px solid #18181b; padding:2px 10px; border-radius:5px;">確定2発</div>
+            </div>
+            <!-- 16-segment bar -->
+            <div style="display:flex; gap:3px; margin-top:18px;">
+              <div style="flex:1; height:8px; border-radius:2px; background:#18181b;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#18181b;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#18181b;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#18181b;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#18181b;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#18181b;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#18181b;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#18181b;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#18181b;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#18181b;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#18181b;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#18181b;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#dcdad3;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#dcdad3;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#dcdad3;"></div>
+              <div style="flex:1; height:8px; border-radius:2px; background:#dcdad3;"></div>
+            </div>
+          </div>
+
+          <div style="height:1px; background:#e4e2dc; margin:24px 0 18px;"></div>
+
+          <!-- sliders -->
+          <div style="font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.12em; color:#a8a69f; text-transform:uppercase; margin-bottom:14px;">Defender EVs</div>
+          <div style="margin-bottom:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+              <div style="font-size:13px; font-weight:700; color:#18181b;">HP <span style="font-family:'Space Mono',monospace; color:#9b9a95; font-weight:400; font-size:11px;">20SP</span></div>
+              <div style="font-family:'Space Mono',monospace; font-size:15px; font-weight:700; color:#18181b;">191</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:10px; color:#a8a69f;">0</span>
+              <div style="flex:1; height:3px; background:#e0ded7; border-radius:3px; position:relative;">
+                <div style="position:absolute; left:0; top:0; bottom:0; width:62%; background:#18181b; border-radius:3px;"></div>
+                <div style="position:absolute; left:62%; top:50%; width:14px; height:14px; background:#18181b; border-radius:50%; transform:translate(-50%,-50%); border:2px solid #f7f6f3;"></div>
+              </div>
+              <span style="font-size:10px; color:#a8a69f;">MAX</span>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+              <div style="font-size:13px; font-weight:700; color:#18181b;">ぼうぎょ <span style="font-family:'Space Mono',monospace; color:#9b9a95; font-weight:400; font-size:11px;">12SP</span></div>
+              <div style="font-family:'Space Mono',monospace; font-size:15px; font-weight:700; color:#18181b;">130</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:10px; color:#a8a69f;">0</span>
+              <div style="flex:1; height:3px; background:#e0ded7; border-radius:3px; position:relative;">
+                <div style="position:absolute; left:0; top:0; bottom:0; width:38%; background:#18181b; border-radius:3px;"></div>
+                <div style="position:absolute; left:38%; top:50%; width:14px; height:14px; background:#18181b; border-radius:50%; transform:translate(-50%,-50%); border:2px solid #f7f6f3;"></div>
+              </div>
+              <span style="font-size:10px; color:#a8a69f;">MAX</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- tab bar -->
+        <div style="border-top:1px solid #e4e2dc; background:#f7f6f3; padding:12px 26px 28px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:#18181b;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="13" x2="9" y2="13"/><line x1="12" y1="13" x2="12" y2="13"/><line x1="15" y1="13" x2="15" y2="13"/></svg>
+            <span style="font-size:9px; font-weight:700;">ダメ計</span>
+          </div>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#bdbbb3" stroke-width="1.9"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M4 19c0-3 2.5-5 5-5s5 2 5 5"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#bdbbb3" stroke-width="1.9"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#bdbbb3" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#bdbbb3" stroke-width="1.9"><line x1="4" y1="8" x2="20" y2="8"/><circle cx="15" cy="8" r="2.2" fill="#f7f6f3"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="9" cy="16" r="2.2" fill="#f7f6f3"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 案② タイプ・ポップ ===================== -->
+    <div style="flex:none; width:393px;">
+      <div style="margin-bottom:14px;">
+        <div style="font-size:15px; font-weight:800; color:#1a1a1a;">案②　タイプ・ポップ</div>
+        <div style="font-size:12.5px; color:#6b6960; margin-top:3px; line-height:1.5;">丸ゴシック＋タイプ色が主役。やわらかい影と大きな角丸で親しみやすく。ポケモンらしい彩り。</div>
+      </div>
+      <div style="width:393px; height:852px; border-radius:46px; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.16); background:#f4f1fb; position:relative; display:flex; flex-direction:column; font-family:'M PLUS Rounded 1c','Noto Sans JP',sans-serif;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 30px 0; font-size:13px; color:#4a3d6b; font-weight:700;">
+          <span>21:30</span>
+          <span style="letter-spacing:2px; opacity:0.7;">●●● ▮</span>
+        </div>
+        <div style="flex:1; padding:18px 22px 0; overflow:hidden;">
+          <div style="font-size:23px; font-weight:800; color:#3a2d5c;">ダメージ計算 ⚡</div>
+
+          <!-- matchup -->
+          <div style="display:flex; gap:12px; margin-top:18px; align-items:stretch;">
+            <div style="flex:1; background:#fff; border-radius:20px; padding:14px; box-shadow:0 8px 20px rgba(107,79,224,0.18); border-top:5px solid #6B4FE0;">
+              <div style="font-size:10px; font-weight:800; color:#6B4FE0; letter-spacing:0.06em;">こうげき</div>
+              <div style="font-size:17px; font-weight:800; color:#3a2d5c; margin-top:6px;">ガブリアス</div>
+              <div style="display:flex; gap:5px; margin-top:9px; flex-wrap:wrap;">
+                <span style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:8px; color:#fff; background:#6B4FE0;">ドラゴン</span>
+                <span style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:8px; color:#fff; background:#D4A95A;">じめん</span>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; font-size:20px; color:#c3b6e6; font-weight:800;">VS</div>
+            <div style="flex:1; background:#fff; border-radius:20px; padding:14px; box-shadow:0 8px 20px rgba(74,70,85,0.16); border-top:5px solid #4A4655;">
+              <div style="font-size:10px; font-weight:800; color:#6b6779; letter-spacing:0.06em;">ぼうぎょ</div>
+              <div style="font-size:17px; font-weight:800; color:#3a2d5c; margin-top:6px;">パオジアン</div>
+              <div style="display:flex; gap:5px; margin-top:9px; flex-wrap:wrap;">
+                <span style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:8px; color:#fff; background:#4A4655;">あく</span>
+                <span style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:8px; color:#15494f; background:#9BDAE3;">こおり</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- move -->
+          <div style="margin-top:14px; background:#fff; border-radius:18px; padding:14px 16px; box-shadow:0 6px 16px rgba(58,45,92,0.08); display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:42px; height:42px; border-radius:14px; background:#D4A95A; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:11px;">地</div>
+              <div>
+                <div style="font-size:16px; font-weight:800; color:#3a2d5c;">じしん</div>
+                <div style="font-family:'DM Mono',monospace; font-size:11px; color:#8a7fa8; margin-top:2px;">威力 100 · 物理</div>
+              </div>
+            </div>
+            <div style="width:28px; height:28px; border-radius:50%; background:#f0ebfb; color:#6B4FE0; display:flex; align-items:center; justify-content:center; font-weight:800;">›</div>
+          </div>
+
+          <!-- result -->
+          <div style="margin-top:16px; background:linear-gradient(135deg,#6B4FE0,#8B6BF0); border-radius:24px; padding:18px 20px; box-shadow:0 12px 28px rgba(107,79,224,0.32);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <div style="font-size:10px; font-weight:800; color:rgba(255,255,255,0.75); letter-spacing:0.08em;">ダメージ</div>
+                <div style="font-family:'DM Mono',monospace; font-size:38px; font-weight:500; color:#fff; line-height:1.05; margin-top:4px;">185–218</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-family:'DM Mono',monospace; font-size:22px; font-weight:500; color:#fff;">92.0%</div>
+                <div style="font-size:11px; font-weight:800; color:#6B4FE0; background:#fff; padding:3px 10px; border-radius:10px; margin-top:6px;">確定2発</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:3px; margin-top:16px;">
+              <div style="flex:1; height:10px; border-radius:5px; background:linear-gradient(90deg,#ff5fa2,#ffaa5f); opacity:1;"></div>
+              <div style="flex:1; height:10px; border-radius:5px; background:linear-gradient(90deg,#ff5fa2,#ffaa5f);"></div>
+              <div style="flex:1; height:10px; border-radius:5px; background:linear-gradient(90deg,#ff7fa2,#ffaa5f);"></div>
+              <div style="flex:1; height:10px; border-radius:5px; background:linear-gradient(90deg,#ff9f8f,#ffbb6f);"></div>
+              <div style="flex:1; height:10px; border-radius:5px; background:rgba(255,255,255,0.25);"></div>
+              <div style="flex:1; height:10px; border-radius:5px; background:rgba(255,255,255,0.25);"></div>
+            </div>
+          </div>
+
+          <!-- sliders -->
+          <div style="margin-top:18px; background:#fff; border-radius:20px; padding:16px 18px; box-shadow:0 6px 16px rgba(58,45,92,0.08);">
+            <div style="margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px;">
+                <div style="font-size:13px; font-weight:800; color:#3a2d5c;">HP</div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-family:'DM Mono',monospace; font-size:11px; color:#a99fc4;">20SP</span>
+                  <span style="font-family:'DM Mono',monospace; font-size:15px; font-weight:500; color:#6B4FE0;">191</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:10px; font-weight:800; color:#c3b6e6;">0</span>
+                <div style="flex:1; height:6px; background:#eee7fb; border-radius:6px; position:relative;">
+                  <div style="position:absolute; left:0; top:0; bottom:0; width:62%; background:linear-gradient(90deg,#ff5fa2,#ffaa5f); border-radius:6px;"></div>
+                  <div style="position:absolute; left:62%; top:50%; width:20px; height:20px; background:#fff; border-radius:50%; transform:translate(-50%,-50%); box-shadow:0 2px 8px rgba(255,95,162,0.5); border:3px solid #ff5fa2;"></div>
+                </div>
+                <span style="font-size:10px; font-weight:800; color:#c3b6e6;">MAX</span>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px;">
+                <div style="font-size:13px; font-weight:800; color:#3a2d5c;">ぼうぎょ</div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-family:'DM Mono',monospace; font-size:11px; color:#a99fc4;">12SP</span>
+                  <span style="font-family:'DM Mono',monospace; font-size:15px; font-weight:500; color:#6B4FE0;">130</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:10px; font-weight:800; color:#c3b6e6;">0</span>
+                <div style="flex:1; height:6px; background:#eee7fb; border-radius:6px; position:relative;">
+                  <div style="position:absolute; left:0; top:0; bottom:0; width:38%; background:linear-gradient(90deg,#ff5fa2,#ffaa5f); border-radius:6px;"></div>
+                  <div style="position:absolute; left:38%; top:50%; width:20px; height:20px; background:#fff; border-radius:50%; transform:translate(-50%,-50%); box-shadow:0 2px 8px rgba(255,95,162,0.5); border:3px solid #ff5fa2;"></div>
+                </div>
+                <span style="font-size:10px; font-weight:800; color:#c3b6e6;">MAX</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- tab bar -->
+        <div style="margin:0 16px 24px; background:#fff; border-radius:26px; box-shadow:0 8px 24px rgba(58,45,92,0.16); padding:12px 22px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:7px; background:#6B4FE0; padding:9px 14px; border-radius:16px; color:#fff;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="3"/><line x1="9" y1="8" x2="15" y2="8"/></svg>
+            <span style="font-size:11px; font-weight:800;">ダメ計</span>
+          </div>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6e6" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M4 19c0-3 2.5-5 5-5s5 2 5 5"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6e6" stroke-width="2"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6e6" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6e6" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><circle cx="15" cy="8" r="2.2" fill="#fff"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="9" cy="16" r="2.2" fill="#fff"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 案③ バトルカード（大胆） ===================== -->
+    <div style="flex:none; width:393px;">
+      <div style="margin-bottom:14px;">
+        <div style="font-size:15px; font-weight:800; color:#1a1a1a;">案③　バトルカード（大胆）</div>
+        <div style="font-size:12.5px; color:#6b6960; margin-top:3px; line-height:1.5;">eスポーツの戦績カード風。極太タイポと黒の構造線、コバルト1色で強い個性。情報の主従が明快。</div>
+      </div>
+      <div style="width:393px; height:852px; border-radius:46px; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.16); background:#f1f0ec; position:relative; display:flex; flex-direction:column; font-family:'Archivo','Noto Sans JP',sans-serif;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 30px 0; font-family:'Space Mono',monospace; font-size:13px; color:#111; font-weight:700;">
+          <span>21:30</span>
+          <span style="letter-spacing:2px;">●●● ▮</span>
+        </div>
+        <div style="flex:1; padding:18px 20px 0; overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="font-size:25px; font-weight:900; color:#111; letter-spacing:-0.01em; text-transform:none;">ダメージ計算</div>
+            <div style="font-family:'Space Mono',monospace; font-size:10px; font-weight:700; color:#fff; background:#1d4ed8; padding:3px 7px;">SINGLE</div>
+          </div>
+
+          <!-- matchup band -->
+          <div style="margin-top:16px; background:#111; border-radius:14px; padding:16px; position:relative; overflow:hidden;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="flex:1;">
+                <div style="font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#1d4ed8; font-weight:700;">ATK</div>
+                <div style="font-size:18px; font-weight:900; color:#fff; margin-top:3px; line-height:1.1;">ガブリアス</div>
+                <div style="display:flex; gap:4px; margin-top:8px;">
+                  <span style="font-size:9px; font-weight:800; padding:2px 7px; color:#fff; background:#6B4FE0;">ドラゴン</span>
+                  <span style="font-size:9px; font-weight:800; padding:2px 7px; color:#111; background:#D4A95A;">じめん</span>
+                </div>
+              </div>
+              <div style="font-family:'Archivo',sans-serif; font-size:22px; font-weight:900; font-style:italic; color:#1d4ed8;">VS</div>
+              <div style="flex:1; text-align:right;">
+                <div style="font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#9aa6c4; font-weight:700;">DEF</div>
+                <div style="font-size:18px; font-weight:900; color:#fff; margin-top:3px; line-height:1.1;">パオジアン</div>
+                <div style="display:flex; gap:4px; margin-top:8px; justify-content:flex-end;">
+                  <span style="font-size:9px; font-weight:800; padding:2px 7px; color:#fff; background:#4A4655;">あく</span>
+                  <span style="font-size:9px; font-weight:800; padding:2px 7px; color:#15494f; background:#9BDAE3;">こおり</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- move -->
+          <div style="margin-top:14px; display:flex; align-items:center; justify-content:space-between; border:2px solid #111; border-radius:12px; padding:12px 14px; background:#fff;">
+            <div style="display:flex; align-items:center; gap:11px;">
+              <span style="font-size:10px; font-weight:800; padding:3px 8px; color:#111; background:#D4A95A;">じめん</span>
+              <div style="font-size:16px; font-weight:900; color:#111;">じしん</div>
+            </div>
+            <div style="font-family:'Space Mono',monospace; font-size:12px; font-weight:700; color:#444;">100 · 物理</div>
+          </div>
+
+          <!-- result -->
+          <div style="margin-top:16px; border:2px solid #111; border-radius:14px; overflow:hidden; background:#fff;">
+            <div style="background:#1d4ed8; padding:6px 14px; display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-family:'Space Mono',monospace; font-size:10px; font-weight:700; color:#fff; letter-spacing:0.1em;">DAMAGE</span>
+              <span style="font-size:13px; font-weight:900; color:#1d4ed8; background:#fff; padding:1px 10px; border-radius:3px;">確定2発</span>
+            </div>
+            <div style="padding:16px 16px 14px;">
+              <div style="display:flex; align-items:baseline; justify-content:space-between;">
+                <div style="font-family:'Space Mono',monospace; font-size:42px; font-weight:700; color:#111; line-height:1; letter-spacing:-0.02em;">185–218</div>
+              </div>
+              <div style="font-family:'Space Mono',monospace; font-size:16px; font-weight:700; color:#1d4ed8; margin-top:8px;">92.0%</div>
+              <!-- blocky 16 bar -->
+              <div style="display:flex; gap:2px; margin-top:14px;">
+                <div style="flex:1; height:14px; background:#111;"></div>
+                <div style="flex:1; height:14px; background:#111;"></div>
+                <div style="flex:1; height:14px; background:#111;"></div>
+                <div style="flex:1; height:14px; background:#111;"></div>
+                <div style="flex:1; height:14px; background:#111;"></div>
+                <div style="flex:1; height:14px; background:#111;"></div>
+                <div style="flex:1; height:14px; background:#1d4ed8;"></div>
+                <div style="flex:1; height:14px; background:#1d4ed8;"></div>
+                <div style="flex:1; height:14px; background:#1d4ed8;"></div>
+                <div style="flex:1; height:14px; background:#1d4ed8;"></div>
+                <div style="flex:1; height:14px; background:#1d4ed8;"></div>
+                <div style="flex:1; height:14px; background:#1d4ed8;"></div>
+                <div style="flex:1; height:14px; background:#d6d4cd;"></div>
+                <div style="flex:1; height:14px; background:#d6d4cd;"></div>
+                <div style="flex:1; height:14px; background:#d6d4cd;"></div>
+                <div style="flex:1; height:14px; background:#d6d4cd;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- sliders -->
+          <div style="margin-top:18px;">
+            <div style="font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#888; font-weight:700; margin-bottom:12px;">DEF · EV調整</div>
+            <div style="margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px;">
+                <div style="font-size:13px; font-weight:900; color:#111;">HP <span style="font-family:'Space Mono',monospace; font-weight:400; font-size:11px; color:#999;">20SP</span></div>
+                <div style="font-family:'Space Mono',monospace; font-size:15px; font-weight:700; color:#111;">191</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:9px;">
+                <span style="font-family:'Space Mono',monospace; font-size:10px; color:#aaa;">0</span>
+                <div style="flex:1; height:8px; background:#dedcd5; position:relative;">
+                  <div style="position:absolute; left:0; top:0; bottom:0; width:62%; background:#1d4ed8;"></div>
+                  <div style="position:absolute; left:62%; top:50%; width:14px; height:18px; background:#111; transform:translate(-50%,-50%);"></div>
+                </div>
+                <span style="font-family:'Space Mono',monospace; font-size:10px; color:#aaa;">MAX</span>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px;">
+                <div style="font-size:13px; font-weight:900; color:#111;">ぼうぎょ <span style="font-family:'Space Mono',monospace; font-weight:400; font-size:11px; color:#999;">12SP</span></div>
+                <div style="font-family:'Space Mono',monospace; font-size:15px; font-weight:700; color:#111;">130</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:9px;">
+                <span style="font-family:'Space Mono',monospace; font-size:10px; color:#aaa;">0</span>
+                <div style="flex:1; height:8px; background:#dedcd5; position:relative;">
+                  <div style="position:absolute; left:0; top:0; bottom:0; width:38%; background:#1d4ed8;"></div>
+                  <div style="position:absolute; left:38%; top:50%; width:14px; height:18px; background:#111; transform:translate(-50%,-50%);"></div>
+                </div>
+                <span style="font-family:'Space Mono',monospace; font-size:10px; color:#aaa;">MAX</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- tab bar -->
+        <div style="background:#111; padding:14px 24px 28px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:#fff;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/></svg>
+            <span style="font-size:9px; font-weight:800; color:#1d4ed8;">ダメ計</span>
+          </div>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M4 19c0-3 2.5-5 5-5s5 2 5 5"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><circle cx="15" cy="8" r="2.2" fill="#111"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="9" cy="16" r="2.2" fill="#111"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 案④ 和テイスト（墨・朱） ===================== -->
+    <div style="flex:none; width:393px;">
+      <div style="margin-bottom:14px;">
+        <div style="font-size:15px; font-weight:800; color:#1a1a1a;">案④　和テイスト（墨・朱）</div>
+        <div style="font-size:12.5px; color:#6b6960; margin-top:3px; line-height:1.5;">和紙の地に墨色と朱の落款。明朝の見出しで品と日本らしさ。落ち着きつつ唯一無二の個性。</div>
+      </div>
+      <div style="width:393px; height:852px; border-radius:46px; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.16); background:#f4eee1; position:relative; display:flex; flex-direction:column; font-family:'Noto Sans JP',sans-serif;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 30px 0; font-family:'Space Mono',monospace; font-size:13px; color:#1d1b17; font-weight:700;">
+          <span>21:30</span>
+          <span style="letter-spacing:2px; opacity:0.8;">●●● ▮</span>
+        </div>
+        <div style="flex:1; padding:22px 26px 0; overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="font-family:'Shippori Mincho',serif; font-size:26px; font-weight:800; color:#1d1b17;">威力計算</div>
+            <div style="font-family:'Shippori Mincho',serif; font-size:12px; color:#c5402b; border:1px solid #c5402b; padding:3px 8px; letter-spacing:0.1em;">単 打</div>
+          </div>
+          <div style="height:2px; background:#1d1b17; margin:16px 0 4px;"></div>
+          <div style="height:1px; background:#1d1b17; opacity:0.25; margin-bottom:22px;"></div>
+
+          <!-- matchup -->
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="flex:1;">
+              <div style="font-family:'Shippori Mincho',serif; font-size:11px; color:#c5402b; letter-spacing:0.1em;">攻</div>
+              <div style="font-size:19px; font-weight:700; color:#1d1b17; margin-top:5px;">ガブリアス</div>
+              <div style="display:flex; gap:5px; margin-top:8px;">
+                <span style="font-size:10px; font-weight:700; padding:3px 9px; border-radius:2px; color:#fff; background:#5d4ea8;">ドラゴン</span>
+                <span style="font-size:10px; font-weight:700; padding:3px 9px; border-radius:2px; color:#3a2c11; background:#cda85e;">じめん</span>
+              </div>
+            </div>
+            <div style="font-family:'Shippori Mincho',serif; font-size:22px; color:#c5402b;">⟶</div>
+            <div style="flex:1; text-align:right;">
+              <div style="font-family:'Shippori Mincho',serif; font-size:11px; color:#6b6459; letter-spacing:0.1em;">守</div>
+              <div style="font-size:19px; font-weight:700; color:#1d1b17; margin-top:5px;">パオジアン</div>
+              <div style="display:flex; gap:5px; margin-top:8px; justify-content:flex-end;">
+                <span style="font-size:10px; font-weight:700; padding:3px 9px; border-radius:2px; color:#fff; background:#3f3b46;">あく</span>
+                <span style="font-size:10px; font-weight:700; padding:3px 9px; border-radius:2px; color:#14474d; background:#93c3cc;">こおり</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="height:1px; background:#1d1b17; opacity:0.18; margin:22px 0;"></div>
+
+          <!-- move -->
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="font-family:'Shippori Mincho',serif; font-size:18px; font-weight:700; color:#1d1b17;">地 震</div>
+              <div style="display:flex; gap:8px; margin-top:6px; align-items:center;">
+                <span style="font-size:10px; font-weight:700; padding:3px 9px; border-radius:2px; color:#3a2c11; background:#cda85e;">じめん</span>
+                <span style="font-family:'Space Mono',monospace; font-size:11px; color:#6b6459;">威力 100 · 物理</span>
+              </div>
+            </div>
+            <div style="font-family:'Shippori Mincho',serif; font-size:13px; color:#c5402b;">改</div>
+          </div>
+
+          <!-- result -->
+          <div style="margin-top:24px; display:flex; align-items:flex-start; justify-content:space-between;">
+            <div>
+              <div style="font-family:'Shippori Mincho',serif; font-size:12px; color:#6b6459; letter-spacing:0.1em;">与ダメージ</div>
+              <div style="font-family:'Space Mono',monospace; font-size:44px; font-weight:700; color:#1d1b17; line-height:1; margin-top:8px;">185<span style="color:#c5402b;">–</span>218</div>
+              <div style="font-family:'Space Mono',monospace; font-size:17px; font-weight:700; color:#1d1b17; margin-top:10px;">92.0<span style="font-size:12px; color:#6b6459;">%</span></div>
+            </div>
+            <!-- hanko seal -->
+            <div style="width:60px; height:60px; border:2px solid #c5402b; border-radius:5px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#c5402b; font-family:'Shippori Mincho',serif; font-weight:800; line-height:1.15;">
+              <span style="font-size:15px;">確定</span>
+              <span style="font-size:15px;">二発</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:3px; margin-top:18px;">
+            <div style="flex:1; height:10px; background:#1d1b17;"></div><div style="flex:1; height:10px; background:#1d1b17;"></div><div style="flex:1; height:10px; background:#1d1b17;"></div><div style="flex:1; height:10px; background:#1d1b17;"></div><div style="flex:1; height:10px; background:#1d1b17;"></div><div style="flex:1; height:10px; background:#1d1b17;"></div>
+            <div style="flex:1; height:10px; background:#c5402b;"></div><div style="flex:1; height:10px; background:#c5402b;"></div><div style="flex:1; height:10px; background:#c5402b;"></div><div style="flex:1; height:10px; background:#c5402b;"></div><div style="flex:1; height:10px; background:#c5402b;"></div><div style="flex:1; height:10px; background:#c5402b;"></div>
+            <div style="flex:1; height:10px; background:#ddd5c5;"></div><div style="flex:1; height:10px; background:#ddd5c5;"></div><div style="flex:1; height:10px; background:#ddd5c5;"></div><div style="flex:1; height:10px; background:#ddd5c5;"></div>
+          </div>
+
+          <div style="height:1px; background:#1d1b17; opacity:0.18; margin:24px 0 18px;"></div>
+
+          <!-- sliders -->
+          <div style="font-family:'Shippori Mincho',serif; font-size:12px; color:#6b6459; letter-spacing:0.1em; margin-bottom:16px;">防御側 努力値</div>
+          <div style="margin-bottom:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+              <div style="font-size:13px; font-weight:700; color:#1d1b17;">体力 <span style="font-family:'Space Mono',monospace; color:#9c9484; font-weight:400; font-size:11px;">20SP</span></div>
+              <div style="font-family:'Space Mono',monospace; font-size:15px; font-weight:700; color:#1d1b17;">191</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:10px; color:#9c9484;">0</span>
+              <div style="flex:1; height:3px; background:#d8d0bf; position:relative;">
+                <div style="position:absolute; left:0; top:0; bottom:0; width:62%; background:#c5402b;"></div>
+                <div style="position:absolute; left:62%; top:50%; width:13px; height:13px; background:#c5402b; border-radius:50%; transform:translate(-50%,-50%); border:2px solid #f4eee1;"></div>
+              </div>
+              <span style="font-size:10px; color:#9c9484;">MAX</span>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+              <div style="font-size:13px; font-weight:700; color:#1d1b17;">防御 <span style="font-family:'Space Mono',monospace; color:#9c9484; font-weight:400; font-size:11px;">12SP</span></div>
+              <div style="font-family:'Space Mono',monospace; font-size:15px; font-weight:700; color:#1d1b17;">130</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:10px; color:#9c9484;">0</span>
+              <div style="flex:1; height:3px; background:#d8d0bf; position:relative;">
+                <div style="position:absolute; left:0; top:0; bottom:0; width:38%; background:#c5402b;"></div>
+                <div style="position:absolute; left:38%; top:50%; width:13px; height:13px; background:#c5402b; border-radius:50%; transform:translate(-50%,-50%); border:2px solid #f4eee1;"></div>
+              </div>
+              <span style="font-size:10px; color:#9c9484;">MAX</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- tab bar -->
+        <div style="border-top:2px solid #1d1b17; background:#f4eee1; padding:12px 26px 28px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:#c5402b;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/></svg>
+            <span style="font-size:9px; font-weight:700;">ダメ計</span>
+          </div>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b0a892" stroke-width="1.9"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M4 19c0-3 2.5-5 5-5s5 2 5 5"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b0a892" stroke-width="1.9"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b0a892" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b0a892" stroke-width="1.9"><line x1="4" y1="8" x2="20" y2="8"/><circle cx="15" cy="8" r="2.2" fill="#f4eee1"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="9" cy="16" r="2.2" fill="#f4eee1"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 案⑤ 分析ツール / ダッシュボード ===================== -->
+    <div style="flex:none; width:393px;">
+      <div style="margin-bottom:14px;">
+        <div style="font-size:15px; font-weight:800; color:#1a1a1a;">案⑤　分析ツール / ダッシュボード</div>
+        <div style="font-size:12.5px; color:#6b6960; margin-top:3px; line-height:1.5;">プロの対戦分析ツール風。等幅とグリッド線で精密に。情報密度が高く、ガチ勢に刺さる無駄のなさ。</div>
+      </div>
+      <div style="width:393px; height:852px; border-radius:46px; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.16); background:#eceef0; background-image:linear-gradient(#dde1e4 1px,transparent 1px),linear-gradient(90deg,#dde1e4 1px,transparent 1px); background-size:26px 26px; position:relative; display:flex; flex-direction:column; font-family:'DM Mono',monospace;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 30px 0; font-size:13px; color:#15202b; font-weight:500;">
+          <span>21:30</span>
+          <span style="letter-spacing:2px; opacity:0.7;">●●● ▮</span>
+        </div>
+        <div style="flex:1; padding:18px 20px 0; overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="font-family:'Hanken Grotesk',sans-serif; font-size:13px; font-weight:800; color:#15202b; letter-spacing:0.04em;">DAMAGE_CALC</div>
+            <div style="font-size:10px; color:#fff; background:#0a96b8; padding:3px 8px; border-radius:3px;">SINGLES</div>
+          </div>
+
+          <!-- matchup grid -->
+          <div style="margin-top:16px; display:grid; grid-template-columns:1fr auto 1fr; gap:0; border:1px solid #c6ccd1; background:#fff; border-radius:6px; overflow:hidden;">
+            <div style="padding:12px 13px;">
+              <div style="font-size:9px; color:#0a96b8; letter-spacing:0.08em;">ATK //</div>
+              <div style="font-family:'Hanken Grotesk',sans-serif; font-size:16px; font-weight:800; color:#15202b; margin-top:5px;">ガブリアス</div>
+              <div style="display:flex; gap:4px; margin-top:8px;">
+                <span style="font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; color:#fff; background:#6B4FE0;">DRAGON</span>
+                <span style="font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; color:#3a2c11; background:#D4A95A;">GROUND</span>
+              </div>
+            </div>
+            <div style="width:1px; background:#c6ccd1;"></div>
+            <div style="padding:12px 13px; text-align:right;">
+              <div style="font-size:9px; color:#8a949c; letter-spacing:0.08em;">// DEF</div>
+              <div style="font-family:'Hanken Grotesk',sans-serif; font-size:16px; font-weight:800; color:#15202b; margin-top:5px;">パオジアン</div>
+              <div style="display:flex; gap:4px; margin-top:8px; justify-content:flex-end;">
+                <span style="font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; color:#fff; background:#4A4655;">DARK</span>
+                <span style="font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; color:#14474d; background:#9BDAE3;">ICE</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- move row -->
+          <div style="margin-top:12px; border:1px solid #c6ccd1; background:#fff; border-radius:6px; padding:10px 13px; display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:9px;">
+              <span style="font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; color:#3a2c11; background:#D4A95A;">GND</span>
+              <span style="font-family:'Hanken Grotesk',sans-serif; font-size:15px; font-weight:800; color:#15202b;">じしん</span>
+            </div>
+            <span style="font-size:12px; color:#5a646c;">PWR 100 · PHYS</span>
+          </div>
+
+          <!-- result panel -->
+          <div style="margin-top:12px; border:1px solid #0a96b8; background:#fff; border-radius:6px; overflow:hidden;">
+            <div style="display:flex; border-bottom:1px solid #d8dde1;">
+              <div style="flex:1; padding:12px 13px; border-right:1px solid #d8dde1;">
+                <div style="font-size:9px; color:#8a949c; letter-spacing:0.06em;">DMG_RANGE</div>
+                <div style="font-size:26px; font-weight:500; color:#15202b; margin-top:4px; letter-spacing:-0.01em;">185–218</div>
+              </div>
+              <div style="flex:1; padding:12px 13px;">
+                <div style="font-size:9px; color:#8a949c; letter-spacing:0.06em;">PERCENT</div>
+                <div style="font-size:26px; font-weight:500; color:#0a96b8; margin-top:4px;">92.0%</div>
+              </div>
+            </div>
+            <div style="padding:12px 13px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:9px;">
+                <span style="font-size:9px; color:#8a949c; letter-spacing:0.06em;">ROLL · 16</span>
+                <span style="font-family:'Hanken Grotesk',sans-serif; font-size:12px; font-weight:800; color:#15202b; background:#e3f4f8; padding:2px 9px; border-radius:3px;">確定2発</span>
+              </div>
+              <div style="display:flex; gap:2px;">
+                <div style="flex:1; height:9px; background:#0a96b8;"></div><div style="flex:1; height:9px; background:#0a96b8;"></div><div style="flex:1; height:9px; background:#0a96b8;"></div><div style="flex:1; height:9px; background:#0a96b8;"></div><div style="flex:1; height:9px; background:#0a96b8;"></div><div style="flex:1; height:9px; background:#0a96b8;"></div><div style="flex:1; height:9px; background:#0a96b8;"></div><div style="flex:1; height:9px; background:#0a96b8;"></div><div style="flex:1; height:9px; background:#0a96b8;"></div><div style="flex:1; height:9px; background:#0a96b8;"></div><div style="flex:1; height:9px; background:#0a96b8;"></div><div style="flex:1; height:9px; background:#0a96b8;"></div>
+                <div style="flex:1; height:9px; background:#cdd3d8;"></div><div style="flex:1; height:9px; background:#cdd3d8;"></div><div style="flex:1; height:9px; background:#cdd3d8;"></div><div style="flex:1; height:9px; background:#cdd3d8;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- sliders -->
+          <div style="margin-top:16px; font-size:9px; color:#8a949c; letter-spacing:0.08em; margin-bottom:12px;">DEF_EV //</div>
+          <div style="margin-bottom:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px;">
+              <div style="font-family:'Hanken Grotesk',sans-serif; font-size:12px; font-weight:800; color:#15202b;">HP <span style="font-family:'DM Mono',monospace; color:#8a949c; font-weight:400; font-size:11px;">20</span></div>
+              <div style="font-size:14px; font-weight:500; color:#0a96b8;">191</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:9px;">
+              <span style="font-size:10px; color:#aab2b8;">0</span>
+              <div style="flex:1; height:4px; background:#d3d9dd; position:relative; border-radius:2px;">
+                <div style="position:absolute; left:0; top:0; bottom:0; width:62%; background:#0a96b8; border-radius:2px;"></div>
+                <div style="position:absolute; left:62%; top:50%; width:12px; height:12px; background:#fff; border:2px solid #0a96b8; border-radius:50%; transform:translate(-50%,-50%);"></div>
+              </div>
+              <span style="font-size:10px; color:#aab2b8;">MAX</span>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px;">
+              <div style="font-family:'Hanken Grotesk',sans-serif; font-size:12px; font-weight:800; color:#15202b;">DEF <span style="font-family:'DM Mono',monospace; color:#8a949c; font-weight:400; font-size:11px;">12</span></div>
+              <div style="font-size:14px; font-weight:500; color:#0a96b8;">130</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:9px;">
+              <span style="font-size:10px; color:#aab2b8;">0</span>
+              <div style="flex:1; height:4px; background:#d3d9dd; position:relative; border-radius:2px;">
+                <div style="position:absolute; left:0; top:0; bottom:0; width:38%; background:#0a96b8; border-radius:2px;"></div>
+                <div style="position:absolute; left:38%; top:50%; width:12px; height:12px; background:#fff; border:2px solid #0a96b8; border-radius:50%; transform:translate(-50%,-50%);"></div>
+              </div>
+              <span style="font-size:10px; color:#aab2b8;">MAX</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- tab bar -->
+        <div style="border-top:1px solid #c6ccd1; background:#fbfcfc; padding:12px 24px 28px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:#0a96b8;">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/></svg>
+            <span style="font-family:'Hanken Grotesk',sans-serif; font-size:9px; font-weight:800;">ダメ計</span>
+          </div>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#a7afb5" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M4 19c0-3 2.5-5 5-5s5 2 5 5"/></svg>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#a7afb5" stroke-width="2"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#a7afb5" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#a7afb5" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><circle cx="15" cy="8" r="2.2" fill="#fbfcfc"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="9" cy="16" r="2.2" fill="#fbfcfc"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 案⑥ コレクションカード調 ===================== -->
+    <div style="flex:none; width:393px;">
+      <div style="margin-bottom:14px;">
+        <div style="font-size:15px; font-weight:800; color:#1a1a1a;">案⑥　コレクションカード調</div>
+        <div style="font-size:12.5px; color:#6b6960; margin-top:3px; line-height:1.5;">トレカのフレーム＆ホロ光沢。攻撃ポケモンのタイプ色で縁取り。最も「ポケモンらしい」遊び心。</div>
+      </div>
+      <div style="width:393px; height:852px; border-radius:46px; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.16); background:#e7e1d2; position:relative; display:flex; flex-direction:column; font-family:'M PLUS Rounded 1c','Noto Sans JP',sans-serif;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 30px 0; font-size:13px; color:#3a2c5c; font-weight:700;">
+          <span>21:30</span>
+          <span style="letter-spacing:2px; opacity:0.7;">●●● ▮</span>
+        </div>
+        <div style="flex:1; padding:16px 18px 0; overflow:hidden;">
+          <!-- TCG frame -->
+          <div style="border-radius:22px; padding:7px; background:linear-gradient(135deg,#6B4FE0,#9b7bff 45%,#D4A95A);">
+            <div style="background:#fdfbf4; border-radius:16px; overflow:hidden;">
+              <!-- nameplate -->
+              <div style="background:linear-gradient(180deg,#fbe07a,#f2c84b); padding:10px 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #6B4FE0;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div style="width:24px; height:24px; border-radius:50%; background:#6B4FE0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:800;">竜</div>
+                  <span style="font-size:18px; font-weight:800; color:#3a2c11;">ガブリアス</span>
+                </div>
+                <div style="display:flex; gap:4px;">
+                  <span style="font-size:9px; font-weight:800; padding:2px 7px; border-radius:6px; color:#fff; background:#6B4FE0;">ドラゴン</span>
+                  <span style="font-size:9px; font-weight:800; padding:2px 7px; border-radius:6px; color:#fff; background:#D4A95A;">じめん</span>
+                </div>
+              </div>
+              <!-- art window: matchup -->
+              <div style="background:linear-gradient(135deg,#ece4ff,#fff4e0); padding:16px 14px; position:relative;">
+                <div style="position:absolute; top:8px; right:10px; font-size:9px; font-weight:800; color:#9b8bbf; letter-spacing:0.1em;">VS</div>
+                <div style="font-size:10px; font-weight:800; color:#8a7fb0;">こうげき技</div>
+                <div style="display:flex; align-items:center; gap:10px; margin-top:6px;">
+                  <div style="font-size:22px; font-weight:800; color:#3a2c5c;">じしん</div>
+                  <span style="font-family:'DM Mono',monospace; font-size:12px; color:#7a6fa0;">威力100·物理</span>
+                </div>
+                <div style="margin-top:14px; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.7); border-radius:12px; padding:8px 12px;">
+                  <span style="font-size:10px; font-weight:800; color:#6b6779;">相手</span>
+                  <span style="font-size:15px; font-weight:800; color:#3a2c5c;">パオジアン</span>
+                  <span style="font-size:9px; font-weight:800; padding:2px 6px; border-radius:6px; color:#fff; background:#4A4655;">あく</span>
+                  <span style="font-size:9px; font-weight:800; padding:2px 6px; border-radius:6px; color:#15494f; background:#9BDAE3;">こおり</span>
+                </div>
+              </div>
+              <!-- stat box: damage -->
+              <div style="padding:14px;">
+                <div style="background:linear-gradient(110deg,#fff,#f3eeff 40%,#fff6e8); border:2px solid #efe6cf; border-radius:12px; padding:13px 15px;">
+                  <div style="display:flex; align-items:flex-end; justify-content:space-between;">
+                    <div>
+                      <div style="font-size:10px; font-weight:800; color:#9b8bbf;">ダメージ</div>
+                      <div style="font-family:'DM Mono',monospace; font-size:34px; font-weight:500; color:#3a2c5c; line-height:1; margin-top:3px;">185–218</div>
+                    </div>
+                    <div style="text-align:right;">
+                      <div style="font-family:'DM Mono',monospace; font-size:20px; font-weight:500; color:#6B4FE0;">92.0%</div>
+                      <div style="font-size:11px; font-weight:800; color:#fff; background:#6B4FE0; padding:2px 9px; border-radius:8px; margin-top:4px;">確定2発</div>
+                    </div>
+                  </div>
+                  <div style="display:flex; gap:3px; margin-top:13px;">
+                    <div style="flex:1; height:9px; border-radius:4px; background:linear-gradient(90deg,#6B4FE0,#9b7bff);"></div><div style="flex:1; height:9px; border-radius:4px; background:linear-gradient(90deg,#6B4FE0,#9b7bff);"></div><div style="flex:1; height:9px; border-radius:4px; background:linear-gradient(90deg,#7B5FE0,#a98bff);"></div><div style="flex:1; height:9px; border-radius:4px; background:linear-gradient(90deg,#9b7bff,#D4A95A);"></div>
+                    <div style="flex:1; height:9px; border-radius:4px; background:#e7dfcb;"></div><div style="flex:1; height:9px; border-radius:4px; background:#e7dfcb;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- sliders below card -->
+          <div style="margin-top:16px; padding:0 4px;">
+            <div style="margin-bottom:14px;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+                <div style="font-size:13px; font-weight:800; color:#3a2c5c;">HP <span style="font-family:'DM Mono',monospace; color:#9b8bbf; font-weight:400; font-size:11px;">20SP</span></div>
+                <div style="font-family:'DM Mono',monospace; font-size:15px; font-weight:500; color:#6B4FE0;">191</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:10px; font-weight:800; color:#c3b6e6;">0</span>
+                <div style="flex:1; height:6px; background:#e3dccf; border-radius:6px; position:relative;">
+                  <div style="position:absolute; left:0; top:0; bottom:0; width:62%; background:linear-gradient(90deg,#6B4FE0,#D4A95A); border-radius:6px;"></div>
+                  <div style="position:absolute; left:62%; top:50%; width:18px; height:18px; background:#fff; border-radius:50%; transform:translate(-50%,-50%); box-shadow:0 2px 6px rgba(107,79,224,0.45); border:3px solid #6B4FE0;"></div>
+                </div>
+                <span style="font-size:10px; font-weight:800; color:#c3b6e6;">MAX</span>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+                <div style="font-size:13px; font-weight:800; color:#3a2c5c;">ぼうぎょ <span style="font-family:'DM Mono',monospace; color:#9b8bbf; font-weight:400; font-size:11px;">12SP</span></div>
+                <div style="font-family:'DM Mono',monospace; font-size:15px; font-weight:500; color:#6B4FE0;">130</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:10px; font-weight:800; color:#c3b6e6;">0</span>
+                <div style="flex:1; height:6px; background:#e3dccf; border-radius:6px; position:relative;">
+                  <div style="position:absolute; left:0; top:0; bottom:0; width:38%; background:linear-gradient(90deg,#6B4FE0,#D4A95A); border-radius:6px;"></div>
+                  <div style="position:absolute; left:38%; top:50%; width:18px; height:18px; background:#fff; border-radius:50%; transform:translate(-50%,-50%); box-shadow:0 2px 6px rgba(107,79,224,0.45); border:3px solid #6B4FE0;"></div>
+                </div>
+                <span style="font-size:10px; font-weight:800; color:#c3b6e6;">MAX</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- tab bar -->
+        <div style="margin:0 16px 24px; background:#fdfbf4; border-radius:24px; box-shadow:0 8px 22px rgba(58,44,92,0.18); padding:11px 22px; display:flex; justify-content:space-between; align-items:center; border:2px solid #6B4FE0;">
+          <div style="display:flex; align-items:center; gap:6px; background:#6B4FE0; padding:8px 13px; border-radius:14px; color:#fff;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="3"/><line x1="9" y1="8" x2="15" y2="8"/></svg>
+            <span style="font-size:11px; font-weight:800;">ダメ計</span>
+          </div>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#c3b6e6" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M4 19c0-3 2.5-5 5-5s5 2 5 5"/></svg>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#c3b6e6" stroke-width="2"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#c3b6e6" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#c3b6e6" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><circle cx="15" cy="8" r="2.2" fill="#fdfbf4"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="9" cy="16" r="2.2" fill="#fdfbf4"/></svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
