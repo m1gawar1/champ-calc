@@ -1,12 +1,21 @@
 import type { RosterEntry, BaseStats, Move, Nature, ChampionsData, LearnsetEntry } from './types';
 import seasonMb from './data/season-mb.json';
+import seasonMbMegas from './data/season-mb-megas.json';
 
 const BASE_URL =
   'https://raw.githubusercontent.com/otterlyclueless/pokemon-champions-data/main';
 
-// season-mb.json を typed として扱う（JSON import は unknown になるため）
-const MB_ROSTER = (seasonMb as { roster: RosterEntry[]; baseStats: BaseStats[] }).roster;
-const MB_BASE_STATS = (seasonMb as { roster: RosterEntry[]; baseStats: BaseStats[] }).baseStats;
+// season-mb*.json を typed として扱う（JSON import は unknown になるため）
+type MbData = { roster: RosterEntry[]; baseStats: BaseStats[] };
+// 自動取得分（PokeAPI）＋ チャンピオンズ独自メガ（手動管理）を結合
+const MB_ROSTER = [
+  ...(seasonMb as MbData).roster,
+  ...(seasonMbMegas as unknown as MbData).roster,
+];
+const MB_BASE_STATS = [
+  ...(seasonMb as MbData).baseStats,
+  ...(seasonMbMegas as unknown as MbData).baseStats,
+];
 
 let cache: ChampionsData | null = null;
 

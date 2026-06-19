@@ -1,0 +1,29 @@
+{
+  "_note": "チャンピオンズ独自メガ（PokeAPIに存在しない）。オーナー提供データを手動管理。generate-season-mb.mjs では再生成されない。特性のうち うなぎのぼり/ほのおのたてがみ は独自特性のため日本語のまま格納（非ダメージ特性・表示用）。",
+  "roster": [
+    { "name": "Mega Raichu X", "dexNumber": 26, "types": ["Electric"], "form": "Mega", "abilities": { "0": "Electric Surge" }, "championsVerified": false },
+    { "name": "Mega Raichu Y", "dexNumber": 26, "types": ["Electric"], "form": "Mega", "abilities": { "0": "No Guard" }, "championsVerified": false },
+    { "name": "Mega Staraptor", "dexNumber": 398, "types": ["Fighting", "Flying"], "form": "Mega", "abilities": { "0": "Contrary" }, "championsVerified": false },
+    { "name": "Mega Scolipede", "dexNumber": 545, "types": ["Bug", "Poison"], "form": "Mega", "abilities": { "0": "Shell Armor" }, "championsVerified": false },
+    { "name": "Mega Scrafty", "dexNumber": 560, "types": ["Dark", "Fighting"], "form": "Mega", "abilities": { "0": "Intimidate" }, "championsVerified": false },
+    { "name": "Mega Eelektross", "dexNumber": 604, "types": ["Electric"], "form": "Mega", "abilities": { "0": "うなぎのぼり" }, "championsVerified": false },
+    { "name": "Mega Pyroar", "dexNumber": 668, "types": ["Normal", "Fire"], "form": "Mega", "abilities": { "0": "ほのおのたてがみ" }, "championsVerified": false },
+    { "name": "Mega Malamar", "dexNumber": 687, "types": ["Dark", "Psychic"], "form": "Mega", "abilities": { "0": "Contrary" }, "championsVerified": false },
+    { "name": "Mega Barbaracle", "dexNumber": 689, "types": ["Rock", "Fighting"], "form": "Mega", "abilities": { "0": "Tough Claws" }, "championsVerified": false },
+    { "name": "Mega Dragalge", "dexNumber": 691, "types": ["Poison", "Dragon"], "form": "Mega", "abilities": { "0": "Regenerator" }, "championsVerified": false },
+    { "name": "Mega Falinks", "dexNumber": 870, "types": ["Fighting"], "form": "Mega", "abilities": { "0": "Defiant" }, "championsVerified": false }
+  ],
+  "baseStats": [
+    { "name": "Mega Raichu X", "dexNumber": 26, "form": "Mega", "hp": 60, "atk": 135, "def": 95, "spa": 90, "spd": 95, "spe": 110, "total": 585, "championsVerified": false },
+    { "name": "Mega Raichu Y", "dexNumber": 26, "form": "Mega", "hp": 60, "atk": 100, "def": 55, "spa": 160, "spd": 85, "spe": 130, "total": 590, "championsVerified": false },
+    { "name": "Mega Staraptor", "dexNumber": 398, "form": "Mega", "hp": 85, "atk": 140, "def": 100, "spa": 60, "spd": 90, "spe": 110, "total": 585, "championsVerified": false },
+    { "name": "Mega Scolipede", "dexNumber": 545, "form": "Mega", "hp": 60, "atk": 140, "def": 149, "spa": 75, "spd": 99, "spe": 62, "total": 585, "championsVerified": false },
+    { "name": "Mega Scrafty", "dexNumber": 560, "form": "Mega", "hp": 65, "atk": 130, "def": 135, "spa": 55, "spd": 135, "spe": 68, "total": 588, "championsVerified": false },
+    { "name": "Mega Eelektross", "dexNumber": 604, "form": "Mega", "hp": 85, "atk": 145, "def": 80, "spa": 135, "spd": 90, "spe": 80, "total": 615, "championsVerified": false },
+    { "name": "Mega Pyroar", "dexNumber": 668, "form": "Mega", "hp": 86, "atk": 88, "def": 92, "spa": 129, "spd": 86, "spe": 126, "total": 607, "championsVerified": false },
+    { "name": "Mega Malamar", "dexNumber": 687, "form": "Mega", "hp": 86, "atk": 102, "def": 88, "spa": 98, "spd": 120, "spe": 88, "total": 582, "championsVerified": false },
+    { "name": "Mega Barbaracle", "dexNumber": 689, "form": "Mega", "hp": 72, "atk": 140, "def": 130, "spa": 64, "spd": 106, "spe": 88, "total": 600, "championsVerified": false },
+    { "name": "Mega Dragalge", "dexNumber": 691, "form": "Mega", "hp": 65, "atk": 85, "def": 105, "spa": 132, "spd": 163, "spe": 44, "total": 594, "championsVerified": false },
+    { "name": "Mega Falinks", "dexNumber": 870, "form": "Mega", "hp": 65, "atk": 135, "def": 135, "spa": 70, "spd": 65, "spe": 100, "total": 570, "championsVerified": false }
+  ]
+}
