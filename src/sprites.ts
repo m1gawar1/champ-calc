@@ -44,8 +44,13 @@ export function getFallbackSpriteUrl(dexNumber: number): string {
 // 集約アイテム（TypeBoost/ResistBerry）や「なし」は実物が無いので '' を返す。
 // 一部（heavy-duty-boots 等）は404のため、表示側は onError でアイコンを隠すこと。
 const POKEAPI_ITEMS = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items';
+// PokeAPI に無い道具アイコンの個別差し替え（読み込み失敗時は表示側で自動非表示）
+const ITEM_ICON_OVERRIDES: Record<string, string> = {
+  'Fairy Feather': 'https://www.serebii.net/itemdex/sprites/fairyfeather.png',
+};
 export function getItemSpriteUrl(en: string): string {
   if (!en || en === 'TypeBoost' || en === 'ResistBerry') return '';
+  if (ITEM_ICON_OVERRIDES[en]) return ITEM_ICON_OVERRIDES[en];
   const slug = en.toLowerCase().replace(/['.]/g, '').replace(/\s+/g, '-');
   return `${POKEAPI_ITEMS}/${slug}.png`;
 }
