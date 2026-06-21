@@ -412,6 +412,16 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
 
   const filledCount = draft.members.filter(Boolean).length;
 
+  // ボックスピッカーモーダルの表示状態
+  const [showBoxPicker, setShowBoxPicker] = useState(false);
+
+  // ボックス個体をコピーして最初の空スロットに追加
+  function addFromBox(build: PokemonBuild) {
+    const firstEmpty = draft.members.findIndex(m => !m);
+    if (firstEmpty === -1) return;
+    setMember(firstEmpty, structuredClone(build)); // 原本を壊さないようディープコピー
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <input
@@ -434,7 +444,14 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
       </div>
       {filledCount < 6 && (
         <button
-          onClick={addSlot}
+          onClick={() => {
+            // ボックスに個体があれば選択モーダルを開く、なければ直接空枠追加
+            if (store.box.length > 0) {
+              setShowBoxPicker(true);
+            } else {
+              addSlot();
+            }
+          }}
           style={{
             width: '100%', padding: '12px 0',
             border: `1px dashed ${t.dashedRim}`, borderRadius: 16,
@@ -443,6 +460,81 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
           }}
         >+ ポケモンを追加</button>
       )}
+
+      {/* ボックスから個体を選ぶピッカーモーダル */}
+      {showBoxPicker && (
+        <div
+          onClick={() => setShowBoxPicker(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ width: '100%', maxWidth: 440, maxHeight: '88vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
+          >
+            <Glass tint={t.glassTint} radius={22} padding={16}>
+              {/* ヘッダー */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4 }}>
+                  ボックスから追加
+                </div>
+                <button
+                  onClick={() => setShowBoxPicker(false)}
+                  aria-label="閉じる"
+                  style={{ color: t.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, padding: '0 4px', lineHeight: 1 }}
+                >✕</button>
+              </div>
+
+              {/* 空の個体を追加ボタン */}
+              <button
+                onClick={() => { addSlot(); setShowBoxPicker(false); }}
+                style={{
+                  width: '100%', padding: '10px 0', marginBottom: 12,
+                  border: `1px dashed ${t.dashedRim}`, borderRadius: 12,
+                  color: t.textMuted, fontSize: 13, fontWeight: 600,
+                  background: 'transparent', cursor: 'pointer',
+                }}
+              >＋ 空の個体を追加</button>
+
+              {/* ボックス個体グリッド */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                {store.box.map(b => {
+                  const entry = data.roster.find(r => r.name === b.build.rosterName);
+                  const spriteName = b.build.isMega && b.build.megaFormName ? b.build.megaFormName : b.build.rosterName;
+                  return (
+                    <Glass key={b.id} tint={t.glassTint} radius={16} padding={10}
+                      onClick={() => { addFromBox(b.build); setShowBoxPicker(false); }}
+                      style={{ cursor: 'pointer' }}>
+                      <div style={{
+                        width: '100%', aspectRatio: '1', borderRadius: 12, background: t.glassChip,
+                        boxShadow: `inset 0 0 0 0.5px ${t.btnSoftRim}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: 6,
+                      }}>
+                        <img
+                          src={getSpriteUrl(spriteName)}
+                          onError={e => { if (entry) (e.target as HTMLImageElement).src = getFallbackSpriteUrl(entry.dexNumber); }}
+                          alt="" style={{ width: '85%', height: '85%', objectFit: 'contain', imageRendering: 'pixelated' }}
+                        />
+                      </div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: t.text, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {displayPokemonName(spriteName)}
+                      </div>
+                      {b.nickname && (
+                        <div style={{ fontSize: 10, color: t.textMuted, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {b.nickname}
+                        </div>
+                      )}
+                    </Glass>
+                  );
+                })}
+              </div>
+            </Glass>
+          </div>
+        </div>
+      )}
+
       <div style={{ display: 'flex', gap: 8 }}>
         <button
           onClick={() => onSave(draft)}
