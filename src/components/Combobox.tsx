@@ -13,6 +13,7 @@ function normalize(str: string): string {
 interface ComboboxItem {
   label: string;
   value: string;
+  icon?: string; // 左に表示するアイコンURL（持ち物など）。'' なら非表示
 }
 
 interface ComboboxProps {
@@ -28,7 +29,10 @@ const MAX_SEARCH_RESULTS = 20;
 
 export function Combobox({ items, value, onChange, placeholder }: ComboboxProps) {
   const t = useTheme();
-  const selectedLabel = items.find(i => i.value === value)?.label ?? '';
+  const selectedItem = items.find(i => i.value === value);
+  const selectedLabel = selectedItem?.label ?? '';
+  // 選択中の項目にアイコンがあり、かつ検索入力中でなければ入力欄左にアイコンを出す
+  const showLeadingIcon = !!selectedItem?.icon && query === selectedLabel;
   const [query, setQuery] = useState(selectedLabel);
   const [open, setOpen] = useState(false);
   const [rect, setRect] = useState<{ left: number; top: number; bottom: number; width: number } | null>(null);
@@ -97,6 +101,11 @@ export function Combobox({ items, value, onChange, placeholder }: ComboboxProps)
 
   return (
     <div ref={containerRef} style={{ position: 'relative' }}>
+      {showLeadingIcon && (
+        <img src={selectedItem!.icon} alt="" loading="lazy"
+          onError={e => { (e.currentTarget.style.display = 'none'); }}
+          style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', width: 20, height: 20, objectFit: 'contain', imageRendering: 'pixelated', pointerEvents: 'none' }} />
+      )}
       <input
         ref={inputRef}
         type="text"
@@ -110,7 +119,7 @@ export function Combobox({ items, value, onChange, placeholder }: ComboboxProps)
           background: t.inputBg,
           color: t.text,
           border: `1px solid ${t.rim}`,
-          borderRadius: 10, padding: '8px 10px',
+          borderRadius: 10, padding: '8px 10px', paddingLeft: showLeadingIcon ? 32 : 10,
           fontSize: 13, fontWeight: 600,
           outline: 'none',
           fontFamily: 'inherit',
@@ -161,9 +170,16 @@ export function Combobox({ items, value, onChange, placeholder }: ComboboxProps)
                     onMouseEnter={e => (e.currentTarget.style.background = t.glassChip)}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
-                    <span>{item.label}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                      {item.icon && (
+                        <img src={item.icon} alt="" loading="lazy"
+                          onError={e => { (e.currentTarget.style.display = 'none'); }}
+                          style={{ width: 20, height: 20, objectFit: 'contain', imageRendering: 'pixelated', flexShrink: 0 }} />
+                      )}
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
+                    </span>
                     {item.label !== item.value && (
-                      <span style={{ color: t.textWeak, fontSize: 11, marginLeft: 8 }}>{item.value}</span>
+                      <span style={{ color: t.textWeak, fontSize: 11, marginLeft: 8, flexShrink: 0 }}>{item.value}</span>
                     )}
                   </li>
                 ))}

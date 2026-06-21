@@ -264,13 +264,23 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
             onClick={() => setShowItemModal(true)}
             style={{
               width: '100%', textAlign: 'left', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 6,
               background: t.inputBg, color: build.item ? t.text : t.textMuted,
               border: `1px solid ${t.rim}`, borderRadius: 10,
               padding: '8px 10px', fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              overflow: 'hidden', whiteSpace: 'nowrap',
             }}
           >
-            {itemItems.find(i => i.value === build.item)?.label ?? 'なし'}
+            {(() => { const it = itemItems.find(i => i.value === build.item); return (
+              <>
+                {it?.icon && (
+                  <img src={it.icon} alt="" loading="lazy"
+                    onError={e => { (e.currentTarget.style.display = 'none'); }}
+                    style={{ width: 20, height: 20, objectFit: 'contain', imageRendering: 'pixelated', flexShrink: 0 }} />
+                )}
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{it?.label ?? 'なし'}</span>
+              </>
+            ); })()}
           </button>
         </Glass>
         <Glass tint={t.glassNest} radius={6} padding={10} blur={14}>

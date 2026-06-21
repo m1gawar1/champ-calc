@@ -1,4 +1,5 @@
 // 競技用持ち物・特性のリストと日本語名定義
+import { getItemSpriteUrl } from '../sprites';
 
 export interface CompetitiveItem {
   en: string;
@@ -144,23 +145,27 @@ export function getAbilityItems(pokemonAbilities: Record<string, string>): { lab
 }
 
 // UIで持ち物選択リストを生成（ダメ計用・ダメージ系のみ）
-export function getItemItems(): { label: string; value: string }[] {
-  return COMPETITIVE_ITEMS.map(item => ({
-    value: item.en === 'No Item' ? '' : item.en,
-    label: item.ja + (item.note ? ` (${item.note})` : ''),
-  }));
+export function getItemItems(): { label: string; value: string; icon: string }[] {
+  return COMPETITIVE_ITEMS.map(item => {
+    const value = item.en === 'No Item' ? '' : item.en;
+    return {
+      value,
+      label: item.ja + (item.note ? ` (${item.note})` : ''),
+      icon: getItemSpriteUrl(value),
+    };
+  });
 }
 
 // パーティ/ボックス編集用の全持ち物リスト（名前のみ・管理用）。
 // ダメージ系（noteあり）＋一般道具を結合し、英名重複は除外する。
-export function getAllItemItems(): { label: string; value: string }[] {
+export function getAllItemItems(): { label: string; value: string; icon: string }[] {
   const seen = new Set<string>();
-  const out: { label: string; value: string }[] = [];
+  const out: { label: string; value: string; icon: string }[] = [];
   for (const item of [...COMPETITIVE_ITEMS, ...GENERAL_ITEMS]) {
     const value = item.en === 'No Item' ? '' : item.en;
     if (seen.has(value)) continue;
     seen.add(value);
-    out.push({ value, label: item.ja + (item.note ? ` (${item.note})` : '') });
+    out.push({ value, label: item.ja + (item.note ? ` (${item.note})` : ''), icon: getItemSpriteUrl(value) });
   }
   return out;
 }

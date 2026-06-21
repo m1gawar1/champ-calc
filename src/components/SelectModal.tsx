@@ -11,6 +11,7 @@ export interface SelectItem {
   type?: string;      // タイプ（英語名）。指定があるとタイプ絞り込みバーを表示
   power?: number;     // 威力（並び替え用）
   category?: string;  // 'Physical' | 'Special'（並び替え用）
+  icon?: string;      // 左に表示するアイコンURL（持ち物など）。'' なら非表示
 }
 
 export type SortKey = 'gojuon' | 'power' | 'type';
@@ -234,8 +235,15 @@ export function SelectModal({ title, items, value, onSelect, onClose, sortable, 
                     onMouseEnter={e => { if (!selected) e.currentTarget.style.background = t.glassChip; }}
                     onMouseLeave={e => { if (!selected) e.currentTarget.style.background = t.glassChip2; }}
                   >
-                    <span>{item.label}</span>
-                    {item.sub && <span style={{ color: t.textWeak, fontSize: 11, fontWeight: 600 }}>{item.sub}</span>}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                      {item.icon && (
+                        <img src={item.icon} alt="" loading="lazy"
+                          onError={e => { (e.currentTarget.style.display = 'none'); }}
+                          style={{ width: 24, height: 24, objectFit: 'contain', imageRendering: 'pixelated', flexShrink: 0 }} />
+                      )}
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
+                    </span>
+                    {item.sub && <span style={{ color: t.textWeak, fontSize: 11, fontWeight: 600, flexShrink: 0 }}>{item.sub}</span>}
                   </button>
                 );
               })}
