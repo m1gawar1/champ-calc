@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { Combobox } from './Combobox';
 import { NatureModal } from './NatureModal';
 import { Glass } from './Glass';
 import { SpSlider } from './Glass';
@@ -64,6 +63,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
   const [open, setOpen] = useState(defaultOpen ?? false);
   const [showNatureModal, setShowNatureModal] = useState(false);
   const [showPokemonModal, setShowPokemonModal] = useState(false);
+  const [showItemModal, setShowItemModal] = useState(false);
   const [openMoveSlot, setOpenMoveSlot] = useState<number | null>(null);
   const rosterNames = useMemo(() => getSelectableRoster(data.roster).map(r => r.name), [data.roster]);
   const pokemonItems = useMemo(() => getPokemonJaList(rosterNames), [rosterNames]);
@@ -239,9 +239,28 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.label}</span>
                   </div>
                 );
-              })() : (
-                <Combobox items={itemItems} value={build.item ?? ''} onChange={v => onChange({ ...build, item: v })} placeholder="なし" hideValueHint />
-              )}
+              })() : (() => {
+                // 技と同じ検索付きモーダルで選択
+                const it = resolveItem(build.item ?? '');
+                return (
+                  <button onClick={() => setShowItemModal(true)}
+                    style={{
+                      width: '100%', textAlign: 'left', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      background: t.inputBg, color: build.item ? t.text : t.textMuted,
+                      border: `1px solid ${t.rim}`, borderRadius: 10,
+                      padding: '8px 10px', fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
+                      overflow: 'hidden', whiteSpace: 'nowrap',
+                    }}>
+                    {it.icon && (
+                      <img src={it.icon} alt="" loading="lazy"
+                        onError={e => { e.currentTarget.style.display = 'none'; }}
+                        style={{ width: 20, height: 20, objectFit: 'contain', imageRendering: 'pixelated', flexShrink: 0 }} />
+                    )}
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.label}</span>
+                  </button>
+                );
+              })()}
             </div>
             <div>
               <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4, fontWeight: 600 }}>特性</div>
@@ -335,6 +354,15 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
           onClose={() => setOpenMoveSlot(null)}
           sortable
           persistKey="champ_move_sort"
+        />
+      )}
+      {showItemModal && (
+        <SelectModal
+          title="持ち物を選択"
+          items={itemItems}
+          value={build.item ?? ''}
+          onSelect={v => onChange({ ...build, item: v })}
+          onClose={() => setShowItemModal(false)}
         />
       )}
       {showNatureModal && (
