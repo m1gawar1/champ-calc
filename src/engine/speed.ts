@@ -8,6 +8,8 @@ export interface SpeedConditions {
   scarf: boolean;      // こだわりスカーフ ×1.5
   tailwind: boolean;   // おいかぜ ×2
   paralyzed: boolean;  // まひ ×0.5
+  abilityMod?: number;       // 特性による素早さ補正（4096=なし, 8192=×2, 6144=×1.5）
+  ignoreParaSpeed?: boolean; // はやあし: まひによる速度低下を無視
 }
 
 export const DEFAULT_SPEED_CONDITIONS: SpeedConditions = {
@@ -36,13 +38,15 @@ function applyRank(stat: number, rank: number): number {
 export function finalSpeed(stat: number, cond: SpeedConditions): number {
   let speed = applyRank(stat, cond.rank);
 
-  // 持ち物・場の補正を 4096 ベースで連結してから一括適用
+  // 持ち物・特性・場の補正を 4096 ベースで連結してから一括適用
   let mod = 4096;
+  if (cond.abilityMod && cond.abilityMod !== 4096) mod = chainMod(mod, cond.abilityMod); // 素早さ特性
   if (cond.scarf) mod = chainMod(mod, 6144);    // ×1.5
   if (cond.tailwind) mod = chainMod(mod, 8192); // ×2
   if (mod !== 4096) speed = pokeRound((speed * mod) / 4096);
 
-  if (cond.paralyzed) speed = Math.floor((speed * 50) / 100);
+  // まひは ×0.5。ただし「はやあし」は速度低下を無視
+  if (cond.paralyzed && !cond.ignoreParaSpeed) speed = Math.floor((speed * 50) / 100);
 
   return Math.min(speed, 10000);
 }
@@ -72,4 +76,36 @@ export function compareSpeed(mySpeed: number, theirSpeed: number): SpeedVerdict 
   if (mySpeed > theirSpeed) return 'faster';
   if (mySpeed < theirSpeed) return 'slower';
   return 'tie';
+}
+
+// ─── 素早さを上げる特性 ───
+export interface SpeedAbilityInfo {
+  mod: number;        // 4096ベース補正（8192=×2, 6144=×1.5）
+  label: string;      // トグルに出す発動条件ラベル
+  ignorePara?: boolean; // まひ速度低下を無視（はやあし）
+}
+
+// 英語特性名 → 素早さ補正情報
+export const SPEED_ABILITIES: Record<string, SpeedAbilityInfo> = {
+  'Swift Swim':   { mod: 8192, label: '雨' },
+  'Chlorophyll':  { mod: 8192, label: '晴れ' },
+  'Sand Rush':    { mod: 8192, label: '砂' },
+  'Slush Rush':   { mod: 8192, label: '雪' },
+  'Surge Surfer': { mod: 8192, label: 'エレキF' },
+  'Unburden':     { mod: 8192, label: 'かるわざ' },
+  'Quick Feet':   { mod: 6144, label: '状態異常', ignorePara: true },
+};
+
+// 候補特性（英語名Record）または明示選択から素早さ特性を検出。
+// chosen を渡した場合: それが素早さ特性ならそれを採用、違えば null（ユーザー選択を尊重）。
+// chosen 未指定: abilities の値を走査して最初の素早さ特性を返す。
+export function detectSpeedAbility(
+  abilities: Record<string, string>,
+  chosen?: string,
+): { en: string; info: SpeedAbilityInfo } | null {
+  if (chosen) return SPEED_ABILITIES[chosen] ? { en: chosen, info: SPEED_ABILITIES[chosen] } : null;
+  for (const en of Object.values(abilities ?? {})) {
+    if (SPEED_ABILITIES[en]) return { en, info: SPEED_ABILITIES[en] };
+  }
+  return null;
 }

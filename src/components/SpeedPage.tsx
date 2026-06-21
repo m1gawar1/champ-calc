@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Glass } from './Glass';
 import { useTheme, useThemeName } from '../theme';
 import type { ChampionsData, PokemonBuild } from '../types';
@@ -9,8 +9,10 @@ import {
   finalSpeed, speedPresets, compareSpeed,
   DEFAULT_SPEED_CONDITIONS,
   type SpeedConditions,
+  detectSpeedAbility,
+  type SpeedAbilityInfo,
 } from '../engine/speed';
-import { displayPokemonName } from '../i18n';
+import { displayPokemonName, abilityJaName } from '../i18n';
 import { getSpriteUrl, getFallbackSpriteUrl } from '../sprites';
 
 // ─── Props ───
@@ -141,6 +143,10 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
   const [theirCond, setTheirCond] = useState<SpeedConditions>(DEFAULT_SPEED_CONDITIONS);
   // 自分側選択中インデックス（candidates 配列のインデックス）
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  // 自分の素早さ特性トグル
+  const [myAbilityOn, setMyAbilityOn] = useState(false);
+  // 相手個体別の素早さ特性トグル（キー: opponentMembers のインデックス）
+  const [oppAbilityOn, setOppAbilityOn] = useState<Record<number, boolean>>({});
 
   // ── 自分側候補を組み立て ──
   // 1) アクティブパーティの非 null メンバー
@@ -193,6 +199,22 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
   // 選択中候補
   const selected = selectedIdx !== null ? candidates[selectedIdx] ?? null : null;
 
+  // 選択個体が変わったら特性トグルをリセット
+  useEffect(() => { setMyAbilityOn(false); }, [selectedIdx]);
+
+  // 選択中個体のロースターエントリから素早さ特性を検出
+  const mySpeedAbility = useMemo((): { en: string; info: SpeedAbilityInfo } | null => {
+    if (!selected) return null;
+    // メガ時はメガフォーム名のエントリを参照（特性固定なので chosen 無し）
+    // 非メガ時はユーザーが選択した特性（build.ability）を優先
+    const entryName = selected.build.isMega && selected.build.megaFormName
+      ? selected.build.megaFormName
+      : selected.build.rosterName;
+    const entry = data.roster.find(r => r.name === entryName);
+    const chosen = (!selected.build.isMega && selected.build.ability) ? selected.build.ability : undefined;
+    return detectSpeedAbility(entry?.abilities ?? {}, chosen);
+  }, [selected, data.roster]);
+
   // 選択中個体の S 実数値を computeStats で算出
   const myStatSpe: number | null = useMemo(() => {
     if (!selected) return null;
@@ -210,8 +232,13 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
     return computed.spe;
   }, [selected, data.baseStats, data.natures]);
 
+  // 素早さ特性ONを反映した補正（特性がONのときのみ abilityMod を注入）
+  const myCondEff: SpeedConditions = mySpeedAbility && myAbilityOn
+    ? { ...myCond, abilityMod: mySpeedAbility.info.mod, ignoreParaSpeed: mySpeedAbility.info.ignorePara }
+    : myCond;
+
   // 自分の最終素早さ
-  const myFinalSpeed: number | null = myStatSpe !== null ? finalSpeed(myStatSpe, myCond) : null;
+  const myFinalSpeed: number | null = myStatSpe !== null ? finalSpeed(myStatSpe, myCondEff) : null;
 
   return (
     <div style={{ padding: '70px 16px 130px', maxWidth: 500, margin: '0 auto' }}>
@@ -297,6 +324,16 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
             {/* 補正コントロール */}
             <div style={{ marginTop: 14 }}>
               <CondControls cond={myCond} onChange={setMyCond} />
+              {/* 素早さ特性トグル（特性がある場合のみ表示） */}
+              {mySpeedAbility && (
+                <div style={{ marginTop: 8 }}>
+                  <ToggleChip
+                    label={`${abilityJaName(mySpeedAbility.en)}（${mySpeedAbility.info.label}）`}
+                    active={myAbilityOn}
+                    onClick={() => setMyAbilityOn(v => !v)}
+                  />
+                </div>
+              )}
             </div>
 
             {/* 最終素早さ大表示 */}
@@ -346,6 +383,12 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
                 : displayPokemonName(opp.rosterName);
               const rosterEntry = data.roster.find(r => r.name === opp.rosterName);
 
+              // 特性検出用エントリ（メガ時はメガフォームのエントリを使う）
+              const abilEntry = opp.isMega && opp.megaFormName
+                ? data.roster.find(r => r.name === opp.megaFormName) ?? rosterEntry
+                : rosterEntry;
+              const oppSpeedAbility = detectSpeedAbility(abilEntry?.abilities ?? {});
+
               return (
                 <div key={idx} style={{
                   padding: 12, borderRadius: 16,
@@ -362,16 +405,28 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
                       alt={dispName}
                       style={{ width: 40, height: 40, imageRendering: 'pixelated', flexShrink: 0 }}
                     />
-                    <div>
+                    <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 14, fontWeight: 800, color: t.text }}>{dispName}</div>
                       <div style={{ fontSize: 11, color: t.textMuted }}>種族値S: {bs.spe}</div>
                     </div>
+                    {/* 素早さ特性トグル（特性がある場合のみ表示） */}
+                    {oppSpeedAbility && (
+                      <ToggleChip
+                        label={`${abilityJaName(oppSpeedAbility.en)}（${oppSpeedAbility.info.label}）`}
+                        active={!!oppAbilityOn[idx]}
+                        onClick={() => setOppAbilityOn(prev => ({ ...prev, [idx]: !prev[idx] }))}
+                      />
+                    )}
                   </div>
 
                   {/* 速度プリセットチップ */}
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {presets.map(preset => {
-                      const theirFinal = finalSpeed(preset.stat, theirCond);
+                      // 相手の特性トグルを反映した補正
+                      const theirCondEff: SpeedConditions = oppSpeedAbility && oppAbilityOn[idx]
+                        ? { ...theirCond, abilityMod: oppSpeedAbility.info.mod, ignoreParaSpeed: oppSpeedAbility.info.ignorePara }
+                        : theirCond;
+                      const theirFinal = finalSpeed(preset.stat, theirCondEff);
                       // 自分の最終素早さが確定している場合のみ色分け
                       const verdict = myFinalSpeed !== null
                         ? compareSpeed(myFinalSpeed, theirFinal)
