@@ -14,7 +14,7 @@ import { getMegaForms, getSelectableRoster, getPokemonLearnset, findBaseStats } 
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { getPokemonJaList, displayPokemonName, moveJa, NATURE_JA, STAT_JA, TYPE_JA } from '../i18n';
 import { getSpriteUrl, getFallbackSpriteUrl } from '../sprites';
-import { getAbilityItems, getItemItems } from '../engine/competitive';
+import { getAbilityItems, getAllItemItems } from '../engine/competitive';
 
 interface Props {
   data: ChampionsData;
@@ -79,9 +79,16 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
     moveCandidates.map(m => ({ label: moveJa(m.name), value: m.name, sub: `${TYPE_JA[m.type] ?? m.type} ${m.power}`, type: m.type, power: m.power, category: m.category })),
     [moveCandidates]);
   const abilityItems = useMemo(() => getAbilityItems(activeEntry?.abilities ?? {}), [activeEntry]);
-  const itemItems = useMemo(() => getItemItems(), []);
+  // パーティ/ボックス編集は名前だけの全持ち物リスト（管理用）
+  const itemItems = useMemo(() => getAllItemItems(), []);
 
-  function setSp(key: keyof SpAlloc, val: number) { onChange({ ...build, sp: { ...build.sp, [key]: val } }); }
+  // SP合計66・各32上限でクランプ（66超過時は今振れる残量まで）
+  function clampSp(key: keyof SpAlloc, val: number): number {
+    const others = (['hp', 'atk', 'def', 'spa', 'spd', 'spe'] as const)
+      .filter(k => k !== key).reduce((s, k) => s + build.sp[k], 0);
+    return Math.max(0, Math.min(val, 32, 66 - others));
+  }
+  function setSp(key: keyof SpAlloc, val: number) { onChange({ ...build, sp: { ...build.sp, [key]: clampSp(key, val) } }); }
   function setMove(i: number, v: string) {
     const next = [...(build.moves ?? []), '', '', '', ''].slice(0, 4);
     next[i] = v;

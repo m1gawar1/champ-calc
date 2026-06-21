@@ -44,6 +44,16 @@ export async function loadData(): Promise<ChampionsData> {
     if (!baseStatsNames.has(entry.name)) baseStats.push(entry);
   }
 
+  // ローカル技上書き: 上流が未反映/古い値の技を Champions 仕様に補正
+  // Make It Rain（ゴールドラッシュ・サーフゴー専用技）は上流が inChampions:false のため
+  // 技選択に出てこない。Champions では実装済み・命中95 に下方修正されているため上書きする。
+  for (const m of moves) {
+    if (m.name === 'Make It Rain') {
+      m.inChampions = true;
+      m.accuracy = 95;
+    }
+  }
+
   cache = { roster, baseStats, moves, natures, learnsets };
   return cache;
 }

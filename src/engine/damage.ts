@@ -12,6 +12,17 @@ function chain(val: number, num: number, den = 4096): number {
   return Math.floor(val * num / den);
 }
 
+// ウェザーボールの天候別タイプ（天候なしは Normal）。表示・計算で共用。
+export function getWeatherBallType(weather: BattleConditions['weather']): string {
+  switch (weather) {
+    case 'sun':  return 'Fire';
+    case 'rain': return 'Water';
+    case 'sand': return 'Rock';
+    case 'hail': return 'Ice';
+    default:     return 'Normal';
+  }
+}
+
 // ランク補正（攻撃/防御実数値に直接かける）
 function applyRank(stat: number, rank: number): number {
   if (rank === 0) return stat;
@@ -31,23 +42,31 @@ export function calcDamageRolls(
   attackerAbility = '',
   defenderAbility = '',
 ): number[] {
-  if (move.category === 'Status' || move.power <= 0) return Array(16).fill(0);
+  // ウェザーボール: 天候で威力2倍・タイプ変化（STAB/相性/天候補正すべてに反映）
+  let effType = move.type;
+  let effPower = move.power;
+  if (move.name === 'Weather Ball' && (cond.weather ?? null) !== null) {
+    effType = getWeatherBallType(cond.weather ?? null);
+    effPower = move.power * 2;
+  }
+
+  if (move.category === 'Status' || effPower <= 0) return Array(16).fill(0);
 
   const isPhysical = move.category === 'Physical';
 
   // ── 防御側特性による無効チェック ──
-  if (defenderAbility === 'Wonder Guard' && getTypeEffectiveness(move.type, defenderTypes) <= 1) return Array(16).fill(0);
-  if (defenderAbility === 'Levitate'     && move.type === 'Ground')   return Array(16).fill(0);
-  if (defenderAbility === 'Flash Fire'   && move.type === 'Fire')     return Array(16).fill(0);
-  if (defenderAbility === 'Water Absorb' && move.type === 'Water')    return Array(16).fill(0);
-  if (defenderAbility === 'Volt Absorb'  && move.type === 'Electric') return Array(16).fill(0);
-  if (defenderAbility === 'Lightning Rod'&& move.type === 'Electric') return Array(16).fill(0);
-  if (defenderAbility === 'Storm Drain'  && move.type === 'Water')    return Array(16).fill(0);
-  if (defenderAbility === 'Sap Sipper'   && move.type === 'Grass')    return Array(16).fill(0);
-  if (defenderAbility === 'Motor Drive'  && move.type === 'Electric') return Array(16).fill(0);
+  if (defenderAbility === 'Wonder Guard' && getTypeEffectiveness(effType, defenderTypes) <= 1) return Array(16).fill(0);
+  if (defenderAbility === 'Levitate'     && effType === 'Ground')   return Array(16).fill(0);
+  if (defenderAbility === 'Flash Fire'   && effType === 'Fire')     return Array(16).fill(0);
+  if (defenderAbility === 'Water Absorb' && effType === 'Water')    return Array(16).fill(0);
+  if (defenderAbility === 'Volt Absorb'  && effType === 'Electric') return Array(16).fill(0);
+  if (defenderAbility === 'Lightning Rod'&& effType === 'Electric') return Array(16).fill(0);
+  if (defenderAbility === 'Storm Drain'  && effType === 'Water')    return Array(16).fill(0);
+  if (defenderAbility === 'Sap Sipper'   && effType === 'Grass')    return Array(16).fill(0);
+  if (defenderAbility === 'Motor Drive'  && effType === 'Electric') return Array(16).fill(0);
 
   // タイプ相性
-  const effectiveness = getTypeEffectiveness(move.type, defenderTypes);
+  const effectiveness = getTypeEffectiveness(effType, defenderTypes);
   if (effectiveness === 0) return Array(16).fill(0);
 
   // ── ランク補正後の実数値 ──
@@ -73,7 +92,7 @@ export function calcDamageRolls(
   }
 
   // ── 有効威力（テクニシャン等） ──
-  let power = move.power;
+  let power = effPower;
   if (attackerAbility === 'Technician' && power <= 60) {
     power = Math.floor(power * 3 / 2);
   }
@@ -91,33 +110,33 @@ export function calcDamageRolls(
     // ── 天候 ──
     const weather = cond.weather ?? null;
     if (weather === 'sun') {
-      if (move.type === 'Fire')  d = chain(d, 6144);
-      if (move.type === 'Water') d = chain(d, 2048);
+      if (effType === 'Fire')  d = chain(d, 6144);
+      if (effType === 'Water') d = chain(d, 2048);
     } else if (weather === 'rain') {
-      if (move.type === 'Water') d = chain(d, 6144);
-      if (move.type === 'Fire')  d = chain(d, 2048);
+      if (effType === 'Water') d = chain(d, 6144);
+      if (effType === 'Fire')  d = chain(d, 2048);
     }
 
     // サンドフォース（砂嵐中のいわ/はがね/じめん）
     if (weather === 'sand' && attackerAbility === 'Sand Force' &&
-        ['Rock', 'Steel', 'Ground'].includes(move.type)) {
+        ['Rock', 'Steel', 'Ground'].includes(effType)) {
       d = chain(d, 5325); // ×1.3
     }
 
     // もらいび（攻撃側）
-    if (attackerAbility === 'Flash Fire' && move.type === 'Fire') {
+    if (attackerAbility === 'Flash Fire' && effType === 'Fire') {
       d = chain(d, 6144); // ×1.5
     }
 
     // ── フィールド ──
     const field = cond.field ?? null;
-    if (field === 'electric' && move.type === 'Electric') d = chain(d, 5325);
+    if (field === 'electric' && effType === 'Electric') d = chain(d, 5325);
     if (field === 'grassy') {
-      if (move.type === 'Grass') d = chain(d, 5325);
+      if (effType === 'Grass') d = chain(d, 5325);
       if (['Earthquake', 'Bulldoze', 'Magnitude'].includes(move.name)) d = chain(d, 2048);
     }
-    if (field === 'psychic' && move.type === 'Psychic') d = chain(d, 5325);
-    if (field === 'misty'   && move.type === 'Dragon')  d = chain(d, 2048);
+    if (field === 'psychic' && effType === 'Psychic') d = chain(d, 5325);
+    if (field === 'misty'   && effType === 'Dragon')  d = chain(d, 2048);
 
     // ── 急所（×1.5） ──
     if (cond.isCrit) d = chain(d, 6144);
@@ -126,7 +145,7 @@ export function calcDamageRolls(
     d = Math.floor(d * r / 100);
 
     // ── STAB ──
-    if (attackerTypes.includes(move.type)) {
+    if (attackerTypes.includes(effType)) {
       d = chain(d, attackerAbility === 'Adaptability' ? 8192 : 6144);
     }
 
@@ -149,10 +168,10 @@ export function calcDamageRolls(
     if (attackerItem === 'Punching Glove' && PUNCH_MOVES.has(move.name)) d = chain(d, 4505);
 
     // タイプ強化アイテム（×1.2）。集約値 'TypeBoost' / 旧個別アイテム両対応
-    if (attackerItem === 'TypeBoost' || TYPE_BOOST_ITEMS[attackerItem] === move.type) d = chain(d, 4915);
+    if (attackerItem === 'TypeBoost' || TYPE_BOOST_ITEMS[attackerItem] === effType) d = chain(d, 4915);
 
     // 半減きのみ（受け側・該当タイプ×0.5）。ノーマルは常時、他は効果抜群時のみ発動
-    if (defenderItem === 'ResistBerry' && (move.type === 'Normal' || effectiveness > 1)) d = chain(d, 2048);
+    if (defenderItem === 'ResistBerry' && (effType === 'Normal' || effectiveness > 1)) d = chain(d, 2048);
 
     // ── 攻撃側特性（ダメージ修正子） ──
     if (attackerAbility === 'Sheer Force'   && hasSecondaryEffect(move.name))  d = chain(d, 5325);
@@ -161,9 +180,9 @@ export function calcDamageRolls(
     if (attackerAbility === 'Strong Jaw'    && BITE_MOVES.has(move.name))      d = chain(d, 6144);
     if (attackerAbility === 'Mega Launcher' && PULSE_MOVES.has(move.name))     d = chain(d, 6144);
     if (attackerAbility === 'Reckless'      && RECOIL_MOVES.has(move.name))    d = chain(d, 4915);
-    if (attackerAbility === "Dragon's Maw"  && move.type === 'Dragon')         d = chain(d, 6144);
-    if (attackerAbility === 'Transistor'    && move.type === 'Electric')       d = chain(d, 5325);
-    if (attackerAbility === 'Rocky Payload' && move.type === 'Rock')           d = chain(d, 6144);
+    if (attackerAbility === "Dragon's Maw"  && effType === 'Dragon')         d = chain(d, 6144);
+    if (attackerAbility === 'Transistor'    && effType === 'Electric')       d = chain(d, 5325);
+    if (attackerAbility === 'Rocky Payload' && effType === 'Rock')           d = chain(d, 6144);
     if (attackerAbility === 'Punk Rock'     && SOUND_MOVES.has(move.name))     d = chain(d, 5325);
 
     // HP1/3以下特性（簡略：常に適用としてUIでトグル可能に）
@@ -177,7 +196,7 @@ export function calcDamageRolls(
         (cond.defAtFullHp !== false)) {
       d = chain(d, 2048); // ×0.5
     }
-    if (defenderAbility === 'Thick Fat' && (move.type === 'Fire' || move.type === 'Ice')) {
+    if (defenderAbility === 'Thick Fat' && (effType === 'Fire' || effType === 'Ice')) {
       d = chain(d, 2048);
     }
     if ((defenderAbility === 'Filter' || defenderAbility === 'Solid Rock' || defenderAbility === 'Prism Armor') &&
@@ -186,7 +205,7 @@ export function calcDamageRolls(
     }
     if (defenderAbility === 'Fluffy') {
       if (contact)              d = chain(d, 2048);
-      if (move.type === 'Fire') d = chain(d, 8192);
+      if (effType === 'Fire') d = chain(d, 8192);
     }
     if (defenderAbility === 'Punk Rock' && SOUND_MOVES.has(move.name)) d = chain(d, 2048);
     if (defenderAbility === 'Ice Scales' && !isPhysical)               d = chain(d, 2048);

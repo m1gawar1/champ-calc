@@ -8,8 +8,8 @@ import { DEFAULT_IVS, DEFAULT_SP, DEFAULT_CONDITIONS } from '../types';
 import type { CalcHistoryEntry } from '../store';
 import { findBaseStats, getMegaForms, getSelectableRoster, getSelectableMoves, getPokemonLearnset } from '../data';
 import { computeStats, getNatureMult } from '../engine/stats';
-import { calcDamageRolls, buildResult, calcHazardDamage } from '../engine/damage';
-import { reverseCalcDefense } from '../engine/reverseCalc';
+import { calcDamageRolls, buildResult, calcHazardDamage, getWeatherBallType } from '../engine/damage';
+import { reverseCalcDefense, reverseCalcAttack } from '../engine/reverseCalc';
 import { getTypeEffectiveness, effectivenessLabel } from '../engine/typeChart';
 import { getPokemonJaList, getMoveJaList, displayPokemonName, moveJa, TYPE_JA } from '../i18n';
 import { getSpriteUrl, getFallbackSpriteUrl } from '../sprites';
@@ -109,9 +109,10 @@ function PartyQuickBar({ label, accentColor, members, selectedName, onSelect }: 
 }
 
 // ─── ポケモンパネル ───
-function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory = [], myPartyMembers = [], opponentMembers = [], onHistoryAdd = () => {} }: {
+function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondChange, pokemonHistory = [], myPartyMembers = [], opponentMembers = [], onHistoryAdd = () => {} }: {
   title: string; build: PokemonBuild; onChange: (b: PokemonBuild) => void;
   data: ChampionsData; showAtkSp: boolean;
+  cond: BattleConditions; onCondChange: (c: BattleConditions) => void;
   pokemonHistory?: string[];
   myPartyMembers?: (PokemonBuild | null)[];
   opponentMembers?: PokemonBuild[];
@@ -140,7 +141,19 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
   const itemItems = useMemo(() => getItemItems(), []);
   const abilityItems = useMemo(() => getAbilityItems(activeEntry?.abilities ?? {}), [activeEntry]);
 
-  function setSp(k: keyof SpAlloc, v: number) { onChange({ ...build, sp: { ...build.sp, [k]: v } }); }
+  // SP合計66・各32上限でクランプ（66超過時は今振れる残量まで）
+  function clampSp(k: keyof SpAlloc, v: number): number {
+    const others = (['hp', 'atk', 'def', 'spa', 'spd', 'spe'] as const)
+      .filter(s => s !== k).reduce((sum, s) => sum + build.sp[s], 0);
+    return Math.max(0, Math.min(v, 32, 66 - others));
+  }
+  function setSp(k: keyof SpAlloc, v: number) { onChange({ ...build, sp: { ...build.sp, [k]: clampSp(k, v) } }); }
+
+  // ランク補正（攻撃側=atkRank / 防御側=defRank）。バトル状況からこのパネルへ移設。
+  const rankKey: 'atkRank' | 'defRank' = showAtkSp ? 'atkRank' : 'defRank';
+  const rankVal = cond[rankKey];
+  function setRank(v: number) { onCondChange({ ...cond, [rankKey]: Math.max(-6, Math.min(6, v)) }); }
+
   function toggleMega(megaName: string, isOn: boolean) {
     const entry = data.roster.find(r => r.name === megaName);
     const autoAbility = isOn && entry ? Object.values(entry.abilities)[0] ?? '' : (rosterEntry ? Object.values(rosterEntry.abilities)[0] ?? '' : '');
@@ -159,7 +172,15 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
 
   function setPreset(val: number) {
     const next = { ...build.sp };
-    relevantKeys.forEach(k => { next[k] = val; });
+    // 一旦対象キーを0にしてから、合計66を超えないよう順に充填する
+    relevantKeys.forEach(k => { next[k] = 0; });
+    if (val > 0) {
+      let used = (Object.keys(next) as (keyof SpAlloc)[]).reduce((s, k) => s + next[k], 0);
+      for (const k of relevantKeys) {
+        const give = Math.max(0, Math.min(val, 32, 66 - used));
+        next[k] = give; used += give;
+      }
+    }
     onChange({ ...build, sp: next });
   }
 
@@ -270,7 +291,18 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, pokemonHistory 
 
       {/* 性格補正（倍率を直接指定。相手の性格不明時の予測用）。タブバー風セグメントで1行表示 */}
       <div style={{ marginBottom: 14 }}>
-        <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600 }}>性格補正</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600 }}>性格補正</span>
+          {/* ランク補正（攻撃側=攻撃ランク / 防御側=防御ランク） */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600 }}>{showAtkSp ? '攻撃ランク' : '防御ランク'}</span>
+            <button onClick={() => setRank(rankVal - 1)}
+              style={{ width: 24, height: 24, borderRadius: 99, background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`, color: t.text, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, lineHeight: 1 }}>−</button>
+            <span style={{ width: 26, textAlign: 'center', fontSize: 13, fontWeight: 800, color: rankVal > 0 ? t.accentAtk : rankVal < 0 ? t.accentDef : t.textMuted }}>{rankVal > 0 ? `+${rankVal}` : rankVal}</span>
+            <button onClick={() => setRank(rankVal + 1)}
+              style={{ width: 24, height: 24, borderRadius: 99, background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`, color: t.text, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, lineHeight: 1 }}>＋</button>
+          </div>
+        </div>
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
           {(showAtkSp ? (['atk', 'spa'] as const) : (['def', 'spd'] as const)).map(stat => {
             const cur = multOf(stat);
@@ -361,7 +393,7 @@ function ConditionsPanel({ cond, onChange }: { cond: BattleConditions; onChange:
   const t = useTheme();
   const [open, setOpen] = useState(false);
   const hasCondition = cond.weather || cond.field || cond.isCrit || cond.isBurned ||
-    cond.atkRank !== 0 || cond.defRank !== 0 || !cond.defAtFullHp ||
+    !cond.defAtFullHp ||
     cond.reflect || cond.lightScreen || cond.auroraVeil ||
     cond.stealthRock || cond.spikes > 0 || cond.sandTurns > 0;
 
@@ -383,26 +415,6 @@ function ConditionsPanel({ cond, onChange }: { cond: BattleConditions; onChange:
         color: active ? t.text : t.textMuted, border: 'none', cursor: 'pointer',
         transition: 'all 0.15s',
       }}>{label}</button>
-    );
-  }
-
-  function RankControl({ label, value, statKey }: { label: string; value: number; statKey: 'atkRank' | 'defRank' }) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 12, color: t.textMuted, width: 60 }}>{label}</span>
-        <button onClick={() => onChange({ ...cond, [statKey]: Math.max(-6, value - 1) })}
-          style={{ width: 28, height: 28, borderRadius: 99, background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`, color: t.text, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700 }}>−</button>
-        <span style={{
-          width: 32, textAlign: 'center', fontSize: 13, fontWeight: 800,
-          color: value > 0 ? t.accentAtk : value < 0 ? t.accentDef : t.textMuted,
-        }}>{value > 0 ? `+${value}` : value}</span>
-        <button onClick={() => onChange({ ...cond, [statKey]: Math.min(6, value + 1) })}
-          style={{ width: 28, height: 28, borderRadius: 99, background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`, color: t.text, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700 }}>+</button>
-        {value !== 0 && (
-          <button onClick={() => onChange({ ...cond, [statKey]: 0 })}
-            style={{ fontSize: 11, color: t.textWeak, background: 'none', border: 'none', cursor: 'pointer' }}>0</button>
-        )}
-      </div>
     );
   }
 
@@ -443,9 +455,6 @@ function ConditionsPanel({ cond, onChange }: { cond: BattleConditions; onChange:
             <ChipBtn active={cond.isBurned} onClick={() => onChange({ ...cond, isBurned: !cond.isBurned })} label="攻撃側やけど" activeColor="rgba(255,120,60,0.3)" />
             <ChipBtn active={cond.defAtFullHp} onClick={() => onChange({ ...cond, defAtFullHp: !cond.defAtFullHp })} label="防御側満タン" activeColor="rgba(80,200,150,0.3)" />
           </div>
-          <RankControl label="攻撃ランク" value={cond.atkRank} statKey="atkRank" />
-          <RankControl label="防御ランク" value={cond.defRank} statKey="defRank" />
-
           <div>
             <div style={{ fontSize: 11, color: t.textMuted, fontWeight: 600, marginBottom: 8 }}>スクリーン（防御側）</div>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -505,15 +514,18 @@ function MoveSlots({ slots, onChange, data, rosterName, learnsetFilter, onToggle
   learnsetFilter: boolean; onToggleFilter: () => void;
 }) {
   const t = useTheme();
+  const [includeStatus, setIncludeStatus] = useState(false); // 変化技も候補に含めるか
   const learnset = useMemo(() => learnsetFilter && rosterName
     ? getPokemonLearnset(data.learnsets, rosterName) : null,
     [data.learnsets, rosterName, learnsetFilter]);
-  const verifiedMoves = useMemo(() => getSelectableMoves(data.moves), [data.moves]);
+  const verifiedMoves = useMemo(() => getSelectableMoves(data.moves), [data.moves]); // 攻撃技（変化除く）
+  const verifiedWithStatus = useMemo(() => data.moves.filter(m => m.inChampions !== false && (m.power > 0 || m.category === 'Status')), [data.moves]);
   const allDamagingMoves = useMemo(() => data.moves.filter(m => m.power > 0 && m.category !== 'Status'), [data.moves]);
+  const allWithStatus = useMemo(() => data.moves.filter(m => m.power > 0 || m.category === 'Status'), [data.moves]);
   const filteredMoves = useMemo(() => {
-    if (!learnset) return verifiedMoves;
-    return allDamagingMoves.filter(m => learnset.has(m.name));
-  }, [verifiedMoves, allDamagingMoves, learnset]);
+    if (!learnset) return includeStatus ? verifiedWithStatus : verifiedMoves;
+    return (includeStatus ? allWithStatus : allDamagingMoves).filter(m => learnset.has(m.name));
+  }, [verifiedMoves, verifiedWithStatus, allDamagingMoves, allWithStatus, learnset, includeStatus]);
   const learnsetFound = !learnsetFilter || !rosterName || learnset !== null;
   // 技選択モーダル用（日本語名 + タイプ・威力を補助表示）
   const moveSelectItems = useMemo(() =>
@@ -528,6 +540,14 @@ function MoveSlots({ slots, onChange, data, rosterName, learnsetFilter, onToggle
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {learnsetFilter && !learnsetFound && <span style={{ fontSize: 11, color: 'rgba(255,200,60,0.9)' }}>データなし</span>}
           {learnsetFilter && learnsetFound && learnset && <span style={{ fontSize: 11, color: t.textWeak }}>{filteredMoves.length}技</span>}
+          <button onClick={() => setIncludeStatus(s => !s)}
+            style={{
+              fontSize: 11, padding: '4px 10px', borderRadius: 99,
+              background: includeStatus ? 'rgba(90,200,250,0.2)' : t.glassChip,
+              boxShadow: includeStatus ? `inset 0 0 0 0.5px ${t.rimAccent}` : `inset 0 0 0 0.5px ${t.rim}`,
+              color: includeStatus ? t.accentAtk : t.textMuted,
+              border: 'none', cursor: 'pointer', fontWeight: 600,
+            }}>変化</button>
           <button onClick={onToggleFilter}
             style={{
               fontSize: 11, padding: '4px 10px', borderRadius: 99,
@@ -566,7 +586,7 @@ function MoveSlots({ slots, onChange, data, rosterName, learnsetFilter, onToggle
               {move && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 6 }}>
                   <TypePill type={move.type} size={9} />
-                  <span style={{ fontSize: 9, color: t.textMuted }}>{move.category === 'Physical' ? '物理' : '特殊'}</span>
+                  <span style={{ fontSize: 9, color: t.textMuted }}>{move.category === 'Physical' ? '物理' : move.category === 'Special' ? '特殊' : '変化'}</span>
                   <span style={{ fontFamily: 'monospace', fontSize: 10, color: t.text, fontWeight: 700, marginLeft: 'auto' }}>{move.power}</span>
                 </div>
               )}
@@ -590,9 +610,9 @@ function MoveSlots({ slots, onChange, data, rosterName, learnsetFilter, onToggle
 }
 
 // ─── 結果カード（1技分） ───
-function ResultCard({ data, attacker, defender, moveEnName, cond }: {
+function ResultCard({ data, attacker, defender, moveEnName, cond, swapped }: {
   data: ChampionsData; attacker: PokemonBuild; defender: PokemonBuild;
-  moveEnName: string; cond: BattleConditions;
+  moveEnName: string; cond: BattleConditions; swapped: boolean;
 }) {
   const t = useTheme();
   const isDark = useThemeName() === 'dark';
@@ -620,9 +640,13 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
       : getSelectableRoster(data.roster).find(r => r.name === defender.rosterName);
     const atkTypes = atkEntry?.types ?? [];
     const defTypes = defEntry?.types ?? [];
-    const effectiveness = getTypeEffectiveness(move.type, defTypes);
+    // ウェザーボールは天候で実効タイプ・威力が変わる（表示・相性に反映）
+    const isWB = move.name === 'Weather Ball' && (cond.weather ?? null) !== null;
+    const dispType = isWB ? getWeatherBallType(cond.weather) : move.type;
+    const dispPower = isWB ? move.power * 2 : move.power;
+    const effectiveness = getTypeEffectiveness(dispType, defTypes);
     const rolls = calcDamageRolls(atkStats, defStats, atkTypes, defTypes, move, cond, attacker.item, defender.item, attacker.ability, defender.ability);
-    const result = buildResult(rolls, defStats.hp, effectiveness, moveEnName, move.type, move.power, move.category);
+    const result = buildResult(rolls, defStats.hp, effectiveness, moveEnName, dispType, dispPower, move.category);
     const isPhysical = move.category === 'Physical';
     const defStatKey = isPhysical ? 'def' : 'spd';
     let minDefSp: number | null = null;
@@ -878,7 +902,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
           )}
 
           <div style={{ fontSize: 11, color: t.textMuted, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            <span>{result.moveCategory === 'Physical' ? '物理' : '特殊'} {result.movePower}</span>
+            <span>{result.moveCategory === 'Physical' ? '物理' : result.moveCategory === 'Special' ? '特殊' : '変化'} {result.movePower}</span>
             {attacker.item && <span>{attacker.item}</span>}
             {attacker.ability && <span>{ABILITY_JA[attacker.ability] ?? attacker.ability}</span>}
           </div>
@@ -928,7 +952,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
           {/* ダメージから逆算 */}
           <Glass tint={t.glassNest} radius={6} padding={10} blur={12}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-              <div style={{ fontSize: 11, color: t.textMuted, fontWeight: 700 }}>▼ ダメージから相手の型を逆算</div>
+              <div style={{ fontSize: 11, color: t.textMuted, fontWeight: 700 }}>▼ ダメージから相手の型を逆算（{swapped ? '攻撃側' : '防御側'}）</div>
               <div style={{ display: 'flex', gap: 4 }}>
                 {(['dmg', 'pct'] as const).map(mode => (
                   <button key={mode} onClick={() => { setReverseMode(mode); setReverseResult(null); }}
@@ -989,7 +1013,11 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
                     dmg = Math.round(result.defenderHp * pct / 100);
                   }
                   if (!dmg || dmg <= 0) return;
-                  setReverseResult(reverseCalcDefense(data, attacker, defender, move, cond, dmg));
+                  setReverseResult(
+                    swapped
+                      ? reverseCalcAttack(data, attacker, defender, move, cond, dmg)
+                      : reverseCalcDefense(data, attacker, defender, move, cond, dmg),
+                  );
                 }}
                 style={{
                   padding: '5px 12px', borderRadius: 99,
@@ -1000,8 +1028,14 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
             </div>
             {reverseResult && (
               <div>
-                <div style={{ fontSize: 11, color: t.text, fontWeight: 700, marginBottom: 6 }}>
-                  {reverseResult.statLabel} の候補（補正区分別）:
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <div style={{ fontSize: 11, color: t.text, fontWeight: 700 }}>
+                    {reverseResult.statLabel} の候補（補正区分別）:
+                  </div>
+                  <button onClick={() => setReverseResult(null)}
+                    style={{ fontSize: 11, padding: '3px 9px', borderRadius: 99, background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`, color: t.textMuted, border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+                    ✕ クリア
+                  </button>
                 </div>
                 {reverseResult.groups.every(g => g.entries.length === 0) ? (
                   <div style={{ fontSize: 11, color: 'rgba(255,100,100,0.8)' }}>該当なし（値を確認してください）</div>
@@ -1012,8 +1046,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
                         flex: 1, background: t.glassChip, borderRadius: 8,
                         boxShadow: `inset 0 0 0 0.5px ${t.rim}`, padding: '6px 8px',
                       }}>
-                        <div style={{ fontSize: 10.5, fontWeight: 700, color: t.accentAtk, marginBottom: 1 }}>{g.label}</div>
-                        <div style={{ fontSize: 9.5, color: t.textWeak, marginBottom: 4 }}>{g.natureJa}</div>
+                        <div style={{ fontSize: 10.5, fontWeight: 700, color: t.accentAtk, marginBottom: 4 }}>{g.label}</div>
                         {g.entries.length === 0 ? (
                           <div style={{ fontSize: 10, color: t.textWeak }}>—</div>
                         ) : (
@@ -1042,10 +1075,11 @@ function ResultCard({ data, attacker, defender, moveEnName, cond }: {
 }
 
 // ─── 結果セクション（自動保存付き） ───
-function ResultsSection({ data, attacker, defender, moveSlots, cond, onCalcHistory }: {
+function ResultsSection({ data, attacker, defender, moveSlots, cond, onCalcHistory, swapped }: {
   data: ChampionsData; attacker: PokemonBuild; defender: PokemonBuild;
   moveSlots: string[]; cond: BattleConditions;
   onCalcHistory?: Props['onCalcHistory'];
+  swapped: boolean;
 }) {
   const t = useTheme();
   const activeMoves = moveSlots.filter(Boolean);
@@ -1092,7 +1126,7 @@ function ResultsSection({ data, attacker, defender, moveSlots, cond, onCalcHisto
       <div style={{ fontSize: 11, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4, padding: '0 4px 10px' }}>計算結果</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {moveSlots.map((m, i) => m ? (
-          <ResultCard key={i} data={data} attacker={attacker} defender={defender} moveEnName={m} cond={cond} />
+          <ResultCard key={i} data={data} attacker={attacker} defender={defender} moveEnName={m} cond={cond} swapped={swapped} />
         ) : null)}
       </div>
     </div>
@@ -1105,6 +1139,8 @@ export function Calculator({ data, myPartyMembers = [], opponentMembers = [], po
   const [attacker, setAttacker] = useState<PokemonBuild>(defaultBuild());
   const [defender, setDefender] = useState<PokemonBuild>(defaultBuild());
   const [moveSlots, setMoveSlots] = useState<string[]>(['', '', '', '']);
+  // 反対向き（攻守入替後）の技セットを保持し、往復しても各向きの技を復元する
+  const [otherMoveSlots, setOtherMoveSlots] = useState<string[]>(['', '', '', '']);
   const [cond, setCond] = useState<BattleConditions>({ ...DEFAULT_CONDITIONS });
   const [learnsetFilter, setLearnsetFilter] = useState(true);
   // 攻守の向き: false=自が攻撃/相が防御, true=相が攻撃/自が防御
@@ -1115,6 +1151,7 @@ export function Calculator({ data, myPartyMembers = [], opponentMembers = [], po
       setAttacker(reloadEntry.attacker);
       setDefender(reloadEntry.defender);
       setMoveSlots([...reloadEntry.moveSlots, '', '', '', ''].slice(0, 4));
+      setOtherMoveSlots(['', '', '', '']);
       setCond(reloadEntry.conditions);
       setSwapped(false);
       onReloadConsumed?.();
@@ -1134,7 +1171,9 @@ export function Calculator({ data, myPartyMembers = [], opponentMembers = [], po
   function swap() {
     const [a, d] = [attacker, defender];
     setAttacker(d); setDefender(a);
-    setMoveSlots(['', '', '', '']);
+    // 技は向きごとに保持。現在の技と反対向きの技を入れ替える
+    setMoveSlots(otherMoveSlots);
+    setOtherMoveSlots(moveSlots);
     setSwapped(s => !s); // 向きを保持（交替したまま）
   }
 
@@ -1181,6 +1220,7 @@ export function Calculator({ data, myPartyMembers = [], opponentMembers = [], po
 
       <PokemonPanel
         title="攻撃側" build={attacker} onChange={changeAttacker} data={data} showAtkSp={true}
+        cond={cond} onCondChange={setCond}
         pokemonHistory={pokemonHistory} myPartyMembers={myPartyMembers} opponentMembers={opponentMembers}
         onHistoryAdd={onHistoryAdd}
       />
@@ -1204,12 +1244,13 @@ export function Calculator({ data, myPartyMembers = [], opponentMembers = [], po
 
       <PokemonPanel
         title="防御側" build={defender} onChange={changeDefender} data={data} showAtkSp={false}
+        cond={cond} onCondChange={setCond}
         pokemonHistory={pokemonHistory} myPartyMembers={myPartyMembers} opponentMembers={opponentMembers}
         onHistoryAdd={onHistoryAdd}
       />
 
       {activeMoves.length > 0 ? (
-        <ResultsSection data={data} attacker={attacker} defender={defender} moveSlots={moveSlots} cond={cond} onCalcHistory={onCalcHistory} />
+        <ResultsSection data={data} attacker={attacker} defender={defender} moveSlots={moveSlots} cond={cond} onCalcHistory={onCalcHistory} swapped={swapped} />
       ) : (
         <Glass tint={t.glassTint2} radius={8} padding={16}>
           <p style={{ textAlign: 'center', color: t.textMuted, fontSize: 14, margin: 0 }}>ポケモンと技を選択してください</p>

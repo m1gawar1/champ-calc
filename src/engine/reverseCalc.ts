@@ -117,3 +117,84 @@ export function reverseCalcDefense(
 
   return { statLabel, groups };
 }
+
+/**
+ * 与えたダメージから相手の攻撃SP・性格を逆算する（自分が防御側のとき用）
+ *
+ * reverseCalcDefense と対称。防御側（自分）の実数値は固定し、
+ * 攻撃側（相手）の攻撃(A)/特攻(C) SP・性格を 0..32 で走査して候補を求める。
+ */
+export function reverseCalcAttack(
+  data: ChampionsData,
+  attacker: PokemonBuild,
+  defender: PokemonBuild,
+  move: Move,
+  cond: BattleConditions,
+  observedDamage: number,
+): ReverseResult | null {
+  const atkBs = findBaseStats(data.baseStats, attacker.rosterName, attacker.isMega, attacker.megaFormName);
+  const defBs = findBaseStats(data.baseStats, defender.rosterName, defender.isMega, defender.megaFormName);
+  if (!atkBs || !defBs) return null;
+
+  const isPhysical = move.category === 'Physical';
+  const statKey = isPhysical ? 'atk' : 'spa';
+  const statLabel = isPhysical ? '攻撃(A)' : '特攻(C)';
+
+  // タイプ取得
+  const atkEntry = attacker.isMega && attacker.megaFormName
+    ? data.roster.find(r => r.name === attacker.megaFormName)
+    : getSelectableRoster(data.roster).find(r => r.name === attacker.rosterName);
+  const defEntry = defender.isMega && defender.megaFormName
+    ? data.roster.find(r => r.name === defender.megaFormName)
+    : getSelectableRoster(data.roster).find(r => r.name === defender.rosterName);
+  const atkTypes = atkEntry?.types ?? [];
+  const defTypes = defEntry?.types ?? [];
+
+  // 防御側（自分）の実数値は固定
+  const defNature = data.natures.find(n => n.name === defender.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
+  const defStats = computeStats(defBs, defender.ivs, defender.sp, defNature, defender.statMult);
+
+  const neutralNature = { name: 'Hardy', increasedStat: null, decreasedStat: null };
+  const upNature = data.natures.find(n => getNatureMult(n, statKey) > 1) ?? neutralNature;
+  const downNature = data.natures.find(n => getNatureMult(n, statKey) < 1) ?? neutralNature;
+
+  const reps: { correction: Correction; label: string; nature: typeof neutralNature }[] = [
+    { correction: 'up', label: '補正あり (↑)', nature: upNature },
+    { correction: 'neutral', label: '無補正', nature: neutralNature },
+    { correction: 'down', label: '下降補正 (↓)', nature: downNature },
+  ];
+
+  const groups: ReverseGroup[] = reps.map(rep => {
+    const byStat = new Map<number, number[]>();
+
+    for (let sp = 0; sp <= 32; sp++) {
+      const testSp = { ...attacker.sp, [statKey]: sp };
+      const atkStats = computeStats(atkBs, attacker.ivs, testSp, rep.nature);
+
+      const rolls = calcDamageRolls(
+        atkStats, defStats, atkTypes, defTypes, move, cond,
+        attacker.item, defender.item, attacker.ability, defender.ability,
+      );
+
+      if (observedDamage >= rolls[0] && observedDamage <= rolls[15]) {
+        const statValue = isPhysical ? atkStats.atk : atkStats.spa;
+        const arr = byStat.get(statValue) ?? [];
+        arr.push(sp);
+        byStat.set(statValue, arr);
+      }
+    }
+
+    const entries: ReverseEntry[] = [...byStat.entries()]
+      .map(([statValue, sps]) => ({ statValue, spMin: Math.min(...sps), spMax: Math.max(...sps) }))
+      .sort((a, b) => a.statValue - b.statValue);
+
+    return {
+      correction: rep.correction,
+      label: rep.label,
+      natureJa: NATURE_JA[rep.nature.name] ?? rep.nature.name,
+      entries,
+    };
+  });
+
+  return { statLabel, groups };
+}

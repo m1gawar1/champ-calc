@@ -22,6 +22,49 @@ export const COMPETITIVE_ITEMS: CompetitiveItem[] = [
   { en: 'ResistBerry', ja: '半減きのみ',         note: '該当タイプ×0.5' },
   // Regulation M-B（2026-06）で追加。全技ダメージ×1.3（エンジンは damage.ts で対応済み）
   { en: 'Life Orb',    ja: 'いのちのたま',       note: '全技×1.3' },
+  // 効果抜群の技ダメージ×1.2（エンジンは damage.ts で対応済み）
+  { en: 'Expert Belt', ja: 'たつじんのおび',     note: '効果抜群×1.2' },
+];
+
+// パーティ/ボックス編集用の「名前だけ」の全持ち物リスト（管理用・効果はダメ計に反映しない）。
+// ダメージ系（COMPETITIVE_ITEMS）＋対戦でよく使う一般道具を列挙する。
+const GENERAL_ITEMS: CompetitiveItem[] = [
+  { en: 'Leftovers',         ja: 'たべのこし' },
+  { en: 'Sitrus Berry',      ja: 'オボンのみ' },
+  { en: 'Focus Sash',        ja: 'きあいのタスキ' },
+  { en: 'Lum Berry',         ja: 'ラムのみ' },
+  { en: 'Eviolite',          ja: 'しんかのきせき' },
+  { en: 'Assault Vest',      ja: 'とつげきチョッキ' },
+  { en: 'Choice Band',       ja: 'こだわりハチマキ' },
+  { en: 'Choice Scarf',      ja: 'こだわりスカーフ' },
+  { en: 'Choice Specs',      ja: 'こだわりメガネ' },
+  { en: 'Rocky Helmet',      ja: 'ゴツゴツメット' },
+  { en: 'Heavy-Duty Boots',  ja: 'あつぞこブーツ' },
+  { en: 'Light Clay',        ja: 'ひかりのねんど' },
+  { en: 'Mental Herb',       ja: 'メンタルハーブ' },
+  { en: 'White Herb',        ja: 'しろいハーブ' },
+  { en: 'Power Herb',        ja: 'パワフルハーブ' },
+  { en: 'Eject Button',      ja: 'だっしゅつボタン' },
+  { en: 'Red Card',          ja: 'レッドカード' },
+  { en: 'Safety Goggles',    ja: 'ぼうじんゴーグル' },
+  { en: 'Protective Pads',   ja: 'ぼうごパッド' },
+  { en: 'Clear Amulet',      ja: 'クリアチャーム' },
+  { en: 'Booster Energy',    ja: 'ブーストエナジー' },
+  { en: 'Covert Cloak',      ja: 'おんみつマント' },
+  { en: 'Loaded Dice',       ja: 'いかさまダイス' },
+  { en: 'Wide Lens',         ja: 'こうかくレンズ' },
+  { en: 'Scope Lens',        ja: 'ピントレンズ' },
+  { en: 'Quick Claw',        ja: 'せんせいのツメ' },
+  { en: "King's Rock",       ja: 'おうじゃのしるし' },
+  { en: 'Razor Claw',        ja: 'するどいツメ' },
+  { en: 'Bright Powder',     ja: 'ひかりのこな' },
+  { en: 'Weakness Policy',   ja: 'じゃくてんほけん' },
+  { en: 'Throat Spray',      ja: 'のどスプレー' },
+  { en: 'Air Balloon',       ja: 'ふうせん' },
+  { en: 'Mirror Herb',       ja: 'ものまねハーブ' },
+  { en: 'Ability Shield',    ja: 'とくせいガード' },
+  { en: 'Toxic Orb',         ja: 'どくどくだま' },
+  { en: 'Flame Orb',         ja: 'かえんだま' },
 ];
 
 // タイプ強化アイテム（英語名 → タイプ）
@@ -100,10 +143,24 @@ export function getAbilityItems(pokemonAbilities: Record<string, string>): { lab
   return items;
 }
 
-// UIで持ち物選択リストを生成
+// UIで持ち物選択リストを生成（ダメ計用・ダメージ系のみ）
 export function getItemItems(): { label: string; value: string }[] {
   return COMPETITIVE_ITEMS.map(item => ({
     value: item.en === 'No Item' ? '' : item.en,
     label: item.ja + (item.note ? ` (${item.note})` : ''),
   }));
+}
+
+// パーティ/ボックス編集用の全持ち物リスト（名前のみ・管理用）。
+// ダメージ系（noteあり）＋一般道具を結合し、英名重複は除外する。
+export function getAllItemItems(): { label: string; value: string }[] {
+  const seen = new Set<string>();
+  const out: { label: string; value: string }[] = [];
+  for (const item of [...COMPETITIVE_ITEMS, ...GENERAL_ITEMS]) {
+    const value = item.en === 'No Item' ? '' : item.en;
+    if (seen.has(value)) continue;
+    seen.add(value);
+    out.push({ value, label: item.ja + (item.note ? ` (${item.note})` : '') });
+  }
+  return out;
 }

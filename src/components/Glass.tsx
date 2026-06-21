@@ -94,10 +94,13 @@ export function SpSlider({ label, value, onChange, actual }: {
           {label}
           <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 400, color: t.textWeak, marginLeft: 6 }}>{value}</span>
         </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {actual !== undefined && (
             <span style={{ fontFamily: MONO, fontSize: 14, fontWeight: 500, color: accent }}>{actual}</span>
           )}
+          {/* ±1 微調整ボタン（細かい数値合わせ用）。上限32は親側のクランプに委ねる */}
+          <button onClick={() => onChange(value - 1)} aria-label="1減らす"
+            style={{ width: 26, height: 26, borderRadius: 6, background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`, color: t.text, border: 'none', cursor: 'pointer', fontFamily: MONO, fontSize: 14, fontWeight: 700, lineHeight: 1 }}>−</button>
           <input
             type="number" min={0} max={32} value={value}
             onChange={e => onChange(Math.max(0, Math.min(32, Math.floor(Number(e.target.value) || 0))))}
@@ -108,6 +111,8 @@ export function SpSlider({ label, value, onChange, actual }: {
               borderRadius: 3, padding: '1px 4px', outline: 'none',
             }}
           />
+          <button onClick={() => onChange(value + 1)} aria-label="1増やす"
+            style={{ width: 26, height: 26, borderRadius: 6, background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`, color: t.text, border: 'none', cursor: 'pointer', fontFamily: MONO, fontSize: 14, fontWeight: 700, lineHeight: 1 }}>＋</button>
         </div>
       </div>
       {/* トラック行: 0 〜 MAX（端ラベルはクイック設定ボタンも兼ねる） */}
