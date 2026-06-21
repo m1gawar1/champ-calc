@@ -134,7 +134,7 @@ export default function App({ themeOverride, forcedTheme }: AppProps = {}) {
 
   // テーマ名（localStorageで永続化）。プレビュー時は forcedTheme を優先。
   const [themeState, setTheme] = useState<ThemeName>(() =>
-    localStorage.getItem('champ_theme') === 'light' ? 'light' : 'dark'
+    localStorage.getItem('champ_theme') === 'dark' ? 'dark' : 'light'
   );
   const theme = forcedTheme ?? themeState;
 
