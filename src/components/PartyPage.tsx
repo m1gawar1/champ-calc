@@ -8,7 +8,7 @@ import { SelectModal } from './SelectModal';
 import type { ChampionsData, PokemonBuild, SpAlloc } from '../types';
 import { DEFAULT_IVS, DEFAULT_SP } from '../types';
 import type { AppStore, SavedParty } from '../store';
-import { newParty, opponentBuild, addPokemonToHistory, addBattleHistory, addBoxPokemon } from '../store';
+import { newParty, opponentBuild, addPokemonToHistory, addBattleHistory, addBoxPokemon, updateBoxPokemon, removeBoxPokemon } from '../store';
 import { getMegaForms, getSelectableRoster, getPokemonLearnset, findBaseStats } from '../data';
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { getPokemonJaList, displayPokemonName, moveJa, NATURE_JA, STAT_JA, TYPE_JA } from '../i18n';
@@ -742,7 +742,8 @@ export function PartyPage({ data, store, onUpdate }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [section, setSection] = useState<'my' | 'opponent' | 'box'>('my');
   const [showRecord, setShowRecord] = useState(false);
-  const [boxDraft, setBoxDraft] = useState<PokemonBuild | null>(null); // ボックス追加中の個体
+  const [boxDraft, setBoxDraft] = useState<PokemonBuild | null>(null); // ボックス追加/編集中の個体
+  const [editingBoxId, setEditingBoxId] = useState<string | null>(null); // 編集中のボックスID（nullなら新規追加）
 
   function handleSave(updated: SavedParty) {
     const exists = store.myParties.some(p => p.id === updated.id);
@@ -912,7 +913,7 @@ export function PartyPage({ data, store, onUpdate }: Props) {
           {/* 追加中の個体エディタ（別画面シート） */}
           {boxDraft && (
             <div
-              onClick={() => setBoxDraft(null)}
+              onClick={() => { setBoxDraft(null); setEditingBoxId(null); }}
               style={{
                 position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
@@ -923,12 +924,19 @@ export function PartyPage({ data, store, onUpdate }: Props) {
                 style={{ width: '100%', maxWidth: 440, maxHeight: '88vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
               >
                 <Glass tint={t.glassTint} radius={22} padding={16}>
-                  <div style={{ fontSize: 11, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4, marginBottom: 12 }}>
-                    新しい個体
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4 }}>
+                      {editingBoxId ? '個体を編集' : '新しい個体'}
+                    </div>
+                    <button
+                      onClick={() => { setBoxDraft(null); setEditingBoxId(null); }}
+                      aria-label="閉じる"
+                      style={{ color: t.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, padding: '0 4px', lineHeight: 1 }}
+                    >✕</button>
                   </div>
                   <MemberEditor
                     build={boxDraft} onChange={setBoxDraft}
-                    onRemove={() => setBoxDraft(null)}
+                    onRemove={() => { setBoxDraft(null); setEditingBoxId(null); }}
                     data={data} index={0}
                     store={store} onUpdateHistory={handleUpdateHistory}
                     defaultOpen hideIndex
@@ -937,9 +945,13 @@ export function PartyPage({ data, store, onUpdate }: Props) {
                     <button
                       disabled={!boxDraft.rosterName}
                       onClick={() => {
-                        const { store: next } = addBoxPokemon(store, boxDraft);
-                        onUpdate({ box: next.box });
-                        setBoxDraft(null);
+                        if (editingBoxId) {
+                          onUpdate({ box: updateBoxPokemon(store, editingBoxId, { build: boxDraft }).box });
+                        } else {
+                          const { store: next } = addBoxPokemon(store, boxDraft);
+                          onUpdate({ box: next.box });
+                        }
+                        setBoxDraft(null); setEditingBoxId(null);
                       }}
                       style={{
                         flex: 1, padding: '11px 0', borderRadius: 12, border: 'none',
@@ -948,9 +960,9 @@ export function PartyPage({ data, store, onUpdate }: Props) {
                         color: boxDraft.rosterName ? '#fff' : t.textWeak, fontSize: 14, fontWeight: 800,
                         opacity: boxDraft.rosterName ? 1 : 0.6,
                       }}
-                    >ボックスに保存</button>
+                    >{editingBoxId ? '保存' : 'ボックスに保存'}</button>
                     <button
-                      onClick={() => setBoxDraft(null)}
+                      onClick={() => { setBoxDraft(null); setEditingBoxId(null); }}
                       style={{
                         flex: 1, padding: '11px 0', borderRadius: 12, background: t.glassChip,
                         boxShadow: `inset 0 0 0 0.5px ${t.rim}`, color: t.textMuted,
@@ -958,6 +970,18 @@ export function PartyPage({ data, store, onUpdate }: Props) {
                       }}
                     >キャンセル</button>
                   </div>
+                  {editingBoxId && (
+                    <button
+                      onClick={() => {
+                        onUpdate({ box: removeBoxPokemon(store, editingBoxId).box });
+                        setBoxDraft(null); setEditingBoxId(null);
+                      }}
+                      style={{
+                        width: '100%', marginTop: 8, padding: '8px 0', background: 'none', border: 'none',
+                        color: 'rgba(255,110,110,0.9)', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                      }}
+                    >この個体を削除</button>
+                  )}
                 </Glass>
               </div>
             </div>
@@ -966,7 +990,7 @@ export function PartyPage({ data, store, onUpdate }: Props) {
           {/* 個体を追加ボタン */}
           {!boxDraft && (
             <button
-              onClick={() => setBoxDraft(emptyBuild())}
+              onClick={() => { setEditingBoxId(null); setBoxDraft(emptyBuild()); }}
               style={{
                 width: '100%', padding: '14px 0',
                 border: `1px dashed ${t.dashedRim}`, borderRadius: 22,
@@ -987,7 +1011,9 @@ export function PartyPage({ data, store, onUpdate }: Props) {
                 const entry = data.roster.find(r => r.name === b.build.rosterName);
                 const spriteName = b.build.isMega && b.build.megaFormName ? b.build.megaFormName : b.build.rosterName;
                 return (
-                  <Glass key={b.id} tint={t.glassTint} radius={16} padding={10}>
+                  <Glass key={b.id} tint={t.glassTint} radius={16} padding={10}
+                    onClick={() => { setBoxDraft(b.build); setEditingBoxId(b.id); }}
+                    style={{ cursor: 'pointer' }}>
                     <div style={{
                       width: '100%', aspectRatio: '1', borderRadius: 12, background: t.glassChip,
                       boxShadow: `inset 0 0 0 0.5px ${t.btnSoftRim}`,
