@@ -139,8 +139,10 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
 
   // 自分側の補正
   const [myCond, setMyCond] = useState<SpeedConditions>(DEFAULT_SPEED_CONDITIONS);
-  // 相手側の一括補正
-  const [theirCond, setTheirCond] = useState<SpeedConditions>(DEFAULT_SPEED_CONDITIONS);
+  // 相手側：おいかぜのみ共通（場の効果）
+  const [theirTailwind, setTheirTailwind] = useState(false);
+  // 相手個体ごとの補正（idxキー）。未設定はデフォルト。
+  const [oppConds, setOppConds] = useState<Record<number, { rank: number; scarf: boolean; paralyzed: boolean }>>({});
   // 自分側選択中インデックス（candidates 配列のインデックス）
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   // 自分の素早さ特性トグル
@@ -355,8 +357,11 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
       <Glass tint={t.glassTint} radius={22} padding={16} style={{ marginBottom: 12 }}>
         <div style={{ fontSize: 10, fontWeight: 800, color: t.accentDef, letterSpacing: 1.4, marginBottom: 10 }}>OPPONENT POKEMON</div>
 
-        {/* 相手側一括補正 */}
-        <CondControls cond={theirCond} onChange={setTheirCond} />
+        {/* 場の効果（味方全体で共通） */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 12, color: t.textMuted, fontWeight: 600 }}>おいかぜ（味方全体）</span>
+          <ToggleChip label="おいかぜ" active={theirTailwind} onClick={() => setTheirTailwind(v => !v)} />
+        </div>
 
         <div style={{ height: 1, background: t.track, margin: '14px 0' }} />
 
@@ -389,6 +394,22 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
                 : rosterEntry;
               const oppSpeedAbility = detectSpeedAbility(abilEntry?.abilities ?? {});
 
+              // 個体ごとの補正（未設定はデフォルト）
+              const rowCond = oppConds[idx] ?? { rank: 0, scarf: false, paralyzed: false };
+              const setRow = (patch: Partial<typeof rowCond>) =>
+                setOppConds(prev => ({ ...prev, [idx]: { ...rowCond, ...patch } }));
+
+              // 個体補正＋共通おいかぜで theirCondEff を組み立て
+              const theirCondEff: SpeedConditions = {
+                rank: rowCond.rank,
+                scarf: rowCond.scarf,
+                tailwind: theirTailwind,
+                paralyzed: rowCond.paralyzed,
+                ...(oppSpeedAbility && oppAbilityOn[idx]
+                  ? { abilityMod: oppSpeedAbility.info.mod, ignoreParaSpeed: oppSpeedAbility.info.ignorePara }
+                  : {}),
+              };
+
               return (
                 <div key={idx} style={{
                   padding: 12, borderRadius: 16,
@@ -419,13 +440,16 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
                     )}
                   </div>
 
+                  {/* 個体ごとの補正 */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+                    <RankStepper value={rowCond.rank} onChange={v => setRow({ rank: v })} />
+                    <ToggleChip label="スカーフ" active={rowCond.scarf} onClick={() => setRow({ scarf: !rowCond.scarf })} />
+                    <ToggleChip label="まひ" active={rowCond.paralyzed} onClick={() => setRow({ paralyzed: !rowCond.paralyzed })} />
+                  </div>
+
                   {/* 速度プリセットチップ */}
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {presets.map(preset => {
-                      // 相手の特性トグルを反映した補正
-                      const theirCondEff: SpeedConditions = oppSpeedAbility && oppAbilityOn[idx]
-                        ? { ...theirCond, abilityMod: oppSpeedAbility.info.mod, ignoreParaSpeed: oppSpeedAbility.info.ignorePara }
-                        : theirCond;
                       const theirFinal = finalSpeed(preset.stat, theirCondEff);
                       // 自分の最終素早さが確定している場合のみ色分け
                       const verdict = myFinalSpeed !== null
