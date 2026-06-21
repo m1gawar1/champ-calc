@@ -14,7 +14,8 @@ import { getMegaForms, getSelectableRoster, getPokemonLearnset, findBaseStats } 
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { getPokemonJaList, displayPokemonName, moveJa, NATURE_JA, STAT_JA, TYPE_JA } from '../i18n';
 import { getSpriteUrl, getFallbackSpriteUrl, KEY_STONE_ICON } from '../sprites';
-import { getAbilityItems, getAllItemItems } from '../engine/competitive';
+import { getAbilityItems, getAllItemItems, resolveItem } from '../engine/competitive';
+import { getMegaStone } from '../data/megaStones';
 
 interface Props {
   data: ChampionsData;
@@ -105,7 +106,9 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
   function toggleMega(megaName: string, isOn: boolean) {
     const entry = data.roster.find(r => r.name === megaName);
     const autoAbility = isOn && entry ? Object.values(entry.abilities)[0] ?? '' : (rosterEntry ? Object.values(rosterEntry.abilities)[0] ?? '' : '');
-    onChange({ ...build, isMega: isOn, megaFormName: isOn ? megaName : '', ability: autoAbility });
+    // メガシンカ時は持ち物を対応メガストーンに。解除時は外す。
+    const item = isOn ? (getMegaStone(megaName)?.en ?? '') : '';
+    onChange({ ...build, isMega: isOn, megaFormName: isOn ? megaName : '', ability: autoAbility, item });
   }
 
   const moves = [...(build.moves ?? []), '', '', '', ''].slice(0, 4);
@@ -146,7 +149,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
               background: build.isMega ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
               boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
               color: build.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-            }}><KeyStone size={12} />メガ</button>
+            }}><KeyStone size={14} /></button>
         )}
         {open && megaForms.length > 1 && megaForms.map(mf => {
           const suffix = mf.name.replace(`Mega ${build.rosterName}`, '').trim() || 'メガ';
@@ -159,7 +162,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
                 background: sel ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
                 boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                 color: sel ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-              }}><KeyStone size={12} />{suffix}</button>
+              }}><KeyStone size={12} />{suffix === 'メガ' ? '' : suffix}</button>
           );
         })}
         {/* スペーサーで SP表示と✕を右端へ */}
@@ -195,7 +198,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
                       background: build.isMega ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
                       boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                       color: build.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-                    }}><KeyStone size={14} />メガシンカ</button>
+                    }}><KeyStone size={16} /></button>
                 ) : megaForms.map(mf => {
                   const suffix = mf.name.replace(`Mega ${build.rosterName}`, '').trim();
                   const sel = build.isMega && build.megaFormName === mf.name;
@@ -207,7 +210,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
                         background: sel ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
                         boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                         color: sel ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-                      }}><KeyStone size={14} />{suffix ? `メガ ${suffix}` : 'メガシンカ'}</button>
+                      }}><KeyStone size={14} />{suffix}</button>
                   );
                 })}
               </div>
@@ -218,7 +221,27 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div>
               <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4, fontWeight: 600 }}>持ち物</div>
-              <Combobox items={itemItems} value={build.item ?? ''} onChange={v => onChange({ ...build, item: v })} placeholder="なし" hideValueHint />
+              {build.isMega ? (() => {
+                // メガ時は持ち物をメガストーンに固定表示
+                const it = resolveItem(build.item ?? '');
+                return (
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    background: t.inputBg, border: `1px solid ${t.rim}`, borderRadius: 10,
+                    padding: '8px 10px', fontSize: 13, fontWeight: 600, color: t.text,
+                    overflow: 'hidden', whiteSpace: 'nowrap',
+                  }}>
+                    {it.icon && (
+                      <img src={it.icon} alt="" loading="lazy"
+                        onError={e => { e.currentTarget.style.display = 'none'; }}
+                        style={{ width: 20, height: 20, objectFit: 'contain', imageRendering: 'pixelated', flexShrink: 0 }} />
+                    )}
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.label}</span>
+                  </div>
+                );
+              })() : (
+                <Combobox items={itemItems} value={build.item ?? ''} onChange={v => onChange({ ...build, item: v })} placeholder="なし" hideValueHint />
+              )}
             </div>
             <div>
               <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4, fontWeight: 600 }}>特性</div>
@@ -538,9 +561,12 @@ function OpponentEditor({ members, data, onChange, store, onUpdateHistory }: {
               {megaForms.length === 1 && (
                 <button
                   onClick={() => {
+                    const isOn = !slot.isMega;
                     const entry = data.roster.find(r => r.name === megaForms[0].name);
-                    const autoAbil = (!slot.isMega && entry) ? Object.values(entry.abilities)[0] ?? '' : '';
-                    setSlot(i, { ...slot, isMega: !slot.isMega, megaFormName: megaForms[0].name, ability: autoAbil || slot.ability });
+                    const autoAbil = (isOn && entry) ? Object.values(entry.abilities)[0] ?? '' : '';
+                    // メガON時は持ち物をメガストーンに、OFFで外す
+                    const item = isOn ? (getMegaStone(megaForms[0].name)?.en ?? '') : '';
+                    setSlot(i, { ...slot, isMega: isOn, megaFormName: isOn ? megaForms[0].name : '', ability: autoAbil || slot.ability, item });
                   }}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 3,
@@ -549,7 +575,7 @@ function OpponentEditor({ members, data, onChange, store, onUpdateHistory }: {
                     boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                     color: slot.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
                   }}
-                ><KeyStone size={12} />メガ</button>
+                ><KeyStone size={14} /></button>
               )}
               {slot.rosterName && (
                 <button onClick={() => setSlot(i, opponentBuild())}

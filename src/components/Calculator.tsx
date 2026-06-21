@@ -13,7 +13,8 @@ import { reverseCalcDefense, reverseCalcAttack } from '../engine/reverseCalc';
 import { getTypeEffectiveness, effectivenessLabel } from '../engine/typeChart';
 import { getPokemonJaList, getMoveJaList, displayPokemonName, moveJa, TYPE_JA } from '../i18n';
 import { getSpriteUrl, getFallbackSpriteUrl, KEY_STONE_ICON } from '../sprites';
-import { getAbilityItems, getItemItems, ABILITY_JA } from '../engine/competitive';
+import { getAbilityItems, getItemItems, resolveItem, ABILITY_JA } from '../engine/competitive';
+import { getMegaStone } from '../data/megaStones';
 import { MULTI_HIT_MOVES, ESCALATING_POWER_MOVES } from '../engine/moveFlags';
 
 interface Props {
@@ -157,7 +158,9 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
   function toggleMega(megaName: string, isOn: boolean) {
     const entry = data.roster.find(r => r.name === megaName);
     const autoAbility = isOn && entry ? Object.values(entry.abilities)[0] ?? '' : (rosterEntry ? Object.values(rosterEntry.abilities)[0] ?? '' : '');
-    onChange({ ...build, isMega: isOn, megaFormName: isOn ? megaName : '', ability: autoAbility });
+    // メガシンカ時は持ち物を対応メガストーンに。解除時は外す。
+    const item = isOn ? (getMegaStone(megaName)?.en ?? '') : '';
+    onChange({ ...build, isMega: isOn, megaFormName: isOn ? megaName : '', ability: autoAbility, item });
   }
 
   const displayName = build.isMega && build.megaFormName
@@ -235,8 +238,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
               color: build.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
             }}>
             <img src={KEY_STONE_ICON} alt="" onError={e => { e.currentTarget.style.display = 'none'; }}
-              style={{ width: 16, height: 16, objectFit: 'contain', imageRendering: 'pixelated' }} />
-            メガ
+              style={{ width: 18, height: 18, objectFit: 'contain', imageRendering: 'pixelated' }} />
           </button>
         )}
         {megaForms.length > 1 && megaForms.map(mf => {
@@ -271,9 +273,9 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
         <Glass tint={t.glassNest} radius={6} padding={10} blur={14}>
           <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 5, fontWeight: 600 }}>持ち物</div>
           <button
-            onClick={() => setShowItemModal(true)}
+            onClick={() => { if (!build.isMega) setShowItemModal(true); }}
             style={{
-              width: '100%', textAlign: 'left', cursor: 'pointer',
+              width: '100%', textAlign: 'left', cursor: build.isMega ? 'default' : 'pointer',
               display: 'flex', alignItems: 'center', gap: 6,
               background: t.inputBg, color: build.item ? t.text : t.textMuted,
               border: `1px solid ${t.rim}`, borderRadius: 10,
@@ -281,14 +283,14 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
               overflow: 'hidden', whiteSpace: 'nowrap',
             }}
           >
-            {(() => { const it = itemItems.find(i => i.value === build.item); return (
+            {(() => { const it = resolveItem(build.item); return (
               <>
-                {it?.icon && (
+                {it.icon && (
                   <img src={it.icon} alt="" loading="lazy"
                     onError={e => { (e.currentTarget.style.display = 'none'); }}
                     style={{ width: 20, height: 20, objectFit: 'contain', imageRendering: 'pixelated', flexShrink: 0 }} />
                 )}
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{it?.label ?? 'なし'}</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.label}</span>
               </>
             ); })()}
           </button>
@@ -923,7 +925,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond, swapped }: {
 
           <div style={{ fontSize: 11, color: t.textMuted, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             <span>{result.moveCategory === 'Physical' ? '物理' : result.moveCategory === 'Special' ? '特殊' : '変化'} {result.movePower}</span>
-            {attacker.item && <span>{attacker.item}</span>}
+            {attacker.item && <span>{resolveItem(attacker.item).label}</span>}
             {attacker.ability && <span>{ABILITY_JA[attacker.ability] ?? attacker.ability}</span>}
           </div>
 

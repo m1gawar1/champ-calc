@@ -1,5 +1,6 @@
 // 競技用持ち物・特性のリストと日本語名定義
 import { getItemSpriteUrl } from '../sprites';
+import { MEGA_STONES } from '../data/megaStones';
 
 export interface CompetitiveItem {
   en: string;
@@ -195,6 +196,18 @@ export function getItemItems(): { label: string; value: string; icon: string }[]
       icon: getItemSpriteUrl(value),
     };
   });
+}
+
+// 英名 → 表示用 { label, icon } を横断解決（集約・Champions・メガストーン）。
+// メガストーンは選択リストには出さないが、自動セット時の表示用に解決できるようにする。
+const MEGA_STONE_JA: Record<string, string> = Object.values(MEGA_STONES)
+  .reduce((m, s) => { m[s.en] = s.ja; return m; }, {} as Record<string, string>);
+export function resolveItem(en: string): { label: string; icon: string } {
+  if (!en) return { label: 'なし', icon: '' };
+  const hit = [...COMPETITIVE_ITEMS, ...CHAMPIONS_ITEMS].find(i => i.en === en);
+  if (hit) return { label: hit.ja + (hit.note ? ` (${hit.note})` : ''), icon: getItemSpriteUrl(en) };
+  if (MEGA_STONE_JA[en]) return { label: MEGA_STONE_JA[en], icon: getItemSpriteUrl(en) };
+  return { label: en, icon: getItemSpriteUrl(en) };
 }
 
 // パーティ/ボックス編集用の全持ち物リスト（名前のみ・管理用）。
