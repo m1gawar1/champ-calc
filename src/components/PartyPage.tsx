@@ -907,7 +907,8 @@ export function PartyPage({ data, store, onUpdate }: Props) {
               />
             </Glass>
           )}
-          {store.myParties.filter(p => p.id !== editingId).map(p => (
+          {/* 編集中は他パーティ・新規作成を隠し、エディタに集中させる */}
+          {!editingId && store.myParties.map(p => (
             <PartyCard key={p.id} party={p} isActive={store.activePartyId === p.id}
               onActivate={() => onUpdate({ activePartyId: p.id })}
               onEdit={() => setEditingId(p.id)}
