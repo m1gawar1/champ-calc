@@ -201,8 +201,13 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
   // 選択中候補
   const selected = selectedIdx !== null ? candidates[selectedIdx] ?? null : null;
 
-  // 選択個体が変わったら特性トグルをリセット
-  useEffect(() => { setMyAbilityOn(false); }, [selectedIdx]);
+  // 選択個体が変わったら特性トグルをリセット。
+  // こだわりスカーフ所持なら自動でスカーフ補正をON、非所持ならOFFにする。
+  useEffect(() => {
+    setMyAbilityOn(false);
+    const holdsScarf = selected?.build.item === 'Choice Scarf';
+    setMyCond(c => ({ ...c, scarf: holdsScarf }));
+  }, [selectedIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 選択中個体のロースターエントリから素早さ特性を検出
   const mySpeedAbility = useMemo((): { en: string; info: SpeedAbilityInfo } | null => {
