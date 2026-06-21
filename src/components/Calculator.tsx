@@ -238,7 +238,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
               color: build.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
             }}>
             <img src={KEY_STONE_ICON} alt="" onError={e => { e.currentTarget.style.display = 'none'; }}
-              style={{ width: 18, height: 18, objectFit: 'contain', imageRendering: 'pixelated' }} />
+              style={{ width: 26, height: 26, objectFit: 'contain', imageRendering: 'pixelated' }} />
           </button>
         )}
         {megaForms.length > 1 && megaForms.map(mf => {
@@ -254,7 +254,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
                 color: sel ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
               }}>
               <img src={KEY_STONE_ICON} alt="" onError={e => { e.currentTarget.style.display = 'none'; }}
-                style={{ width: 16, height: 16, objectFit: 'contain', imageRendering: 'pixelated' }} />
+                style={{ width: 22, height: 22, objectFit: 'contain', imageRendering: 'pixelated' }} />
               {suffix}
             </button>
           );

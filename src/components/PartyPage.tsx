@@ -149,7 +149,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
               background: build.isMega ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
               boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
               color: build.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-            }}><KeyStone size={14} /></button>
+            }}><KeyStone size={22} /></button>
         )}
         {open && megaForms.length > 1 && megaForms.map(mf => {
           const suffix = mf.name.replace(`Mega ${build.rosterName}`, '').trim() || 'メガ';
@@ -162,7 +162,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
                 background: sel ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
                 boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                 color: sel ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-              }}><KeyStone size={12} />{suffix === 'メガ' ? '' : suffix}</button>
+              }}><KeyStone size={18} />{suffix === 'メガ' ? '' : suffix}</button>
           );
         })}
         {/* スペーサーで SP表示と✕を右端へ */}
@@ -198,7 +198,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
                       background: build.isMega ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
                       boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                       color: build.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-                    }}><KeyStone size={16} /></button>
+                    }}><KeyStone size={24} /></button>
                 ) : megaForms.map(mf => {
                   const suffix = mf.name.replace(`Mega ${build.rosterName}`, '').trim();
                   const sel = build.isMega && build.megaFormName === mf.name;
@@ -210,7 +210,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
                         background: sel ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
                         boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                         color: sel ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-                      }}><KeyStone size={14} />{suffix}</button>
+                      }}><KeyStone size={20} />{suffix}</button>
                   );
                 })}
               </div>
@@ -500,7 +500,7 @@ function PartyCard({ party, isActive, onActivate, onEdit, onDelete, data }: {
                     display: 'inline-flex', padding: 1, borderRadius: 99,
                     background: 'rgba(0,0,0,0.25)',
                   }}>
-                    <KeyStone size={14} />
+                    <KeyStone size={18} />
                   </span>
                 )}
               </div>
@@ -575,7 +575,7 @@ function OpponentEditor({ members, data, onChange, store, onUpdateHistory }: {
                     boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                     color: slot.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
                   }}
-                ><KeyStone size={14} /></button>
+                ><KeyStone size={22} /></button>
               )}
               {slot.rosterName && (
                 <button onClick={() => setSlot(i, opponentBuild())}
