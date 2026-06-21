@@ -22,12 +22,13 @@ interface ComboboxProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  hideValueHint?: boolean; // 右側の value（英語名）を表示しない（日本語名が見切れる対策）
 }
 
 const SMALL_LIST_THRESHOLD = 150;
 const MAX_SEARCH_RESULTS = 20;
 
-export function Combobox({ items, value, onChange, placeholder }: ComboboxProps) {
+export function Combobox({ items, value, onChange, placeholder, hideValueHint }: ComboboxProps) {
   const t = useTheme();
   const selectedItem = items.find(i => i.value === value);
   const selectedLabel = selectedItem?.label ?? '';
@@ -178,7 +179,7 @@ export function Combobox({ items, value, onChange, placeholder }: ComboboxProps)
                       )}
                       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
                     </span>
-                    {item.label !== item.value && (
+                    {!hideValueHint && item.label !== item.value && (
                       <span style={{ color: t.textWeak, fontSize: 11, marginLeft: 8, flexShrink: 0 }}>{item.value}</span>
                     )}
                   </li>

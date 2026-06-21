@@ -27,45 +27,86 @@ export const COMPETITIVE_ITEMS: CompetitiveItem[] = [
   { en: 'Expert Belt', ja: 'たつじんのおび',     note: '効果抜群×1.2' },
 ];
 
-// パーティ/ボックス編集用の「名前だけ」の全持ち物リスト（管理用・効果はダメ計に反映しない）。
-// ダメージ系（COMPETITIVE_ITEMS）＋対戦でよく使う一般道具を列挙する。
-const GENERAL_ITEMS: CompetitiveItem[] = [
-  { en: 'Leftovers',         ja: 'たべのこし' },
-  { en: 'Sitrus Berry',      ja: 'オボンのみ' },
-  { en: 'Focus Sash',        ja: 'きあいのタスキ' },
-  { en: 'Lum Berry',         ja: 'ラムのみ' },
-  { en: 'Eviolite',          ja: 'しんかのきせき' },
-  { en: 'Assault Vest',      ja: 'とつげきチョッキ' },
-  { en: 'Choice Band',       ja: 'こだわりハチマキ' },
-  { en: 'Choice Scarf',      ja: 'こだわりスカーフ' },
-  { en: 'Choice Specs',      ja: 'こだわりメガネ' },
-  { en: 'Rocky Helmet',      ja: 'ゴツゴツメット' },
-  { en: 'Heavy-Duty Boots',  ja: 'あつぞこブーツ' },
-  { en: 'Light Clay',        ja: 'ひかりのねんど' },
-  { en: 'Mental Herb',       ja: 'メンタルハーブ' },
-  { en: 'White Herb',        ja: 'しろいハーブ' },
-  { en: 'Power Herb',        ja: 'パワフルハーブ' },
-  { en: 'Eject Button',      ja: 'だっしゅつボタン' },
-  { en: 'Red Card',          ja: 'レッドカード' },
-  { en: 'Safety Goggles',    ja: 'ぼうじんゴーグル' },
-  { en: 'Protective Pads',   ja: 'ぼうごパッド' },
-  { en: 'Clear Amulet',      ja: 'クリアチャーム' },
-  { en: 'Booster Energy',    ja: 'ブーストエナジー' },
-  { en: 'Covert Cloak',      ja: 'おんみつマント' },
-  { en: 'Loaded Dice',       ja: 'いかさまダイス' },
-  { en: 'Wide Lens',         ja: 'こうかくレンズ' },
-  { en: 'Scope Lens',        ja: 'ピントレンズ' },
-  { en: 'Quick Claw',        ja: 'せんせいのツメ' },
-  { en: "King's Rock",       ja: 'おうじゃのしるし' },
-  { en: 'Razor Claw',        ja: 'するどいツメ' },
-  { en: 'Bright Powder',     ja: 'ひかりのこな' },
-  { en: 'Weakness Policy',   ja: 'じゃくてんほけん' },
-  { en: 'Throat Spray',      ja: 'のどスプレー' },
-  { en: 'Air Balloon',       ja: 'ふうせん' },
-  { en: 'Mirror Herb',       ja: 'ものまねハーブ' },
-  { en: 'Ability Shield',    ja: 'とくせいガード' },
-  { en: 'Toxic Orb',         ja: 'どくどくだま' },
-  { en: 'Flame Orb',         ja: 'かえんだま' },
+// Pokémon Champions で使用可能な持ち物（オーナー提供の道具一覧画像 2枚＝2026-06-21 に準拠）。
+// パーティ/ボックス編集の「名前だけ」の管理用リスト。日本語名は画像どおり。
+// en はアイコン（PokeAPI スプライト）とキー用。一部 en は推定（アイコンが無い場合は表示側で自動非表示）。
+const CHAMPIONS_ITEMS: CompetitiveItem[] = [
+  // ── 画像1（威力・補助系） ──
+  { en: 'Wide Lens',       ja: '広角レンズ' },
+  { en: 'Life Orb',        ja: 'いのちのたま' },
+  { en: 'Light Clay',      ja: 'ひかりのねんど' },
+  { en: 'Expert Belt',     ja: 'たつじんのおび' },
+  { en: 'Wise Glasses',    ja: 'ものしりメガネ' },
+  { en: 'Muscle Band',     ja: 'ちからのハチマキ' },
+  { en: 'Icy Rock',        ja: 'つめたいいわ' },
+  { en: 'Iron Ball',       ja: 'くろいてっきゅう' },
+  { en: 'Metronome',       ja: 'メトロノーム' },
+  { en: 'Focus Lens',      ja: 'フォーカスレンズ' },
+  { en: 'Big Root',        ja: 'おおきなねっこ' },
+  { en: 'Shed Shell',      ja: 'きれいなぬけがら' },
+  { en: 'Damp Rock',       ja: 'しめったいわ' },
+  { en: 'Heat Rock',       ja: 'あついいわ' },
+  { en: 'Smooth Rock',     ja: 'さらさらいわ' },
+  // ── 画像2（汎用・タイプ強化・きのみ） ──
+  { en: "King's Rock",     ja: 'おうじゃのしるし' },
+  { en: 'Shell Bell',      ja: 'かいがらのすず' },
+  { en: 'Hard Stone',      ja: 'かたいいし' },
+  { en: 'Focus Sash',      ja: 'きあいのタスキ' },
+  { en: 'Focus Band',      ja: 'きあいのハチマキ' },
+  { en: 'Miracle Seed',    ja: 'きせきのタネ' },
+  { en: 'Silver Powder',   ja: 'ぎんのこな' },
+  { en: 'Black Glasses',   ja: 'くろいメガネ' },
+  { en: 'Black Belt',      ja: 'くろおび' },
+  { en: 'Choice Scarf',    ja: 'こだわりスカーフ' },
+  { en: 'Magnet',          ja: 'じしゃく' },
+  { en: 'Silk Scarf',      ja: 'シルクのスカーフ' },
+  { en: 'White Herb',      ja: 'しろいハーブ' },
+  { en: 'Mystic Water',    ja: 'しんぴのしずく' },
+  { en: 'Sharp Beak',      ja: 'するどいくちばし' },
+  { en: 'Quick Claw',      ja: 'せんせいのツメ' },
+  { en: 'Leftovers',       ja: 'たべのこし' },
+  { en: 'Light Ball',      ja: 'でんきだま' },
+  { en: 'Poison Barb',     ja: 'どくバリ' },
+  { en: 'Never-Melt Ice',  ja: 'とけないこおり' },
+  { en: 'Spell Tag',       ja: 'のろいのおふだ' },
+  { en: 'Bright Powder',   ja: 'ひかりのこな' },
+  { en: 'Scope Lens',      ja: 'ピントレンズ' },
+  { en: 'Twisted Spoon',   ja: 'まがったスプーン' },
+  { en: 'Metal Coat',      ja: 'メタルコート' },
+  { en: 'Mental Herb',     ja: 'メンタルハーブ' },
+  { en: 'Charcoal',        ja: 'もくたん' },
+  { en: 'Soft Sand',       ja: 'やわらかいすな' },
+  { en: 'Fairy Feather',   ja: 'ようせいのハネ' },
+  { en: 'Dragon Fang',     ja: 'りゅうのキバ' },
+  // きのみ（タイプ半減・状態回復・HP回復など）
+  { en: 'Passho Berry',    ja: 'イトケのみ' },
+  { en: 'Payapa Berry',    ja: 'ウタンのみ' },
+  { en: 'Occa Berry',      ja: 'オッカのみ' },
+  { en: 'Sitrus Berry',    ja: 'オボンのみ' },
+  { en: 'Oran Berry',      ja: 'オレンのみ' },
+  { en: 'Chesto Berry',    ja: 'カゴのみ' },
+  { en: 'Kasib Berry',     ja: 'カシブのみ' },
+  { en: 'Persim Berry',    ja: 'キーのみ' },
+  { en: 'Cheri Berry',     ja: 'クラボのみ' },
+  { en: 'Shuca Berry',     ja: 'シュカのみ' },
+  { en: 'Wacan Berry',     ja: 'ソクのみ' },
+  { en: 'Tanga Berry',     ja: 'タンガのみ' },
+  { en: 'Rawst Berry',     ja: 'チーゴのみ' },
+  { en: 'Babiri Berry',    ja: 'ナナシのみ' },
+  { en: 'Colbur Berry',    ja: 'ナモのみ' },
+  { en: 'Kebia Berry',     ja: 'バコウのみ' },
+  { en: 'Haban Berry',     ja: 'ハバンのみ' },
+  { en: 'Chilan Berry',    ja: 'ビアーのみ' },
+  { en: 'Leppa Berry',     ja: 'ヒメリのみ' },
+  { en: 'Charti Berry',    ja: 'ホズのみ' },
+  { en: 'Pecha Berry',     ja: 'モモンのみ' },
+  { en: 'Yache Berry',     ja: 'ヤチェのみ' },
+  { en: 'Chople Berry',    ja: 'ヨプのみ' },
+  { en: 'Coba Berry',      ja: 'ヨロギのみ' },
+  { en: 'Lum Berry',       ja: 'ラムのみ' },
+  { en: 'Rowap Berry',     ja: 'リリバのみ' },
+  { en: 'Rindo Berry',     ja: 'リンドのみ' },
+  { en: 'Roseli Berry',    ja: 'ロゼルのみ' },
 ];
 
 // タイプ強化アイテム（英語名 → タイプ）
@@ -157,15 +198,13 @@ export function getItemItems(): { label: string; value: string; icon: string }[]
 }
 
 // パーティ/ボックス編集用の全持ち物リスト（名前のみ・管理用）。
-// ダメージ系（noteあり）＋一般道具を結合し、英名重複は除外する。
+// Champions で使える道具（CHAMPIONS_ITEMS）を「なし」付きで返す。
 export function getAllItemItems(): { label: string; value: string; icon: string }[] {
-  const seen = new Set<string>();
-  const out: { label: string; value: string; icon: string }[] = [];
-  for (const item of [...COMPETITIVE_ITEMS, ...GENERAL_ITEMS]) {
-    const value = item.en === 'No Item' ? '' : item.en;
-    if (seen.has(value)) continue;
-    seen.add(value);
-    out.push({ value, label: item.ja + (item.note ? ` (${item.note})` : ''), icon: getItemSpriteUrl(value) });
+  const out: { label: string; value: string; icon: string }[] = [
+    { value: '', label: 'なし', icon: '' },
+  ];
+  for (const item of CHAMPIONS_ITEMS) {
+    out.push({ value: item.en, label: item.ja, icon: getItemSpriteUrl(item.en) });
   }
   return out;
 }

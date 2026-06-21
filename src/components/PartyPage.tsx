@@ -208,7 +208,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div>
               <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4, fontWeight: 600 }}>持ち物</div>
-              <Combobox items={itemItems} value={build.item ?? ''} onChange={v => onChange({ ...build, item: v })} placeholder="なし" />
+              <Combobox items={itemItems} value={build.item ?? ''} onChange={v => onChange({ ...build, item: v })} placeholder="なし" hideValueHint />
             </div>
             <div>
               <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4, fontWeight: 600 }}>特性</div>
