@@ -13,7 +13,7 @@ import { newParty, opponentBuild, addPokemonToHistory, addBattleHistory, addBoxP
 import { getMegaForms, getSelectableRoster, getPokemonLearnset, findBaseStats } from '../data';
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { getPokemonJaList, displayPokemonName, moveJa, NATURE_JA, STAT_JA, TYPE_JA } from '../i18n';
-import { getSpriteUrl, getFallbackSpriteUrl } from '../sprites';
+import { getSpriteUrl, getFallbackSpriteUrl, KEY_STONE_ICON } from '../sprites';
 import { getAbilityItems, getAllItemItems } from '../engine/competitive';
 
 interface Props {
@@ -40,6 +40,14 @@ function TypePill({ type, size = 10 }: { type: string; size?: number }) {
     }}>
       {TYPE_JA[type] ?? type}
     </span>
+  );
+}
+
+// メガシンカ共通の目印（キーストーン）アイコン
+function KeyStone({ size = 14 }: { size?: number }) {
+  return (
+    <img src={KEY_STONE_ICON} alt="" onError={e => { e.currentTarget.style.display = 'none'; }}
+      style={{ width: size, height: size, objectFit: 'contain', imageRendering: 'pixelated', flexShrink: 0 }} />
   );
 }
 
@@ -133,12 +141,12 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
         {open && megaForms.length === 1 && (
           <button onClick={() => toggleMega(megaForms[0].name, !build.isMega)}
             style={{
-              flexShrink: 0,
+              flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 3,
               padding: '3px 8px', borderRadius: 99, fontSize: 11, fontWeight: 700,
               background: build.isMega ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
               boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
               color: build.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-            }}>メガ</button>
+            }}><KeyStone size={12} />メガ</button>
         )}
         {open && megaForms.length > 1 && megaForms.map(mf => {
           const suffix = mf.name.replace(`Mega ${build.rosterName}`, '').trim() || 'メガ';
@@ -146,12 +154,12 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
           return (
             <button key={mf.name} onClick={() => toggleMega(mf.name, !sel)}
               style={{
-                flexShrink: 0,
+                flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 3,
                 padding: '3px 7px', borderRadius: 99, fontSize: 11, fontWeight: 700,
                 background: sel ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
                 boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                 color: sel ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-              }}>{suffix}</button>
+              }}><KeyStone size={12} />{suffix}</button>
           );
         })}
         {/* スペーサーで SP表示と✕を右端へ */}
@@ -182,22 +190,24 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
                 {megaForms.length === 1 ? (
                   <button onClick={() => toggleMega(megaForms[0].name, !build.isMega)}
                     style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
                       padding: '5px 12px', borderRadius: 99, fontSize: 12, fontWeight: 700,
                       background: build.isMega ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
                       boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                       color: build.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-                    }}>メガシンカ</button>
+                    }}><KeyStone size={14} />メガシンカ</button>
                 ) : megaForms.map(mf => {
                   const suffix = mf.name.replace(`Mega ${build.rosterName}`, '').trim();
                   const sel = build.isMega && build.megaFormName === mf.name;
                   return (
                     <button key={mf.name} onClick={() => toggleMega(mf.name, !sel)}
                       style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 4,
                         padding: '5px 11px', borderRadius: 99, fontSize: 12, fontWeight: 700,
                         background: sel ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
                         boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                         color: sel ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-                      }}>{suffix ? `メガ ${suffix}` : 'メガシンカ'}</button>
+                      }}><KeyStone size={14} />{suffix ? `メガ ${suffix}` : 'メガシンカ'}</button>
                   );
                 })}
               </div>
@@ -463,11 +473,12 @@ function PartyCard({ party, isActive, onActivate, onEdit, onDelete, data }: {
                 />
                 {m.isMega && (
                   <span style={{
-                    position: 'absolute', top: 2, right: 2,
-                    fontSize: 7, fontWeight: 800, padding: '1px 3px', borderRadius: 99,
-                    background: 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))',
-                    color: '#fff', letterSpacing: 0.2,
-                  }}>M</span>
+                    position: 'absolute', top: 1, right: 1,
+                    display: 'inline-flex', padding: 1, borderRadius: 99,
+                    background: 'rgba(0,0,0,0.25)',
+                  }}>
+                    <KeyStone size={14} />
+                  </span>
                 )}
               </div>
             );
@@ -532,12 +543,13 @@ function OpponentEditor({ members, data, onChange, store, onUpdateHistory }: {
                     setSlot(i, { ...slot, isMega: !slot.isMega, megaFormName: megaForms[0].name, ability: autoAbil || slot.ability });
                   }}
                   style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 3,
                     padding: '4px 8px', borderRadius: 99, fontSize: 11, fontWeight: 700,
                     background: slot.isMega ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
                     boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                     color: slot.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
                   }}
-                >メガ</button>
+                ><KeyStone size={12} />メガ</button>
               )}
               {slot.rosterName && (
                 <button onClick={() => setSlot(i, opponentBuild())}

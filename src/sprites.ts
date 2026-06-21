@@ -49,3 +49,6 @@ export function getItemSpriteUrl(en: string): string {
   const slug = en.toLowerCase().replace(/['.]/g, '').replace(/\s+/g, '-');
   return `${POKEAPI_ITEMS}/${slug}.png`;
 }
+
+// キーストーン（メガシンカ共通の目印アイコン）。ポケモン非依存なので独自メガにも使える。
+export const KEY_STONE_ICON = `${POKEAPI_ITEMS}/key-stone.png`;

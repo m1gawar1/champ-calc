@@ -12,7 +12,7 @@ import { calcDamageRolls, buildResult, calcHazardDamage, getWeatherBallType } fr
 import { reverseCalcDefense, reverseCalcAttack } from '../engine/reverseCalc';
 import { getTypeEffectiveness, effectivenessLabel } from '../engine/typeChart';
 import { getPokemonJaList, getMoveJaList, displayPokemonName, moveJa, TYPE_JA } from '../i18n';
-import { getSpriteUrl, getFallbackSpriteUrl } from '../sprites';
+import { getSpriteUrl, getFallbackSpriteUrl, KEY_STONE_ICON } from '../sprites';
 import { getAbilityItems, getItemItems, ABILITY_JA } from '../engine/competitive';
 import { MULTI_HIT_MOVES, ESCALATING_POWER_MOVES } from '../engine/moveFlags';
 
@@ -228,11 +228,16 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
         {megaForms.length === 1 && (
           <button onClick={() => toggleMega(megaForms[0].name, !build.isMega)}
             style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
               padding: '10px 12px', borderRadius: 12, fontSize: 12, fontWeight: 800,
               background: build.isMega ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
               boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
               color: build.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
-            }}>メガ</button>
+            }}>
+            <img src={KEY_STONE_ICON} alt="" onError={e => { e.currentTarget.style.display = 'none'; }}
+              style={{ width: 16, height: 16, objectFit: 'contain', imageRendering: 'pixelated' }} />
+            メガ
+          </button>
         )}
         {megaForms.length > 1 && megaForms.map(mf => {
           const suffix = mf.name.replace(`Mega ${build.rosterName}`, '').trim() || 'メガ';
@@ -240,11 +245,16 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
           return (
             <button key={mf.name} onClick={() => toggleMega(mf.name, !sel)}
               style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
                 padding: '10px 10px', borderRadius: 12, fontSize: 12, fontWeight: 800,
                 background: sel ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
                 boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                 color: sel ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-              }}>{suffix}</button>
+              }}>
+              <img src={KEY_STONE_ICON} alt="" onError={e => { e.currentTarget.style.display = 'none'; }}
+                style={{ width: 16, height: 16, objectFit: 'contain', imageRendering: 'pixelated' }} />
+              {suffix}
+            </button>
           );
         })}
       </div>
