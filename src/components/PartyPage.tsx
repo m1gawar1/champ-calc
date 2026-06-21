@@ -177,19 +177,20 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
       {/* 展開エリア */}
       {expanded && (
         <div style={{ padding: '0 12px 14px', borderTop: `1px solid ${t.rim}`, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {/* ポケモン選択 */}
-          <div style={{ paddingTop: 12 }}>
+          {/* ポケモン選択（単体モードはメガボタンを名前の右に並べる） */}
+          <div style={{ paddingTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
             <button onClick={() => setShowPokemonModal(true)}
               style={{
-                width: '100%', background: t.glassNest, color: t.text,
+                flex: 1, minWidth: 0, background: t.glassNest, color: t.text,
                 border: `1px solid ${t.rim}`, borderRadius: 12,
                 padding: '10px 14px', fontSize: 14, fontWeight: 700, textAlign: 'left', cursor: 'pointer',
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>
               {build.rosterName ? displayPokemonName(build.rosterName) : 'ポケモンを選択...'}
             </button>
-            {/* 単体モードはヘッダーが無いので、メガボタンをここに表示 */}
+            {/* 単体モードはヘッダーが無いので、メガボタンを名前の右に表示 */}
             {hideIndex && megaForms.length > 0 && (
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', flexShrink: 0 }}>
                 {megaForms.length === 1 ? (
                   <button onClick={() => toggleMega(megaForms[0].name, !build.isMega)}
                     style={{
