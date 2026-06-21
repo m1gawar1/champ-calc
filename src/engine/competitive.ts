@@ -41,7 +41,7 @@ const CHAMPIONS_ITEMS: CompetitiveItem[] = [
   { en: 'Icy Rock',        ja: 'つめたいいわ' },
   { en: 'Iron Ball',       ja: 'くろいてっきゅう' },
   { en: 'Metronome',       ja: 'メトロノーム' },
-  { en: 'Focus Lens',      ja: 'フォーカスレンズ' },
+  { en: 'Zoom Lens',       ja: 'フォーカスレンズ' },
   { en: 'Big Root',        ja: 'おおきなねっこ' },
   { en: 'Shed Shell',      ja: 'きれいなぬけがら' },
   { en: 'Damp Rock',       ja: 'しめったいわ' },
