@@ -47,6 +47,14 @@ export function getBaseSpriteFromName(name: string): string {
   return getSpriteUrl(base);
 }
 
+// メガシンカの公式アート（Serebii）。Showdown gen5 にはチャンピオンズ独自メガの絵が無いため、
+// メガは dexNumber ベースで Serebii アートを使う。語尾 " X"/" Y" は -mx/-my。
+export function getMegaSpriteUrl(dexNumber: number, megaFormName: string): string {
+  const pad = String(dexNumber).padStart(3, '0');
+  const suffix = / X$/.test(megaFormName) ? '-mx' : / Y$/.test(megaFormName) ? '-my' : '-m';
+  return `https://www.serebii.net/pokemon/art/${pad}${suffix}.png`;
+}
+
 // 持ち物アイコン（PokeAPI item スプライト）。英語名 → スラッグ変換。
 // 集約アイテム（TypeBoost/ResistBerry）や「なし」は実物が無いので '' を返す。
 // 一部（heavy-duty-boots 等）は404のため、表示側は onError でアイコンを隠すこと。

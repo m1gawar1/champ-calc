@@ -13,7 +13,7 @@ import {
   type SpeedAbilityInfo,
 } from '../engine/speed';
 import { displayPokemonName, abilityJaName } from '../i18n';
-import { getSpriteUrl, getFallbackSpriteUrl } from '../sprites';
+import { getSpriteUrl, getFallbackSpriteUrl, getMegaSpriteUrl } from '../sprites';
 
 // ─── Props ───
 interface Props {
@@ -293,8 +293,16 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
                     }}
                   >
                     <img
-                      src={getSpriteUrl(c.spriteName)}
-                      onError={e => { (e.target as HTMLImageElement).src = getFallbackSpriteUrl(c.dexNumber); }}
+                      src={c.build.isMega && c.build.megaFormName
+                        ? getMegaSpriteUrl(c.dexNumber, c.build.megaFormName)
+                        : getSpriteUrl(c.spriteName)}
+                      onError={e => {
+                        // Serebii / Showdown が404の場合、dex番号でフォールバック（無限ループ防止）
+                        const img = e.target as HTMLImageElement;
+                        if (img.dataset.fellBack) { img.style.opacity = '0'; return; }
+                        img.dataset.fellBack = '1';
+                        img.src = getFallbackSpriteUrl(c.dexNumber);
+                      }}
                       alt={c.displayName}
                       style={{ width: '88%', height: '88%', objectFit: 'contain', imageRendering: 'pixelated' }}
                     />
@@ -424,9 +432,15 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
                   {/* 相手個体ヘッダー */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                     <img
-                      src={getSpriteUrl(spriteName)}
+                      src={opp.isMega && opp.megaFormName && rosterEntry
+                        ? getMegaSpriteUrl(rosterEntry.dexNumber, opp.megaFormName)
+                        : getSpriteUrl(spriteName)}
                       onError={e => {
-                        if (rosterEntry) (e.target as HTMLImageElement).src = getFallbackSpriteUrl(rosterEntry.dexNumber);
+                        // Serebii / Showdown が404の場合、dex番号でフォールバック（無限ループ防止）
+                        const img = e.target as HTMLImageElement;
+                        if (img.dataset.fellBack) { img.style.opacity = '0'; return; }
+                        img.dataset.fellBack = '1';
+                        if (rosterEntry) img.src = getFallbackSpriteUrl(rosterEntry.dexNumber);
                       }}
                       alt={dispName}
                       style={{ width: 40, height: 40, imageRendering: 'pixelated', flexShrink: 0 }}

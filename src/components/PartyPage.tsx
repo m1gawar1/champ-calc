@@ -12,7 +12,7 @@ import { newParty, opponentBuild, addPokemonToHistory, addBattleHistory, addBoxP
 import { getMegaForms, getSelectableRoster, getPokemonLearnset, findBaseStats } from '../data';
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { getPokemonJaList, displayPokemonName, moveJa, NATURE_JA, STAT_JA, TYPE_JA } from '../i18n';
-import { getSpriteUrl, getFallbackSpriteUrl, getBaseSpriteFromName, KEY_STONE_ICON } from '../sprites';
+import { getSpriteUrl, getFallbackSpriteUrl, getBaseSpriteFromName, getMegaSpriteUrl, KEY_STONE_ICON } from '../sprites';
 import { getAbilityItems, getAllItemItems, resolveItem } from '../engine/competitive';
 import { getMegaStone, getMegaStoneLabel } from '../data/megaStones';
 
@@ -126,10 +126,10 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
         {rosterEntry && (
           <img
             src={build.isMega && build.megaFormName
-              ? getSpriteUrl(build.megaFormName)
+              ? getMegaSpriteUrl(rosterEntry.dexNumber, build.megaFormName)
               : getSpriteUrl(rosterEntry.name)}
             onError={e => {
-              // 独自メガ等で Showdown に絵が無い場合、まずベース種スプライト、最後に番号フォールバック
+              // Serebii / Showdown が404の場合、ベース種→dex番号の順でフォールバック（無限ループ防止）
               const img = e.target as HTMLImageElement;
               if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = getBaseSpriteFromName(rosterEntry.name); }
               else { img.src = getFallbackSpriteUrl(rosterEntry.dexNumber); }
@@ -523,8 +523,16 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
                         display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: 6,
                       }}>
                         <img
-                          src={getSpriteUrl(spriteName)}
-                          onError={e => { if (entry) (e.target as HTMLImageElement).src = getFallbackSpriteUrl(entry.dexNumber); }}
+                          src={b.build.isMega && b.build.megaFormName && entry
+                            ? getMegaSpriteUrl(entry.dexNumber, b.build.megaFormName)
+                            : getSpriteUrl(spriteName)}
+                          onError={e => {
+                            // Serebii / Showdown が404の場合、dex番号でフォールバック（無限ループ防止）
+                            const img = e.target as HTMLImageElement;
+                            if (img.dataset.fellBack) { img.style.opacity = '0'; return; }
+                            img.dataset.fellBack = '1';
+                            if (entry) img.src = getFallbackSpriteUrl(entry.dexNumber);
+                          }}
                           alt="" style={{ width: '85%', height: '85%', objectFit: 'contain', imageRendering: 'pixelated' }}
                         />
                       </div>
@@ -621,8 +629,16 @@ function PartyCard({ party, isActive, onActivate, onEdit, onDelete, data }: {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
               }}>
                 <img
-                  src={getSpriteUrl(spriteName)}
-                  onError={e => { (e.target as HTMLImageElement).src = getFallbackSpriteUrl(entry.dexNumber); }}
+                  src={m.isMega && m.megaFormName
+                    ? getMegaSpriteUrl(entry.dexNumber, m.megaFormName)
+                    : getSpriteUrl(spriteName)}
+                  onError={e => {
+                    // Serebii / Showdown が404の場合、dex番号でフォールバック（無限ループ防止）
+                    const img = e.target as HTMLImageElement;
+                    if (img.dataset.fellBack) { img.style.opacity = '0'; return; }
+                    img.dataset.fellBack = '1';
+                    img.src = getFallbackSpriteUrl(entry.dexNumber);
+                  }}
                   alt={jaName}
                   style={{ width: '85%', height: '85%', objectFit: 'contain', imageRendering: 'pixelated' }}
                 />
@@ -794,8 +810,17 @@ function SelectionRecordModal({ myMembers, myPartyName, opponentMembers, data, o
                 display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
                 opacity: !selected && sel.length >= 3 ? 0.4 : 1,
               }}>
-              <img src={getSpriteUrl(spriteName)}
-                onError={e => { (e.target as HTMLImageElement).src = getFallbackSpriteUrl(entry.dexNumber); }}
+              <img
+                src={m.isMega && m.megaFormName
+                  ? getMegaSpriteUrl(entry.dexNumber, m.megaFormName)
+                  : getSpriteUrl(spriteName)}
+                onError={e => {
+                  // Serebii / Showdown が404の場合、dex番号でフォールバック（無限ループ防止）
+                  const img = e.target as HTMLImageElement;
+                  if (img.dataset.fellBack) { img.style.opacity = '0'; return; }
+                  img.dataset.fellBack = '1';
+                  img.src = getFallbackSpriteUrl(entry.dexNumber);
+                }}
                 alt="" style={{ width: '85%', height: '85%', objectFit: 'contain', imageRendering: 'pixelated' }} />
               {selected && (
                 <span style={{
@@ -1149,8 +1174,17 @@ export function PartyPage({ data, store, onUpdate }: Props) {
                       boxShadow: `inset 0 0 0 0.5px ${t.btnSoftRim}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: 6,
                     }}>
-                      <img src={getSpriteUrl(spriteName)}
-                        onError={e => { if (entry) (e.target as HTMLImageElement).src = getFallbackSpriteUrl(entry.dexNumber); }}
+                      <img
+                        src={b.build.isMega && b.build.megaFormName && entry
+                          ? getMegaSpriteUrl(entry.dexNumber, b.build.megaFormName)
+                          : getSpriteUrl(spriteName)}
+                        onError={e => {
+                          // Serebii / Showdown が404の場合、dex番号でフォールバック（無限ループ防止）
+                          const img = e.target as HTMLImageElement;
+                          if (img.dataset.fellBack) { img.style.opacity = '0'; return; }
+                          img.dataset.fellBack = '1';
+                          if (entry) img.src = getFallbackSpriteUrl(entry.dexNumber);
+                        }}
                         alt="" style={{ width: '85%', height: '85%', objectFit: 'contain', imageRendering: 'pixelated' }} />
                     </div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: t.text, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

@@ -12,7 +12,7 @@ import { calcDamageRolls, buildResult, calcHazardDamage, getWeatherBallType } fr
 import { reverseCalcDefense, reverseCalcAttack } from '../engine/reverseCalc';
 import { getTypeEffectiveness, effectivenessLabel } from '../engine/typeChart';
 import { getPokemonJaList, getMoveJaList, displayPokemonName, moveJa, TYPE_JA } from '../i18n';
-import { getSpriteUrl, getFallbackSpriteUrl, KEY_STONE_ICON } from '../sprites';
+import { getSpriteUrl, getFallbackSpriteUrl, getMegaSpriteUrl, KEY_STONE_ICON } from '../sprites';
 import { getAbilityItems, getItemItems, resolveItem, ABILITY_JA } from '../engine/competitive';
 import { getMegaStone } from '../data/megaStones';
 import { MULTI_HIT_MOVES, ESCALATING_POWER_MOVES, VARIABLE_POWER_MOVES } from '../engine/moveFlags';
@@ -60,10 +60,11 @@ function koColor(ko1Chance: number, guaranteed2HKO: boolean, isDark: boolean, te
 }
 
 // パーティクイック選択バー
-function PartyQuickBar({ label, accentColor, members, selectedName, onSelect }: {
+function PartyQuickBar({ label, accentColor, members, selectedName, onSelect, roster }: {
   label: string; accentColor: string;
   members: (PokemonBuild | null)[];
   selectedName: string; onSelect: (b: PokemonBuild) => void;
+  roster: import('../types').RosterEntry[];
 }) {
   const t = useTheme();
   const filled = members.filter((m): m is PokemonBuild => !!m?.rosterName);
@@ -81,6 +82,8 @@ function PartyQuickBar({ label, accentColor, members, selectedName, onSelect }: 
           const spriteName = m.isMega && m.megaFormName ? m.megaFormName : m.rosterName;
           const jaName = m.isMega && m.megaFormName ? displayPokemonName(m.megaFormName) : displayPokemonName(m.rosterName);
           const isSelected = selectedName === m.rosterName;
+          // メガ時は Serebii アート用に dexNumber を取得
+          const dex = roster.find(r => r.name === m.rosterName)?.dexNumber;
           return (
             <button key={i} onClick={() => onSelect(m)} title={jaName}
               style={{
@@ -96,9 +99,11 @@ function PartyQuickBar({ label, accentColor, members, selectedName, onSelect }: 
               }}
             >
               <img
-                src={getSpriteUrl(spriteName)}
+                src={m.isMega && m.megaFormName && dex
+                  ? getMegaSpriteUrl(dex, m.megaFormName)
+                  : getSpriteUrl(spriteName)}
                 onError={e => {
-                  // 独自メガ等でメガ用スプライトが404になる場合、まずベース種にフォールバック
+                  // Serebii / Showdown が404の場合、ベース種にフォールバック（無限ループ防止）
                   const img = e.target as HTMLImageElement;
                   if (img.dataset.fellBack) { img.style.opacity = '0'; return; }
                   img.dataset.fellBack = '1';
@@ -202,9 +207,15 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
           {rosterEntry && (
             <img
               src={build.isMega && build.megaFormName
-                ? getSpriteUrl(build.megaFormName)
+                ? getMegaSpriteUrl(rosterEntry.dexNumber, build.megaFormName)
                 : getSpriteUrl(rosterEntry.name)}
-              onError={e => { (e.target as HTMLImageElement).src = getFallbackSpriteUrl(rosterEntry.dexNumber); }}
+              onError={e => {
+                // Serebii / Showdown が404の場合、dexNumber ベースでフォールバック（無限ループ防止）
+                const img = e.target as HTMLImageElement;
+                if (img.dataset.fellBack) { img.style.opacity = '0'; return; }
+                img.dataset.fellBack = '1';
+                img.src = getFallbackSpriteUrl(rosterEntry.dexNumber);
+              }}
               alt=""
               style={{ width: 48, height: 48, imageRendering: 'pixelated', flexShrink: 0 }}
             />
@@ -1246,10 +1257,12 @@ export function Calculator({ data, myPartyMembers = [], opponentMembers = [], po
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <PartyQuickBar label="自" accentColor={t.accentAtk} members={myPartyMembers}
               selectedName={swapped ? defender.rosterName : attacker.rosterName}
-              onSelect={swapped ? loadIntoDefender : loadIntoAttacker} />
+              onSelect={swapped ? loadIntoDefender : loadIntoAttacker}
+              roster={data.roster} />
             <PartyQuickBar label="相" accentColor={t.accentDef} members={opponentMembers}
               selectedName={swapped ? attacker.rosterName : defender.rosterName}
-              onSelect={swapped ? loadIntoAttacker : loadIntoDefender} />
+              onSelect={swapped ? loadIntoAttacker : loadIntoDefender}
+              roster={data.roster} />
           </div>
         </Glass>
       )}
