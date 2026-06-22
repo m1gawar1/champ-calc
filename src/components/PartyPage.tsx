@@ -357,13 +357,20 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
 
       {openMoveSlot !== null && (
         <SelectModal
+          key={openMoveSlot}            // スロット切替で再マウントし検索欄・フィルタをリセット
           title={`技${openMoveSlot + 1} を選択`}
           items={[{ label: '（なし）', value: '' }, ...moveSelectItems]}
           value={moves[openMoveSlot]}
-          onSelect={v => setMove(openMoveSlot, v)}
+          onSelect={v => {
+            setMove(openMoveSlot, v);
+            // 1つ選ぶと次の技スロットへ自動で切替。4つ目（slot 3）を選んだら閉じる
+            if (openMoveSlot < 3) setOpenMoveSlot(openMoveSlot + 1);
+            else setOpenMoveSlot(null);
+          }}
           onClose={() => setOpenMoveSlot(null)}
           sortable
           persistKey="champ_move_sort"
+          keepOpenOnSelect
         />
       )}
       {showItemModal && (
@@ -404,6 +411,8 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
     ...party,
     members: [...Array(6)].map((_, i) => party.members[i] ?? null),
   }));
+  // 全画面シートで編集中のメンバーインデックス（null なら一覧表示）
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   function setMember(i: number, build: PokemonBuild) {
     const next = [...draft.members] as (PokemonBuild | null)[];
@@ -415,10 +424,12 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
     next[i] = null;
     setDraft({ ...draft, members: next });
   }
-  function addSlot() {
+  // 空枠を追加し、追加先インデックスを返す（無ければ null）
+  function addSlot(): number | null {
     const firstEmpty = draft.members.findIndex(m => !m);
-    if (firstEmpty === -1) return;
+    if (firstEmpty === -1) return null;
     setMember(firstEmpty, emptyBuild());
+    return firstEmpty;
   }
 
   const filledCount = draft.members.filter(Boolean).length;
@@ -426,11 +437,12 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
   // ボックスピッカーモーダルの表示状態
   const [showBoxPicker, setShowBoxPicker] = useState(false);
 
-  // ボックス個体をコピーして最初の空スロットに追加
-  function addFromBox(build: PokemonBuild) {
+  // ボックス個体をコピーして最初の空スロットに追加。追加先インデックスを返す（無ければ null）
+  function addFromBox(build: PokemonBuild): number | null {
     const firstEmpty = draft.members.findIndex(m => !m);
-    if (firstEmpty === -1) return;
+    if (firstEmpty === -1) return null;
     setMember(firstEmpty, structuredClone(build)); // 原本を壊さないようディープコピー
+    return firstEmpty;
   }
 
   return (
@@ -446,21 +458,56 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
           padding: '10px 14px', fontSize: 15, fontWeight: 700, outline: 'none',
         }}
       />
+      {/* メンバーはサマリ行で一覧表示。タップで全画面シート編集 */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {draft.members.map((m, i) => m !== null ? (
-          <MemberEditor key={i} index={i} build={m} data={data}
-            onChange={b => setMember(i, b)} onRemove={() => removeMember(i)}
-            store={store} onUpdateHistory={onUpdateHistory} />
-        ) : null)}
+        {draft.members.map((m, i) => {
+          if (m === null) return null;
+          const rosterEntry = getSelectableRoster(data.roster).find(r => r.name === m.rosterName);
+          const filled = !!m.rosterName;
+          const name = m.isMega && m.megaFormName
+            ? displayPokemonName(m.megaFormName)
+            : filled ? displayPokemonName(m.rosterName) : 'ポケモンを選択';
+          return (
+            <Glass key={i} tint={t.glassTint2} radius={16} padding={0} style={{ overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px' }}>
+                <button
+                  onClick={() => setEditingIndex(i)}
+                  style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
+                >
+                  {rosterEntry ? (
+                    <img
+                      src={m.isMega && m.megaFormName
+                        ? getMegaSpriteUrl(rosterEntry.dexNumber, m.megaFormName)
+                        : getSpriteUrl(rosterEntry.name)}
+                      onError={e => {
+                        // Serebii / Showdown が404の場合、ベース種→dex番号の順でフォールバック（無限ループ防止）
+                        const img = e.target as HTMLImageElement;
+                        if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = getBaseSpriteFromName(rosterEntry.name); }
+                        else { img.src = getFallbackSpriteUrl(rosterEntry.dexNumber); }
+                      }}
+                      alt=""
+                      style={{ width: 36, height: 36, imageRendering: 'pixelated', flexShrink: 0 }}
+                    />
+                  ) : (
+                    <span style={{ width: 36, height: 36, flexShrink: 0 }} />
+                  )}
+                  <span style={{ fontSize: 14, fontWeight: 700, color: filled ? t.text : t.textMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+                </button>
+                <button onClick={() => removeMember(i)} style={{ flexShrink: 0, color: t.textWeak, background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, padding: '0 2px' }}>✕</button>
+              </div>
+            </Glass>
+          );
+        })}
       </div>
       {filledCount < 6 && (
         <button
           onClick={() => {
-            // ボックスに個体があれば選択モーダルを開く、なければ直接空枠追加
+            // ボックスに個体があれば選択モーダルを開く、なければ空枠追加してすぐ編集シートを開く
             if (store.box.length > 0) {
               setShowBoxPicker(true);
             } else {
-              addSlot();
+              const idx = addSlot();
+              if (idx !== null) setEditingIndex(idx);
             }
           }}
           style={{
@@ -478,16 +525,16 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
           onClick={() => setShowBoxPicker(false)}
           style={{
             position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
           }}
         >
           <div
             onClick={e => e.stopPropagation()}
-            style={{ width: '100%', maxWidth: 440, maxHeight: '88vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
+            style={{ width: '100%', height: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' } as React.CSSProperties}
           >
-            <Glass tint={t.glassTint} radius={22} padding={16}>
-              {/* ヘッダー */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <Glass tint={t.glassTint} radius={0} padding={16}>
+              {/* ヘッダー（ノッチ対策で上端にセーフエリア余白） */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingTop: 'env(safe-area-inset-top)' }}>
                 <div style={{ fontSize: 11, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4 }}>
                   ボックスから追加
                 </div>
@@ -500,7 +547,7 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
 
               {/* 空の個体を追加ボタン */}
               <button
-                onClick={() => { addSlot(); setShowBoxPicker(false); }}
+                onClick={() => { const idx = addSlot(); setShowBoxPicker(false); if (idx !== null) setEditingIndex(idx); }}
                 style={{
                   width: '100%', padding: '10px 0', marginBottom: 12,
                   border: `1px dashed ${t.dashedRim}`, borderRadius: 12,
@@ -516,7 +563,7 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
                   const spriteName = b.build.isMega && b.build.megaFormName ? b.build.megaFormName : b.build.rosterName;
                   return (
                     <Glass key={b.id} tint={t.glassTint} radius={16} padding={10}
-                      onClick={() => { addFromBox(b.build); setShowBoxPicker(false); }}
+                      onClick={() => { const idx = addFromBox(b.build); setShowBoxPicker(false); if (idx !== null) setEditingIndex(idx); }}
                       style={{ cursor: 'pointer' }}>
                       <div style={{
                         width: '100%', aspectRatio: '1', borderRadius: 12, background: t.glassChip,
@@ -549,6 +596,44 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
                   );
                 })}
               </div>
+            </Glass>
+          </div>
+        </div>
+      )}
+
+      {/* メンバー編集の全画面シート（ボックスの個体編集シートと同形式） */}
+      {editingIndex !== null && draft.members[editingIndex] && (
+        <div
+          onClick={() => setEditingIndex(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ width: '100%', height: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' } as React.CSSProperties}
+          >
+            <Glass tint={t.glassTint} radius={0} padding={16}>
+              {/* ヘッダー（ノッチ対策で上端にセーフエリア余白） */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingTop: 'env(safe-area-inset-top)' }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4 }}>
+                  ポケモンを編集
+                </div>
+                <button
+                  onClick={() => setEditingIndex(null)}
+                  aria-label="閉じる"
+                  style={{ color: t.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, padding: '0 4px', lineHeight: 1 }}
+                >✕</button>
+              </div>
+              <MemberEditor
+                build={draft.members[editingIndex]!}
+                onChange={b => setMember(editingIndex!, b)}
+                onRemove={() => { removeMember(editingIndex!); setEditingIndex(null); }}
+                data={data} index={editingIndex!}
+                store={store} onUpdateHistory={onUpdateHistory}
+                defaultOpen hideIndex
+              />
             </Glass>
           </div>
         </div>
@@ -1072,15 +1157,16 @@ export function PartyPage({ data, store, onUpdate }: Props) {
               onClick={() => { setBoxDraft(null); setEditingBoxId(null); }}
               style={{
                 position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
               }}
             >
               <div
                 onClick={e => e.stopPropagation()}
-                style={{ width: '100%', maxWidth: 440, maxHeight: '88vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' } as React.CSSProperties}
+                style={{ width: '100%', height: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' } as React.CSSProperties}
               >
-                <Glass tint={t.glassTint} radius={22} padding={16}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <Glass tint={t.glassTint} radius={0} padding={16}>
+                  {/* ヘッダー（ノッチ対策で上端にセーフエリア余白） */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingTop: 'env(safe-area-inset-top)' }}>
                     <div style={{ fontSize: 11, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4 }}>
                       {editingBoxId ? '個体を編集' : '新しい個体'}
                     </div>

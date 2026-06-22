@@ -31,18 +31,20 @@ export function NatureModal({ value, onChange, onClose }: Props) {
       style={{
         position: 'fixed', inset: 0, zIndex: 1000,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: 16, background: 'rgba(0,0,0,0.7)',
+        padding: 0, background: 'rgba(0,0,0,0.7)',
       }}
       onClick={onClose}
     >
       <Glass
         tint={t.glassTint}
-        radius={26}
+        radius={0}
         padding={16}
-        style={{ width: '100%', maxWidth: 380 }}
+        // 全画面化。テーブルは小さいので中身を縦中央に寄せて自然に見せる
+        style={{ width: '100%', height: '100dvh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
         onClick={e => e.stopPropagation()}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        {/* ヘッダー（ノッチ対策で上端にセーフエリア余白） */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, paddingTop: 'env(safe-area-inset-top)' }}>
           <span style={{ fontSize: 15, fontWeight: 800, color: t.text }}>性格を選択</span>
           <button
             onClick={onClose}

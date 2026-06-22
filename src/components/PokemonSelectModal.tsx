@@ -118,17 +118,17 @@ export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, oppon
   // Glass カードの stacking context から脱出させるため #root へ portal する
   return createPortal(
     <div
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
       onClick={onClose}
     >
       <div
-        style={{ width: '100%', maxWidth: 440, maxHeight: '82vh', display: 'flex', flexDirection: 'column', position: 'relative', borderRadius: 26, overflow: 'hidden', isolation: 'isolate' }}
+        style={{ width: '100%', height: '100dvh', display: 'flex', flexDirection: 'column', position: 'relative', borderRadius: 0, overflow: 'hidden', isolation: 'isolate' }}
         onClick={e => e.stopPropagation()}
       >
-        <GlassLayers radius={26} />
+        <GlassLayers radius={0} />
 
-        {/* ヘッダー */}
-        <div style={{ position: 'relative', zIndex: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 16px 12px' }}>
+        {/* ヘッダー（ノッチ対策で上端にセーフエリア余白） */}
+        <div style={{ position: 'relative', zIndex: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'calc(env(safe-area-inset-top) + 16px) 16px 12px' }}>
           <span style={{ fontSize: 17, fontWeight: 800, color: t.text }}>ポケモンを選択</span>
           <button onClick={onClose} style={{ color: t.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, padding: '0 4px' }}>✕</button>
         </div>
@@ -226,8 +226,8 @@ export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, oppon
           >⚡ メガのみ</button>
         </div>
 
-        {/* リスト */}
-        <div style={{ position: 'relative', zIndex: 3, flex: 1, overflowY: 'auto', padding: '0 8px 12px' }}>
+        {/* リスト（下端にセーフエリア余白） */}
+        <div style={{ position: 'relative', zIndex: 3, flex: 1, overflowY: 'auto', padding: '0 8px calc(env(safe-area-inset-bottom) + 12px)' }}>
           {activeItems.length === 0 ? (
             <div style={{ textAlign: 'center', color: t.textMuted, padding: '32px 0', fontSize: 14 }}>
               ポケモンが見つかりません
