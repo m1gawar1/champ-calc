@@ -27,6 +27,10 @@ function toSlug(name: string): string {
   const paldean  = s.match(/^paldean (.+)$/);
   if (paldean)  return `${paldean[1].replace(/ /g, '')}-paldea`;
 
+  // ロトムのフォルム → "rotom-heat" 等（Showdown はサフィックス形式）
+  const rotomForm = s.match(/^(heat|wash|frost|fan|mow) rotom$/);
+  if (rotomForm) return `rotom-${rotomForm[1]}`;
+
   return s.replace(/ /g, '');
 }
 

@@ -20,8 +20,20 @@ const REGIONAL_PREFIX: Record<string, string> = {
   Hisuian: 'ヒスイ',
 };
 
-// ポケモン表示名（地域フォーム・メガシンカ対応）
+// ロトムのフォルム英語名 → 日本語名
+const ROTOM_FORM_JA: Record<string, string> = {
+  'Heat Rotom':  'ヒートロトム',
+  'Wash Rotom':  'ウォッシュロトム',
+  'Frost Rotom': 'フロストロトム',
+  'Fan Rotom':   'スピンロトム',
+  'Mow Rotom':   'カットロトム',
+};
+
+// ポケモン表示名（地域フォーム・メガシンカ・ロトムフォルム対応）
 export function displayPokemonName(enName: string): string {
+  // ロトムのフォルム
+  if (ROTOM_FORM_JA[enName]) return ROTOM_FORM_JA[enName];
+
   // 地域フォーム: "Alolan Raichu" → "アローラ ライチュウ"
   for (const [prefix, jaPrefix] of Object.entries(REGIONAL_PREFIX)) {
     if (enName.startsWith(prefix + ' ')) {

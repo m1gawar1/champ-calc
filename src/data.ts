@@ -2,6 +2,7 @@ import type { RosterEntry, BaseStats, Move, Nature, ChampionsData, LearnsetEntry
 import seasonMb from './data/season-mb.json';
 import seasonMbMegas from './data/season-mb-megas.json';
 import seasonMbLearnsets from './data/season-mb-learnsets.json';
+import rotomForms from './data/rotom-forms.json';
 
 const BASE_URL =
   'https://raw.githubusercontent.com/otterlyclueless/pokemon-champions-data/main';
@@ -12,10 +13,12 @@ type MbData = { roster: RosterEntry[]; baseStats: BaseStats[] };
 const MB_ROSTER = [
   ...(seasonMb as MbData).roster,
   ...(seasonMbMegas as unknown as MbData).roster,
+  ...(rotomForms as unknown as MbData).roster,
 ];
 const MB_BASE_STATS = [
   ...(seasonMb as MbData).baseStats,
   ...(seasonMbMegas as unknown as MbData).baseStats,
+  ...(rotomForms as unknown as MbData).baseStats,
 ];
 // MB追加ポケモンの覚え技（PokeAPI由来・SV優先、SV未収録は全世代和集合）。上流 learnsets 未収録分を補完。
 const MB_LEARNSETS = seasonMbLearnsets as unknown as Record<string, LearnsetEntry>;
@@ -102,6 +105,14 @@ export async function loadData(): Promise<ChampionsData> {
       if (baseEntry) {
         learnsets[entry.name] = { ...baseEntry };
       }
+    }
+  }
+
+  // ロトムのフォルムは原種ロトムの learnset を継承（上流に form 別 learnset が無いため）。
+  // 原種ロトムの覚え技には各フォルムのシグネチャ技（オーバーヒート等）が既に含まれる。
+  for (const entry of (rotomForms as unknown as MbData).roster) {
+    if (!learnsets[entry.name] && learnsets['Rotom']) {
+      learnsets[entry.name] = { ...learnsets['Rotom'] };
     }
   }
 

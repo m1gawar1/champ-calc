@@ -1,0 +1,17 @@
+{
+  "_note": "ロトムの各フォルム（ヒート/ウォッシュ/フロスト/スピン/カット）。Champions実機で使用可だが上流リポジトリ・Supabaseに未収録のためローカル補完。種族値はcanonical（全フォルム共通 50/65/107/105/107/86）、タイプはでんき＋各属性。覚え技は原種ロトムを継承（data.tsで処理）。スプライトはsprites.tsでrotom-heat等のShowdownスラッグに変換。日本語名はi18n.tsで変換。",
+  "roster": [
+    { "name": "Heat Rotom",  "dexNumber": 479, "types": ["Electric", "Fire"],  "form": "Rotom", "abilities": { "0": "Levitate" }, "championsVerified": false },
+    { "name": "Wash Rotom",  "dexNumber": 479, "types": ["Electric", "Water"], "form": "Rotom", "abilities": { "0": "Levitate" }, "championsVerified": false },
+    { "name": "Frost Rotom", "dexNumber": 479, "types": ["Electric", "Ice"],   "form": "Rotom", "abilities": { "0": "Levitate" }, "championsVerified": false },
+    { "name": "Fan Rotom",   "dexNumber": 479, "types": ["Electric", "Flying"],"form": "Rotom", "abilities": { "0": "Levitate" }, "championsVerified": false },
+    { "name": "Mow Rotom",   "dexNumber": 479, "types": ["Electric", "Grass"], "form": "Rotom", "abilities": { "0": "Levitate" }, "championsVerified": false }
+  ],
+  "baseStats": [
+    { "name": "Heat Rotom",  "dexNumber": 479, "form": "Rotom", "hp": 50, "atk": 65, "def": 107, "spa": 105, "spd": 107, "spe": 86, "total": 520, "championsVerified": false },
+    { "name": "Wash Rotom",  "dexNumber": 479, "form": "Rotom", "hp": 50, "atk": 65, "def": 107, "spa": 105, "spd": 107, "spe": 86, "total": 520, "championsVerified": false },
+    { "name": "Frost Rotom", "dexNumber": 479, "form": "Rotom", "hp": 50, "atk": 65, "def": 107, "spa": 105, "spd": 107, "spe": 86, "total": 520, "championsVerified": false },
+    { "name": "Fan Rotom",   "dexNumber": 479, "form": "Rotom", "hp": 50, "atk": 65, "def": 107, "spa": 105, "spd": 107, "spe": 86, "total": 520, "championsVerified": false },
+    { "name": "Mow Rotom",   "dexNumber": 479, "form": "Rotom", "hp": 50, "atk": 65, "def": 107, "spa": 105, "spd": 107, "spe": 86, "total": 520, "championsVerified": false }
+  ]
+}
