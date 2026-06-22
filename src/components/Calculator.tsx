@@ -546,13 +546,13 @@ function MoveSlots({ slots, onChange, data, rosterName, learnsetFilter, onToggle
   const learnset = useMemo(() => learnsetFilter && rosterName
     ? getPokemonLearnset(data.learnsets, rosterName) : null,
     [data.learnsets, rosterName, learnsetFilter]);
-  // 変化技も常に候補に含める（フィルタは選択モーダル側で行う）
+  // 変化技も常に候補に含める（物理/特殊/変化のフィルタは選択モーダル側で行う）。
+  // Champions に無い技（inChampions:false）は覚え技フィルタON時も表示しない。
   const verifiedWithStatus = useMemo(() => data.moves.filter(m => m.inChampions !== false && (m.power > 0 || m.category === 'Status')), [data.moves]);
-  const allWithStatus = useMemo(() => data.moves.filter(m => m.power > 0 || m.category === 'Status'), [data.moves]);
   const filteredMoves = useMemo(() => {
     if (!learnset) return verifiedWithStatus;
-    return allWithStatus.filter(m => learnset.has(m.name));
-  }, [verifiedWithStatus, allWithStatus, learnset]);
+    return verifiedWithStatus.filter(m => learnset.has(m.name));
+  }, [verifiedWithStatus, learnset]);
   const learnsetFound = !learnsetFilter || !rosterName || learnset !== null;
   // 技選択モーダル用（日本語名 + タイプ・威力を補助表示）
   const moveSelectItems = useMemo(() =>

@@ -20,6 +20,15 @@ const MB_BASE_STATS = [
 // MB追加ポケモンの覚え技（PokeAPI由来・SV優先、SV未収録は全世代和集合）。上流 learnsets 未収録分を補完。
 const MB_LEARNSETS = seasonMbLearnsets as unknown as Record<string, LearnsetEntry>;
 
+// Champions の覚え技を実態に合わせて補正（追加/削除）。
+// PokeAPI(SV)由来の learnset には Champions と異なる技が含まれるため、ポケモンごとに調整する。
+const LEARNSET_PATCHES: Record<string, { add?: string[]; remove?: string[] }> = {
+  // サーフゴー: ゴールドラッシュ・なみのりを習得、でんじは（Champions非対応）を除外
+  Gholdengo: { add: ['Make It Rain', 'Surf'], remove: ['Thunder Wave'] },
+  // オーロンゲ: でんじは（Champions非対応）を除外
+  Grimmsnarl: { remove: ['Thunder Wave'] },
+};
+
 let cache: ChampionsData | null = null;
 
 async function fetchJson<T>(path: string): Promise<T> {
@@ -67,13 +76,18 @@ export async function loadData(): Promise<ChampionsData> {
     }
   }
 
-  // サーフゴー(Gholdengo)の learnset に Make It Rain を補完
-  // 上流 learnsets にゴールドラッシュが含まれないため、覚え技フィルタON時に非表示になる
-  if (learnsets['Gholdengo']) {
-    const alreadyHas = learnsets['Gholdengo'].moves.some(m => m.name === 'Make It Rain');
-    if (!alreadyHas) {
-      learnsets['Gholdengo'].moves.push({ name: 'Make It Rain' });
+  // Champions 仕様に合わせて learnset を補正（追加/削除）。メガ継承より前に適用し、継承先にも反映させる。
+  for (const [name, patch] of Object.entries(LEARNSET_PATCHES)) {
+    const entry = learnsets[name];
+    if (!entry) continue;
+    let moveList = entry.moves;
+    if (patch.remove) moveList = moveList.filter(m => !patch.remove!.includes(m.name));
+    if (patch.add) {
+      for (const mv of patch.add) {
+        if (!moveList.some(m => m.name === mv)) moveList = [...moveList, { name: mv }];
+      }
     }
+    learnsets[name] = { ...entry, moves: moveList };
   }
 
   // MB独自メガの learnset 継承: 上流に learnset が無いメガフォームは
