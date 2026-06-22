@@ -121,7 +121,7 @@ export function SelectModal({ title, items, value, onSelect, onClose, sortable, 
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="名前で検索... (ひらがな/カタカナ)"
-            autoFocus
+            // モバイルで開いた瞬間にキーボードが出ないよう自動フォーカスしない
             style={{
               width: '100%', boxSizing: 'border-box',
               background: t.glassNest, color: t.text,

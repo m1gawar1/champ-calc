@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { ChampionsData, PokemonBuild } from '../types';
 import { getSelectableRoster, getMegaForms } from '../data';
@@ -30,25 +30,19 @@ function toKatakana(str: string) {
   return str.replace(/[\u3041-\u3096]/g, m => String.fromCharCode(m.charCodeAt(0) + 0x60));
 }
 
-export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, opponentMembers, onSelect, onClose, currentName }: Props) {
+export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, opponentMembers, onSelect, onClose }: Props) {
   const t = useTheme();
   const [tab, setTab] = useState<TabType>('all');
-  // currentName があれば初期値をその日本語名にする（フォーカス時に全選択で即上書き可能）
-  const [search, setSearch] = useState(() => currentName ? displayPokemonName(currentName) : '');
+  // 再選択時も検索欄は空で開く（既存名は表示しない）
+  const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
   // メガのみフィルタ
   const [megaOnly, setMegaOnly] = useState(false);
 
-  // 検索 input への ref（autoFocus が効かないモバイル端末対策）
+  // 検索 input への ref
+  // モバイルでモーダルを開いた瞬間にキーボードが出ないよう、自動フォーカスはしない。
+  // ユーザーが検索欄をタップしたときだけキーボードが出る。
   const inputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    // requestAnimationFrame でモーダル描画完了後にフォーカス＋全選択
-    const raf = requestAnimationFrame(() => {
-      inputRef.current?.focus();
-      inputRef.current?.select();
-    });
-    return () => cancelAnimationFrame(raf);
-  }, []);
 
   // rosterName → タイプ配列 / dexNumber（アイコンのフォールバック用）
   const typeMap = useMemo(() => {
@@ -153,7 +147,6 @@ export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, oppon
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="名前で検索... (ひらがな/カタカナ)"
-              autoFocus
               // フォーカス時に全選択 → そのまま打ち直しで即置換できる
               onFocus={e => e.currentTarget.select()}
               style={{
