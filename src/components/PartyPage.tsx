@@ -13,7 +13,7 @@ import { getMegaForms, getSelectableRoster, getPokemonLearnset, findBaseStats } 
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { getPokemonJaList, displayPokemonName, moveJa, NATURE_JA, STAT_JA, TYPE_JA } from '../i18n';
 import { getSpriteUrl, getFallbackSpriteUrl, getBaseSpriteFromName, getMegaSpriteUrl, KEY_STONE_ICON } from '../sprites';
-import { getAbilityItems, getAllItemItems, resolveItem } from '../engine/competitive';
+import { getAbilityItems, getAllItemItems, resolveItem, ITEM_CATEGORIES } from '../engine/competitive';
 import { getMegaStone, getMegaStoneLabel } from '../data/megaStones';
 
 interface Props {
@@ -373,6 +373,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
           value={build.item ?? ''}
           onSelect={v => onChange({ ...build, item: v })}
           onClose={() => setShowItemModal(false)}
+          categoryOptions={ITEM_CATEGORIES}
         />
       )}
       {showNatureModal && (

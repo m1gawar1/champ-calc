@@ -7,11 +7,12 @@ import { TYPE_JA } from '../i18n';
 export interface SelectItem {
   label: string;
   value: string;
-  sub?: string;       // 右側に小さく表示する補助情報（英語名・効果など）
-  type?: string;      // タイプ（英語名）。指定があるとタイプ絞り込みバーを表示
-  power?: number;     // 威力（並び替え用）
-  category?: string;  // 'Physical' | 'Special' | 'Status'（並び替え用）
-  icon?: string;      // 左に表示するアイコンURL（持ち物など）。'' なら非表示
+  sub?: string;         // 右側に小さく表示する補助情報（英語名・効果など）
+  type?: string;        // タイプ（英語名）。指定があるとタイプ絞り込みバーを表示
+  power?: number;       // 威力（並び替え用）
+  category?: string;    // 'Physical' | 'Special' | 'Status'（技分類フィルタ用）
+  icon?: string;        // 左に表示するアイコンURL（持ち物など）。'' なら非表示
+  categories?: string[]; // カテゴリキー配列（持ち物フィルタ用）
 }
 
 export type SortKey = 'gojuon' | 'power' | 'type';
@@ -39,8 +40,9 @@ interface Props {
   value: string;
   onSelect: (value: string) => void;
   onClose: () => void;
-  sortable?: boolean;     // 並び替えバーを表示
-  persistKey?: string;    // 選んだ並び順を localStorage に保存するキー
+  sortable?: boolean;       // 並び替えバーを表示
+  persistKey?: string;      // 選んだ並び順を localStorage に保存するキー
+  categoryOptions?: { key: string; label: string }[]; // 持ち物カテゴリフィルタ用チップ定義
 }
 
 function toKatakana(str: string) {
@@ -48,7 +50,7 @@ function toKatakana(str: string) {
 }
 
 // 技・持ち物などを大きな画面で検索選択する汎用モーダル
-export function SelectModal({ title, items, value, onSelect, onClose, sortable, persistKey }: Props) {
+export function SelectModal({ title, items, value, onSelect, onClose, sortable, persistKey, categoryOptions }: Props) {
   const t = useTheme();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
@@ -68,12 +70,26 @@ export function SelectModal({ title, items, value, onSelect, onClose, sortable, 
     return TYPE_ORDER.filter(ty => present.has(ty));
   }, [items]);
 
+  // categoryOptions 未指定時は従来の技分類フィルタ表示判定
   const hasCategory = useMemo(() => items.some(i => i.category), [items]);
+  // categoryOptions 指定時: カテゴリ付きアイテムが1件でもあればバーを表示
+  const hasCategoryOptions = useMemo(
+    () => categoryOptions != null && items.some(i => i.categories && i.categories.length > 0),
+    [categoryOptions, items],
+  );
 
   const filtered = useMemo(() => {
     let arr = items;
     if (typeFilter) arr = arr.filter(it => it.type === typeFilter);
-    if (categoryFilter) arr = arr.filter(it => it.category === categoryFilter);
+    if (categoryFilter) {
+      if (categoryOptions) {
+        // 持ち物カテゴリフィルタ（categories 配列に含まれるか）
+        arr = arr.filter(it => it.categories?.includes(categoryFilter));
+      } else {
+        // 技分類フィルタ（従来の category 完全一致）
+        arr = arr.filter(it => it.category === categoryFilter);
+      }
+    }
     if (search) {
       const lower = search.toLowerCase();
       const kata = toKatakana(search);
@@ -166,8 +182,29 @@ export function SelectModal({ title, items, value, onSelect, onClose, sortable, 
           </div>
         )}
 
-        {/* 分類フィルター（物理 / 特殊） */}
-        {hasCategory && (
+        {/* 持ち物カテゴリフィルタ（categoryOptions 指定時） */}
+        {hasCategoryOptions && categoryOptions && (
+          <div style={{ position: 'relative', zIndex: 3, display: 'flex', flexWrap: 'wrap', gap: 5, padding: '0 12px 10px' }}>
+            {categoryOptions.map(cat => {
+              const on = categoryFilter === cat.key;
+              return (
+                <button
+                  key={cat.key}
+                  onClick={() => setCategoryFilter(on ? null : cat.key)}
+                  style={{
+                    padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none',
+                    background: on ? 'rgba(90,200,250,0.25)' : t.glassChip2,
+                    color: on ? t.accentAtk : t.textMuted,
+                    boxShadow: `inset 0 0 0 0.5px ${on ? t.rimAccent : t.rim}`,
+                  }}
+                >{cat.label}</button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* 技分類フィルター（物理 / 特殊 / 変化）— categoryOptions 未指定時のみ表示 */}
+        {!categoryOptions && hasCategory && (
           <div style={{ position: 'relative', zIndex: 3, display: 'flex', alignItems: 'center', gap: 5, padding: '0 12px 10px' }}>
             <span style={{ fontSize: 10, color: t.textWeak, fontWeight: 600 }}>分類</span>
             {CATEGORIES.map(cat => {

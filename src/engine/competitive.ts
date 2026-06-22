@@ -13,6 +13,68 @@ export interface CompetitiveAbility {
   ja: string;
 }
 
+// ── 持ち物カテゴリ定義（パーティ編集モーダルのフィルタ用） ──
+export const ITEM_CATEGORIES: { key: string; label: string }[] = [
+  { key: 'stat',     label: '能力' },
+  { key: 'power',    label: '威力' },
+  { key: 'defense',  label: '防御' },
+  { key: 'recovery', label: '回復' },
+  { key: 'extend',   label: '効果延長' },
+  { key: 'berry',    label: 'きのみ' },
+  { key: 'other',    label: 'その他' },
+];
+
+// タイプ半減きのみ18種
+const RESIST_BERRIES = new Set([
+  'Passho Berry', 'Payapa Berry', 'Occa Berry', 'Kasib Berry', 'Shuca Berry',
+  'Wacan Berry', 'Tanga Berry', 'Babiri Berry', 'Colbur Berry', 'Kebia Berry',
+  'Haban Berry', 'Chilan Berry', 'Charti Berry', 'Yache Berry', 'Chople Berry',
+  'Coba Berry', 'Rindo Berry', 'Roseli Berry',
+]);
+
+// HP・状態回復きのみ9種
+const RECOVERY_BERRIES = new Set([
+  'Sitrus Berry', 'Oran Berry', 'Chesto Berry', 'Persim Berry', 'Cheri Berry',
+  'Rawst Berry', 'Pecha Berry', 'Lum Berry', 'Leppa Berry',
+]);
+
+// 全きのみ（半減18 + 回復9 + Rowap Berry）
+const ALL_BERRIES = new Set([...RESIST_BERRIES, ...RECOVERY_BERRIES, 'Rowap Berry']);
+
+// カテゴリ別アイテムセット定義
+const STAT_ITEMS   = new Set(['White Herb', 'Choice Scarf', 'Light Ball']);
+const POWER_ITEMS  = new Set([
+  'Muscle Band', 'Wise Glasses', 'Expert Belt', 'Life Orb', 'Metronome',
+  'Charcoal', 'Mystic Water', 'Magnet', 'Miracle Seed', 'Never-Melt Ice',
+  'Black Belt', 'Poison Barb', 'Soft Sand', 'Sharp Beak', 'Twisted Spoon',
+  'Silver Powder', 'Hard Stone', 'Spell Tag', 'Dragon Fang', 'Black Glasses',
+  'Metal Coat', 'Silk Scarf', 'Fairy Feather',
+]);
+const DEFENSE_ITEMS = new Set(['Focus Band', 'Focus Sash']);
+const RECOVERY_ITEMS = new Set(['Mental Herb', 'Leftovers', 'Shell Bell', 'Big Root']);
+const EXTEND_ITEMS  = new Set(['Light Clay', 'Heat Rock', 'Icy Rock', 'Smooth Rock', 'Damp Rock']);
+const OTHER_ITEMS   = new Set([
+  'Bright Powder', "Quick Claw", "King's Rock", 'Scope Lens',
+  'Wide Lens', 'Zoom Lens', 'Iron Ball', 'Shed Shell', 'Rowap Berry',
+]);
+
+/**
+ * 英語名からカテゴリキー配列を返す。
+ * きのみは複数カテゴリに重複所属（例: 半減きのみ → defense + berry）。
+ * ITEM_CATEGORIES の順で返す。
+ */
+function itemCategories(en: string): string[] {
+  const result: string[] = [];
+  if (STAT_ITEMS.has(en))                       result.push('stat');
+  if (POWER_ITEMS.has(en))                      result.push('power');
+  if (DEFENSE_ITEMS.has(en) || RESIST_BERRIES.has(en)) result.push('defense');
+  if (RECOVERY_ITEMS.has(en) || RECOVERY_BERRIES.has(en)) result.push('recovery');
+  if (EXTEND_ITEMS.has(en))                     result.push('extend');
+  if (ALL_BERRIES.has(en))                      result.push('berry');
+  if (OTHER_ITEMS.has(en))                      result.push('other');
+  return result;
+}
+
 // ダメージに影響する持ち物（Pokémon Champions 準拠）
 // Champions ではタイプ強化18種・半減きのみ18種が実装され、こだわり系/いのちのたま/
 // とつげきチョッキ/しんかのきせき等は未実装。タイプ別アイテムは1つに集約して表示する。
@@ -212,12 +274,19 @@ export function resolveItem(en: string): { label: string; icon: string } {
 
 // パーティ/ボックス編集用の全持ち物リスト（名前のみ・管理用）。
 // Champions で使える道具（CHAMPIONS_ITEMS）を「なし」付きで返す。
-export function getAllItemItems(): { label: string; value: string; icon: string }[] {
-  const out: { label: string; value: string; icon: string }[] = [
-    { value: '', label: 'なし', icon: '' },
+// categories はカテゴリフィルタ用（SelectModal の categoryOptions と対応）。
+export function getAllItemItems(): { label: string; value: string; icon: string; categories: string[] }[] {
+  const out: { label: string; value: string; icon: string; categories: string[] }[] = [
+    // 「なし」はカテゴリなし
+    { value: '', label: 'なし', icon: '', categories: [] },
   ];
   for (const item of CHAMPIONS_ITEMS) {
-    out.push({ value: item.en, label: item.ja, icon: getItemSpriteUrl(item.en) });
+    out.push({
+      value: item.en,
+      label: item.ja,
+      icon: getItemSpriteUrl(item.en),
+      categories: itemCategories(item.en),
+    });
   }
   return out;
 }
