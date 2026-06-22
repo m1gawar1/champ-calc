@@ -40,6 +40,13 @@ export function getFallbackSpriteUrl(dexNumber: number): string {
   return `${POKEAPI}/${dexNumber}.png`;
 }
 
+// メガ名（"Mega Raichu X" 等）から先頭"Mega "と末尾" X"/" Y"を外したベース種名を得る。
+// 独自メガは Showdown に絵が無いため、ベース種スプライトへフォールバックする用途。
+export function getBaseSpriteFromName(name: string): string {
+  const base = name.replace(/^Mega\s+/i, '').replace(/\s+(X|Y)$/i, '');
+  return getSpriteUrl(base);
+}
+
 // 持ち物アイコン（PokeAPI item スプライト）。英語名 → スラッグ変換。
 // 集約アイテム（TypeBoost/ResistBerry）や「なし」は実物が無いので '' を返す。
 // 一部（heavy-duty-boots 等）は404のため、表示側は onError でアイコンを隠すこと。

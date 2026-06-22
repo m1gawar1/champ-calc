@@ -58,3 +58,10 @@ export const MEGA_STONES: Record<string, MegaStone> = {
 export function getMegaStone(formName: string): MegaStone | null {
   return MEGA_STONES[formName] ?? null;
 }
+
+// メガフォーム名から表示用ラベルを取得。
+// 公式メガは対応ストーン名、Champions独自メガ（公式ストーン無し）は汎用プレースホルダを返す。
+// en が空文字なら「実体のあるメガストーンは無い（独自メガ）」を意味する。
+export function getMegaStoneLabel(formName: string): MegaStone {
+  return MEGA_STONES[formName] ?? { en: '', ja: 'メガストーン' };
+}

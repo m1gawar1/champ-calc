@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import type { ChampionsData, PokemonBuild } from '../types';
-import { getSelectableRoster } from '../data';
+import { getSelectableRoster, getMegaForms } from '../data';
 import { displayPokemonName, getPokemonJaList, TYPE_JA } from '../i18n';
 import { Glass, GlassLayers } from './Glass';
 import { useTheme, TYPE_COLORS } from '../theme';
@@ -20,6 +20,8 @@ interface Props {
   opponentMembers: PokemonBuild[];
   onSelect: (name: string) => void;
   onClose: () => void;
+  /** 現在選択中ポケモンの英語 rosterName（省略可） */
+  currentName?: string;
 }
 
 type TabType = 'all' | 'history' | 'party';
@@ -28,11 +30,25 @@ function toKatakana(str: string) {
   return str.replace(/[\u3041-\u3096]/g, m => String.fromCharCode(m.charCodeAt(0) + 0x60));
 }
 
-export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, opponentMembers, onSelect, onClose }: Props) {
+export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, opponentMembers, onSelect, onClose, currentName }: Props) {
   const t = useTheme();
   const [tab, setTab] = useState<TabType>('all');
-  const [search, setSearch] = useState('');
+  // currentName があれば初期値をその日本語名にする（フォーカス時に全選択で即上書き可能）
+  const [search, setSearch] = useState(() => currentName ? displayPokemonName(currentName) : '');
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
+  // メガのみフィルタ
+  const [megaOnly, setMegaOnly] = useState(false);
+
+  // 検索 input への ref（autoFocus が効かないモバイル端末対策）
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    // requestAnimationFrame でモーダル描画完了後にフォーカス＋全選択
+    const raf = requestAnimationFrame(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   // rosterName → タイプ配列 / dexNumber（アイコンのフォールバック用）
   const typeMap = useMemo(() => {
@@ -48,6 +64,15 @@ export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, oppon
 
   const roster = useMemo(() => getSelectableRoster(data.roster), [data.roster]);
   const pokemonItems = useMemo(() => getPokemonJaList(roster.map(r => r.name)), [roster]);
+
+  // メガフォームを持つ rosterName のセット（#18）
+  const megaSet = useMemo(() => {
+    const s = new Set<string>();
+    roster.forEach(r => {
+      if (getMegaForms(data.baseStats, r.name).length > 0) s.add(r.name);
+    });
+    return s;
+  }, [roster, data.baseStats]);
 
   const filteredAll = useMemo(() => {
     if (!search) return pokemonItems;
@@ -82,9 +107,13 @@ export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, oppon
     return TYPE_ORDER.filter(ty => present.has(ty));
   }, [baseItems, typeMap]);
 
-  const activeItems = typeFilter
-    ? baseItems.filter(it => (typeMap[it.value] ?? []).includes(typeFilter))
-    : baseItems;
+  // タイプフィルタ・メガのみフィルタを順に適用（検索との併用可）
+  const activeItems = useMemo(() => {
+    let items = baseItems;
+    if (typeFilter) items = items.filter(it => (typeMap[it.value] ?? []).includes(typeFilter));
+    if (megaOnly) items = items.filter(it => megaSet.has(it.value));
+    return items;
+  }, [baseItems, typeFilter, megaOnly, typeMap, megaSet]);
 
   const tabLabels: { key: TabType; label: string }[] = [
     { key: 'all', label: '全て' },
@@ -118,11 +147,15 @@ export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, oppon
               <path d="M9.5 9.5L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
             </svg>
             <input
+              ref={inputRef}
               type="text"
+              inputMode="search"
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="名前で検索... (ひらがな/カタカナ)"
               autoFocus
+              // フォーカス時に全選択 → そのまま打ち直しで即置換できる
+              onFocus={e => e.currentTarget.select()}
               style={{
                 width: '100%', boxSizing: 'border-box',
                 background: t.glassNest, color: t.text,
@@ -185,6 +218,20 @@ export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, oppon
             })}
           </div>
         )}
+
+        {/* メガのみトグルチップ（#18） */}
+        <div style={{ position: 'relative', zIndex: 3, display: 'flex', padding: '0 12px 10px' }}>
+          <button
+            onClick={() => setMegaOnly(v => !v)}
+            style={{
+              padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none',
+              background: megaOnly ? 'rgba(255,180,50,0.28)' : t.glassChip2,
+              color: megaOnly ? '#f5a623' : t.textMuted,
+              boxShadow: `inset 0 0 0 0.5px ${megaOnly ? 'rgba(245,166,35,0.7)' : t.rim}`,
+              transition: 'all 0.15s',
+            }}
+          >⚡ メガのみ</button>
+        </div>
 
         {/* リスト */}
         <div style={{ position: 'relative', zIndex: 3, flex: 1, overflowY: 'auto', padding: '0 8px 12px' }}>

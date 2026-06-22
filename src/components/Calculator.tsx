@@ -6,7 +6,7 @@ import { useTheme, useThemeName, TYPE_COLORS } from '../theme';
 import type { ChampionsData, PokemonBuild, SpAlloc, BattleConditions } from '../types';
 import { DEFAULT_IVS, DEFAULT_SP, DEFAULT_CONDITIONS } from '../types';
 import type { CalcHistoryEntry } from '../store';
-import { findBaseStats, getMegaForms, getSelectableRoster, getSelectableMoves, getPokemonLearnset } from '../data';
+import { findBaseStats, getMegaForms, getSelectableRoster, getPokemonLearnset } from '../data';
 import { computeStats, getNatureMult } from '../engine/stats';
 import { calcDamageRolls, buildResult, calcHazardDamage, getWeatherBallType } from '../engine/damage';
 import { reverseCalcDefense, reverseCalcAttack } from '../engine/reverseCalc';
@@ -15,7 +15,7 @@ import { getPokemonJaList, getMoveJaList, displayPokemonName, moveJa, TYPE_JA } 
 import { getSpriteUrl, getFallbackSpriteUrl, KEY_STONE_ICON } from '../sprites';
 import { getAbilityItems, getItemItems, resolveItem, ABILITY_JA } from '../engine/competitive';
 import { getMegaStone } from '../data/megaStones';
-import { MULTI_HIT_MOVES, ESCALATING_POWER_MOVES } from '../engine/moveFlags';
+import { MULTI_HIT_MOVES, ESCALATING_POWER_MOVES, VARIABLE_POWER_MOVES } from '../engine/moveFlags';
 
 interface Props {
   data: ChampionsData;
@@ -97,7 +97,13 @@ function PartyQuickBar({ label, accentColor, members, selectedName, onSelect }: 
             >
               <img
                 src={getSpriteUrl(spriteName)}
-                onError={e => { (e.target as HTMLImageElement).style.opacity = '0'; }}
+                onError={e => {
+                  // 独自メガ等でメガ用スプライトが404になる場合、まずベース種にフォールバック
+                  const img = e.target as HTMLImageElement;
+                  if (img.dataset.fellBack) { img.style.opacity = '0'; return; }
+                  img.dataset.fellBack = '1';
+                  img.src = getSpriteUrl(m.rosterName);
+                }}
                 alt={jaName}
                 style={{ width: '85%', height: '85%', objectFit: 'contain', imageRendering: 'pixelated' }}
               />
@@ -393,6 +399,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
         <PokemonSelectModal
           data={data} pokemonHistory={pokemonHistory}
           myPartyMembers={myPartyMembers} opponentMembers={opponentMembers}
+          currentName={build.rosterName}
           onSelect={name => { onChange({ ...defaultBuild(name) }); onHistoryAdd(name); }}
           onClose={() => setShowPokemonModal(false)}
         />
@@ -536,18 +543,16 @@ function MoveSlots({ slots, onChange, data, rosterName, learnsetFilter, onToggle
   learnsetFilter: boolean; onToggleFilter: () => void;
 }) {
   const t = useTheme();
-  const [includeStatus, setIncludeStatus] = useState(false); // 変化技も候補に含めるか
   const learnset = useMemo(() => learnsetFilter && rosterName
     ? getPokemonLearnset(data.learnsets, rosterName) : null,
     [data.learnsets, rosterName, learnsetFilter]);
-  const verifiedMoves = useMemo(() => getSelectableMoves(data.moves), [data.moves]); // 攻撃技（変化除く）
+  // 変化技も常に候補に含める（フィルタは選択モーダル側で行う）
   const verifiedWithStatus = useMemo(() => data.moves.filter(m => m.inChampions !== false && (m.power > 0 || m.category === 'Status')), [data.moves]);
-  const allDamagingMoves = useMemo(() => data.moves.filter(m => m.power > 0 && m.category !== 'Status'), [data.moves]);
   const allWithStatus = useMemo(() => data.moves.filter(m => m.power > 0 || m.category === 'Status'), [data.moves]);
   const filteredMoves = useMemo(() => {
-    if (!learnset) return includeStatus ? verifiedWithStatus : verifiedMoves;
-    return (includeStatus ? allWithStatus : allDamagingMoves).filter(m => learnset.has(m.name));
-  }, [verifiedMoves, verifiedWithStatus, allDamagingMoves, allWithStatus, learnset, includeStatus]);
+    if (!learnset) return verifiedWithStatus;
+    return allWithStatus.filter(m => learnset.has(m.name));
+  }, [verifiedWithStatus, allWithStatus, learnset]);
   const learnsetFound = !learnsetFilter || !rosterName || learnset !== null;
   // 技選択モーダル用（日本語名 + タイプ・威力を補助表示）
   const moveSelectItems = useMemo(() =>
@@ -562,14 +567,6 @@ function MoveSlots({ slots, onChange, data, rosterName, learnsetFilter, onToggle
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {learnsetFilter && !learnsetFound && <span style={{ fontSize: 11, color: 'rgba(255,200,60,0.9)' }}>データなし</span>}
           {learnsetFilter && learnsetFound && learnset && <span style={{ fontSize: 11, color: t.textWeak }}>{filteredMoves.length}技</span>}
-          <button onClick={() => setIncludeStatus(s => !s)}
-            style={{
-              fontSize: 11, padding: '4px 10px', borderRadius: 99,
-              background: includeStatus ? 'rgba(90,200,250,0.2)' : t.glassChip,
-              boxShadow: includeStatus ? `inset 0 0 0 0.5px ${t.rimAccent}` : `inset 0 0 0 0.5px ${t.rim}`,
-              color: includeStatus ? t.accentAtk : t.textMuted,
-              border: 'none', cursor: 'pointer', fontWeight: 600,
-            }}>変化</button>
           <button onClick={onToggleFilter}
             style={{
               fontSize: 11, padding: '4px 10px', borderRadius: 99,
@@ -643,10 +640,15 @@ function ResultCard({ data, attacker, defender, moveEnName, cond, swapped }: {
   const [reverseDmg, setReverseDmg] = useState('');
   const [reversePct, setReversePct] = useState('');
   const [reverseResult, setReverseResult] = useState<ReturnType<typeof reverseCalcDefense>>(null);
+  // 可変威力技（おはかまいり/ふんどのこぶし）の選択威力
+  const varPowerSpec = VARIABLE_POWER_MOVES[moveEnName] ?? null;
+  const [chosenPower, setChosenPower] = useState(varPowerSpec?.default ?? 0);
 
   const calc = useMemo(() => {
     if (!attacker.rosterName || !defender.rosterName || !moveEnName) return null;
-    const move = data.moves.find(m => m.name === moveEnName);
+    const baseMove = data.moves.find(m => m.name === moveEnName);
+    // 可変威力技は選択した威力で上書き
+    const move = baseMove && varPowerSpec ? { ...baseMove, power: chosenPower } : baseMove;
     const atkBs = findBaseStats(data.baseStats, attacker.rosterName, attacker.isMega, attacker.megaFormName);
     const defBs = findBaseStats(data.baseStats, defender.rosterName, defender.isMega, defender.megaFormName);
     if (!move || !atkBs || !defBs) return null;
@@ -697,7 +699,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond, swapped }: {
         )
       : null;
     return { result, defStatKey, minDefSp, minHpSp, hazard, escalatingHitRolls };
-  }, [data, attacker, defender, moveEnName, cond]);
+  }, [data, attacker, defender, moveEnName, cond, chosenPower, varPowerSpec]);
 
   if (!calc) return null;
   const { result, defStatKey, minDefSp, minHpSp, hazard, escalatingHitRolls } = calc;
@@ -792,6 +794,18 @@ function ResultCard({ data, attacker, defender, moveEnName, cond, swapped }: {
         </div>
         <span style={{ fontSize: 11, color: t.textWeak, marginLeft: 4 }}>{expanded ? '▲' : '▼'}</span>
       </button>
+
+      {/* 可変威力技（おはかまいり/ふんどのこぶし）の威力選択（ヘッダー直下に常時表示） */}
+      {varPowerSpec && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+          <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600 }}>威力</span>
+          <button onClick={() => setChosenPower(p => Math.max(varPowerSpec.min, p - varPowerSpec.step))}
+            style={{ width: 24, height: 24, borderRadius: 99, background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`, color: t.text, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, lineHeight: 1, flexShrink: 0 }}>−</button>
+          <span style={{ width: 34, textAlign: 'center', fontFamily: '"DM Mono", "SF Mono", monospace', fontSize: 13, fontWeight: 800, color: t.text }}>{chosenPower}</span>
+          <button onClick={() => setChosenPower(p => Math.min(varPowerSpec.max, p + varPowerSpec.step))}
+            style={{ width: 24, height: 24, borderRadius: 99, background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`, color: t.text, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, lineHeight: 1, flexShrink: 0 }}>＋</button>
+        </div>
+      )}
 
       {/* 残HPプログレスバー */}
       <div style={{ marginBottom: 4 }}>

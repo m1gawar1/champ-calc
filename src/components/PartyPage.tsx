@@ -12,9 +12,9 @@ import { newParty, opponentBuild, addPokemonToHistory, addBattleHistory, addBoxP
 import { getMegaForms, getSelectableRoster, getPokemonLearnset, findBaseStats } from '../data';
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { getPokemonJaList, displayPokemonName, moveJa, NATURE_JA, STAT_JA, TYPE_JA } from '../i18n';
-import { getSpriteUrl, getFallbackSpriteUrl, KEY_STONE_ICON } from '../sprites';
+import { getSpriteUrl, getFallbackSpriteUrl, getBaseSpriteFromName, KEY_STONE_ICON } from '../sprites';
 import { getAbilityItems, getAllItemItems, resolveItem } from '../engine/competitive';
-import { getMegaStone } from '../data/megaStones';
+import { getMegaStone, getMegaStoneLabel } from '../data/megaStones';
 
 interface Props {
   data: ChampionsData;
@@ -128,7 +128,12 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
             src={build.isMega && build.megaFormName
               ? getSpriteUrl(build.megaFormName)
               : getSpriteUrl(rosterEntry.name)}
-            onError={e => { (e.target as HTMLImageElement).src = getFallbackSpriteUrl(rosterEntry.dexNumber); }}
+            onError={e => {
+              // 独自メガ等で Showdown に絵が無い場合、まずベース種スプライト、最後に番号フォールバック
+              const img = e.target as HTMLImageElement;
+              if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = getBaseSpriteFromName(rosterEntry.name); }
+              else { img.src = getFallbackSpriteUrl(rosterEntry.dexNumber); }
+            }}
             alt=""
             style={{ width: 36, height: 36, imageRendering: 'pixelated', flexShrink: 0 }}
           />
@@ -225,6 +230,10 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
               {build.isMega ? (() => {
                 // メガ時は持ち物をメガストーンに固定表示
                 const it = resolveItem(build.item ?? '');
+                // 独自メガは公式ストーンが無く item が空 → 汎用プレースホルダ（キーストーンアイコン）で表示
+                const placeholder = !build.item;
+                const itemLabel = placeholder ? getMegaStoneLabel(build.megaFormName).ja : it.label;
+                const itemIcon = placeholder ? KEY_STONE_ICON : it.icon;
                 return (
                   <div style={{
                     display: 'flex', alignItems: 'center', gap: 6,
@@ -232,12 +241,12 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
                     padding: '8px 10px', fontSize: 13, fontWeight: 600, color: t.text,
                     overflow: 'hidden', whiteSpace: 'nowrap',
                   }}>
-                    {it.icon && (
-                      <img src={it.icon} alt="" loading="lazy"
+                    {itemIcon && (
+                      <img src={itemIcon} alt="" loading="lazy"
                         onError={e => { e.currentTarget.style.display = 'none'; }}
                         style={{ width: 20, height: 20, objectFit: 'contain', imageRendering: 'pixelated', flexShrink: 0 }} />
                     )}
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.label}</span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{itemLabel}</span>
                   </div>
                 );
               })() : (() => {
@@ -374,6 +383,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
           data={data} pokemonHistory={store.pokemonHistory}
           myPartyMembers={store.myParties.find(p => p.id === store.activePartyId)?.members ?? []}
           opponentMembers={store.opponentParty}
+          currentName={build.rosterName}
           onSelect={name => { onChange({ ...emptyBuild(name) }); onUpdateHistory(name); }}
           onClose={() => setShowPokemonModal(false)}
         />
@@ -535,7 +545,8 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 8 }}>
+      {/* 下タブバー（固定）と重ならないようセーフエリア分の余白を確保 */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 'calc(env(safe-area-inset-bottom) + 8px)' }}>
         <button
           onClick={() => onSave(draft)}
           style={{
@@ -698,6 +709,30 @@ function OpponentEditor({ members, data, onChange, store, onUpdateHistory }: {
                   }}
                 ><KeyStone size={22} /></button>
               )}
+              {/* リザードン/ライチュウ等のX/Yメガは各フォームを個別ボタンに（MemberEditor と同形式） */}
+              {megaForms.length > 1 && megaForms.map(mf => {
+                const suffix = mf.name.replace(`Mega ${slot.rosterName}`, '').trim();
+                const sel = slot.isMega && slot.megaFormName === mf.name;
+                return (
+                  <button key={mf.name}
+                    onClick={() => {
+                      const isOn = !sel;
+                      const entry = data.roster.find(r => r.name === mf.name);
+                      const autoAbil = (isOn && entry) ? Object.values(entry.abilities)[0] ?? '' : '';
+                      // メガON時は持ち物をメガストーンに（独自メガは空のまま）、OFFで外す
+                      const item = isOn ? (getMegaStone(mf.name)?.en ?? '') : '';
+                      setSlot(i, { ...slot, isMega: isOn, megaFormName: isOn ? mf.name : '', ability: autoAbil || slot.ability, item });
+                    }}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 3,
+                      padding: '4px 7px', borderRadius: 99, fontSize: 11, fontWeight: 700,
+                      background: sel ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
+                      boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
+                      color: sel ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
+                    }}
+                  ><KeyStone size={18} />{suffix}</button>
+                );
+              })}
               {slot.rosterName && (
                 <button onClick={() => setSlot(i, opponentBuild())}
                   style={{ color: t.textWeak, background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }}>✕</button>
@@ -711,6 +746,7 @@ function OpponentEditor({ members, data, onChange, store, onUpdateHistory }: {
           data={data} pokemonHistory={store.pokemonHistory}
           myPartyMembers={store.myParties.find(p => p.id === store.activePartyId)?.members ?? []}
           opponentMembers={store.opponentParty}
+          currentName={slots[modalIndex].rosterName}
           onSelect={name => { setSlot(modalIndex, { ...opponentBuild(name) }); onUpdateHistory(name); }}
           onClose={() => setModalIndex(null)}
         />
@@ -1015,7 +1051,7 @@ export function PartyPage({ data, store, onUpdate }: Props) {
             >
               <div
                 onClick={e => e.stopPropagation()}
-                style={{ width: '100%', maxWidth: 440, maxHeight: '88vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
+                style={{ width: '100%', maxWidth: 440, maxHeight: '88vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' } as React.CSSProperties}
               >
                 <Glass tint={t.glassTint} radius={22} padding={16}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>

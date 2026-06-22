@@ -74,6 +74,13 @@ export const ESCALATING_POWER_MOVES: Record<string, number[]> = {
   'Triple Kick': [10, 20, 30],
 };
 
+// 状況で威力が変動する技（おはかまいり=倒れた味方数、ふんどのこぶし=受けた攻撃回数）。
+// UIで威力を選ばせ、ダメ計に反映する。
+export const VARIABLE_POWER_MOVES: Record<string, { min: number; max: number; step: number; default: number }> = {
+  'Last Respects': { min: 50, max: 300, step: 50, default: 50 }, // 50 + 50×倒れた味方(最大5)
+  'Rage Fist':     { min: 50, max: 350, step: 50, default: 50 }, // 50 + 50×受けた回数(最大6)
+};
+
 // 連続技（英語名 → ヒット数範囲）
 export const MULTI_HIT_MOVES: Record<string, { min: number; max: number }> = {
   // 2〜5回ランダム

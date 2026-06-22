@@ -47,10 +47,38 @@ export async function loadData(): Promise<ChampionsData> {
   // ローカル技上書き: 上流が未反映/古い値の技を Champions 仕様に補正
   // Make It Rain（ゴールドラッシュ・サーフゴー専用技）は上流が inChampions:false のため
   // 技選択に出てこない。Champions では実装済み・命中95 に下方修正されているため上書きする。
+  // Rage Fist（ふんどのこぶし）も上流が inChampions:false のため同様に有効化する。
   for (const m of moves) {
     if (m.name === 'Make It Rain') {
       m.inChampions = true;
       m.accuracy = 95;
+    }
+    if (m.name === 'Rage Fist') {
+      m.inChampions = true;
+    }
+  }
+
+  // サーフゴー(Gholdengo)の learnset に Make It Rain を補完
+  // 上流 learnsets にゴールドラッシュが含まれないため、覚え技フィルタON時に非表示になる
+  if (learnsets['Gholdengo']) {
+    const alreadyHas = learnsets['Gholdengo'].moves.some(m => m.name === 'Make It Rain');
+    if (!alreadyHas) {
+      learnsets['Gholdengo'].moves.push({ name: 'Make It Rain' });
+    }
+  }
+
+  // MB独自メガの learnset 継承: 上流に learnset が無いメガフォームは
+  // ベース種の learnset をコピーし、覚え技フィルタが機能するようにする
+  for (const entry of MB_ROSTER) {
+    if (entry.form === 'Mega' && !learnsets[entry.name]) {
+      // "Mega Raichu X" → "Raichu"、"Mega Staraptor" → "Staraptor" のように導出
+      const baseName = entry.name
+        .replace(/^Mega /, '')  // 先頭の "Mega " を除去
+        .replace(/ [XY]$/, ''); // 末尾の " X" " Y" を除去
+      const baseEntry = learnsets[baseName];
+      if (baseEntry) {
+        learnsets[entry.name] = { ...baseEntry };
+      }
     }
   }
 
@@ -98,9 +126,9 @@ export function getMegaForms(baseStatsList: BaseStats[], rosterName: string): Ba
   );
 }
 
-// ロスターから選択用ポケモンリスト（Megaを除く）
+// ロスターから選択用ポケモンリスト（Megaを除く・dexNumber昇順）
 export function getSelectableRoster(roster: RosterEntry[]): RosterEntry[] {
-  return roster.filter((r) => r.form !== 'Mega');
+  return [...roster.filter((r) => r.form !== 'Mega')].sort((a, b) => a.dexNumber - b.dexNumber);
 }
 
 // チャンピオンズで使える技に絞る（inChampions or unverified）

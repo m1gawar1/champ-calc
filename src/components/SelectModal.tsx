@@ -10,7 +10,7 @@ export interface SelectItem {
   sub?: string;       // 右側に小さく表示する補助情報（英語名・効果など）
   type?: string;      // タイプ（英語名）。指定があるとタイプ絞り込みバーを表示
   power?: number;     // 威力（並び替え用）
-  category?: string;  // 'Physical' | 'Special'（並び替え用）
+  category?: string;  // 'Physical' | 'Special' | 'Status'（並び替え用）
   icon?: string;      // 左に表示するアイコンURL（持ち物など）。'' なら非表示
 }
 
@@ -20,10 +20,11 @@ const SORT_LABELS: { key: SortKey; label: string }[] = [
   { key: 'power', label: '威力' },
   { key: 'type', label: 'タイプ' },
 ];
-// 分類フィルター（物理/特殊）
+// 分類フィルター（物理/特殊/変化）
 const CATEGORIES: { key: string; label: string }[] = [
   { key: 'Physical', label: '物理' },
   { key: 'Special', label: '特殊' },
+  { key: 'Status', label: '変化' },
 ];
 
 // タイプ絞り込みバーの並び順（標準18タイプ）
