@@ -1,0 +1,4563 @@
+{
+  "Vileplume": {
+    "moves": [
+      {
+        "name": "Absorb"
+      },
+      {
+        "name": "Acid"
+      },
+      {
+        "name": "Acid Spray"
+      },
+      {
+        "name": "After You"
+      },
+      {
+        "name": "Body Slam"
+      },
+      {
+        "name": "Bullet Seed"
+      },
+      {
+        "name": "Charm"
+      },
+      {
+        "name": "Dazzling Gleam"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Energy Ball"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Flail"
+      },
+      {
+        "name": "Fling"
+      },
+      {
+        "name": "Giga Drain"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Grass Knot"
+      },
+      {
+        "name": "Grassy Glide"
+      },
+      {
+        "name": "Grassy Terrain"
+      },
+      {
+        "name": "Growth"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Ingrain"
+      },
+      {
+        "name": "Leaf Storm"
+      },
+      {
+        "name": "Leech Seed"
+      },
+      {
+        "name": "Magical Leaf"
+      },
+      {
+        "name": "Mega Drain"
+      },
+      {
+        "name": "Moonblast"
+      },
+      {
+        "name": "Moonlight"
+      },
+      {
+        "name": "Petal Blizzard"
+      },
+      {
+        "name": "Petal Dance"
+      },
+      {
+        "name": "Poison Powder"
+      },
+      {
+        "name": "Pollen Puff"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Razor Leaf"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Seed Bomb"
+      },
+      {
+        "name": "Sleep Powder"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Sludge Bomb"
+      },
+      {
+        "name": "Sludge Wave"
+      },
+      {
+        "name": "Solar Beam"
+      },
+      {
+        "name": "Solar Blade"
+      },
+      {
+        "name": "Strength Sap"
+      },
+      {
+        "name": "Stun Spore"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Sweet Scent"
+      },
+      {
+        "name": "Swords Dance"
+      },
+      {
+        "name": "Synthesis"
+      },
+      {
+        "name": "Teeter Dance"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Tickle"
+      },
+      {
+        "name": "Toxic"
+      },
+      {
+        "name": "Trailblaze"
+      },
+      {
+        "name": "Venoshock"
+      },
+      {
+        "name": "Weather Ball"
+      }
+    ]
+  },
+  "Qwilfish": {
+    "moves": [
+      {
+        "name": "Acid Spray"
+      },
+      {
+        "name": "Acupressure"
+      },
+      {
+        "name": "Agility"
+      },
+      {
+        "name": "Aqua Jet"
+      },
+      {
+        "name": "Aqua Tail"
+      },
+      {
+        "name": "Astonish"
+      },
+      {
+        "name": "Barb Barrage"
+      },
+      {
+        "name": "Blizzard"
+      },
+      {
+        "name": "Brine"
+      },
+      {
+        "name": "Bubble Beam"
+      },
+      {
+        "name": "Chilling Water"
+      },
+      {
+        "name": "Crunch"
+      },
+      {
+        "name": "Curse"
+      },
+      {
+        "name": "Destiny Bond"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Fell Stinger"
+      },
+      {
+        "name": "Flail"
+      },
+      {
+        "name": "Flip Turn"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Gunk Shot"
+      },
+      {
+        "name": "Gyro Ball"
+      },
+      {
+        "name": "Harden"
+      },
+      {
+        "name": "Haze"
+      },
+      {
+        "name": "Hex"
+      },
+      {
+        "name": "Hydro Pump"
+      },
+      {
+        "name": "Ice Beam"
+      },
+      {
+        "name": "Icy Wind"
+      },
+      {
+        "name": "Liquidation"
+      },
+      {
+        "name": "Minimize"
+      },
+      {
+        "name": "Mud Shot"
+      },
+      {
+        "name": "Pain Split"
+      },
+      {
+        "name": "Pin Missile"
+      },
+      {
+        "name": "Poison Jab"
+      },
+      {
+        "name": "Poison Sting"
+      },
+      {
+        "name": "Poison Tail"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Reversal"
+      },
+      {
+        "name": "Scale Shot"
+      },
+      {
+        "name": "Scary Face"
+      },
+      {
+        "name": "Self-Destruct"
+      },
+      {
+        "name": "Shadow Ball"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Sludge Bomb"
+      },
+      {
+        "name": "Sludge Wave"
+      },
+      {
+        "name": "Spikes"
+      },
+      {
+        "name": "Spit Up"
+      },
+      {
+        "name": "Spite"
+      },
+      {
+        "name": "Stockpile"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Supersonic"
+      },
+      {
+        "name": "Surf"
+      },
+      {
+        "name": "Swift"
+      },
+      {
+        "name": "Swords Dance"
+      },
+      {
+        "name": "Tackle"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Taunt"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Throat Chop"
+      },
+      {
+        "name": "Thunder Wave"
+      },
+      {
+        "name": "Toxic"
+      },
+      {
+        "name": "Toxic Spikes"
+      },
+      {
+        "name": "Venoshock"
+      },
+      {
+        "name": "Water Gun"
+      },
+      {
+        "name": "Water Pulse"
+      },
+      {
+        "name": "Waterfall"
+      },
+      {
+        "name": "Whirlpool"
+      }
+    ]
+  },
+  "Sceptile": {
+    "moves": [
+      {
+        "name": "Absorb"
+      },
+      {
+        "name": "Acrobatics"
+      },
+      {
+        "name": "Aerial Ace"
+      },
+      {
+        "name": "Agility"
+      },
+      {
+        "name": "Assurance"
+      },
+      {
+        "name": "Body Slam"
+      },
+      {
+        "name": "Breaking Swipe"
+      },
+      {
+        "name": "Brick Break"
+      },
+      {
+        "name": "Bulldoze"
+      },
+      {
+        "name": "Bullet Seed"
+      },
+      {
+        "name": "Crunch"
+      },
+      {
+        "name": "Detect"
+      },
+      {
+        "name": "Dig"
+      },
+      {
+        "name": "Double Kick"
+      },
+      {
+        "name": "Double Team"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Dragon Breath"
+      },
+      {
+        "name": "Dragon Cheer"
+      },
+      {
+        "name": "Dragon Claw"
+      },
+      {
+        "name": "Dragon Dance"
+      },
+      {
+        "name": "Dragon Pulse"
+      },
+      {
+        "name": "Dragon Tail"
+      },
+      {
+        "name": "Drain Punch"
+      },
+      {
+        "name": "Earthquake"
+      },
+      {
+        "name": "Endeavor"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Energy Ball"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "False Swipe"
+      },
+      {
+        "name": "Fling"
+      },
+      {
+        "name": "Focus Blast"
+      },
+      {
+        "name": "Focus Punch"
+      },
+      {
+        "name": "Frenzy Plant"
+      },
+      {
+        "name": "Fury Cutter"
+      },
+      {
+        "name": "Giga Drain"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Grass Knot"
+      },
+      {
+        "name": "Grass Pledge"
+      },
+      {
+        "name": "Grassy Glide"
+      },
+      {
+        "name": "Grassy Terrain"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Leaf Blade"
+      },
+      {
+        "name": "Leaf Storm"
+      },
+      {
+        "name": "Leafage"
+      },
+      {
+        "name": "Leech Seed"
+      },
+      {
+        "name": "Leer"
+      },
+      {
+        "name": "Low Kick"
+      },
+      {
+        "name": "Low Sweep"
+      },
+      {
+        "name": "Magical Leaf"
+      },
+      {
+        "name": "Mega Drain"
+      },
+      {
+        "name": "Night Slash"
+      },
+      {
+        "name": "Outrage"
+      },
+      {
+        "name": "Pound"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Quick Attack"
+      },
+      {
+        "name": "Quick Guard"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Roar"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Rock Tomb"
+      },
+      {
+        "name": "Scale Shot"
+      },
+      {
+        "name": "Screech"
+      },
+      {
+        "name": "Seed Bomb"
+      },
+      {
+        "name": "Shed Tail"
+      },
+      {
+        "name": "Slam"
+      },
+      {
+        "name": "Slash"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Solar Beam"
+      },
+      {
+        "name": "Solar Blade"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Swift"
+      },
+      {
+        "name": "Swords Dance"
+      },
+      {
+        "name": "Synthesis"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Thief"
+      },
+      {
+        "name": "Throat Chop"
+      },
+      {
+        "name": "Thunder Punch"
+      },
+      {
+        "name": "Trailblaze"
+      },
+      {
+        "name": "Upper Hand"
+      },
+      {
+        "name": "Vacuum Wave"
+      },
+      {
+        "name": "Worry Seed"
+      },
+      {
+        "name": "X-Scissor"
+      }
+    ]
+  },
+  "Blaziken": {
+    "moves": [
+      {
+        "name": "Acrobatics"
+      },
+      {
+        "name": "Aerial Ace"
+      },
+      {
+        "name": "Agility"
+      },
+      {
+        "name": "Aura Sphere"
+      },
+      {
+        "name": "Baton Pass"
+      },
+      {
+        "name": "Blast Burn"
+      },
+      {
+        "name": "Blaze Kick"
+      },
+      {
+        "name": "Body Slam"
+      },
+      {
+        "name": "Bounce"
+      },
+      {
+        "name": "Brave Bird"
+      },
+      {
+        "name": "Brick Break"
+      },
+      {
+        "name": "Bulk Up"
+      },
+      {
+        "name": "Bulldoze"
+      },
+      {
+        "name": "Close Combat"
+      },
+      {
+        "name": "Coaching"
+      },
+      {
+        "name": "Counter"
+      },
+      {
+        "name": "Crush Claw"
+      },
+      {
+        "name": "Curse"
+      },
+      {
+        "name": "Detect"
+      },
+      {
+        "name": "Dig"
+      },
+      {
+        "name": "Double Kick"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Earthquake"
+      },
+      {
+        "name": "Ember"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Feather Dance"
+      },
+      {
+        "name": "Feint"
+      },
+      {
+        "name": "Fire Blast"
+      },
+      {
+        "name": "Fire Pledge"
+      },
+      {
+        "name": "Fire Punch"
+      },
+      {
+        "name": "Fire Spin"
+      },
+      {
+        "name": "Flame Charge"
+      },
+      {
+        "name": "Flamethrower"
+      },
+      {
+        "name": "Flare Blitz"
+      },
+      {
+        "name": "Fling"
+      },
+      {
+        "name": "Focus Blast"
+      },
+      {
+        "name": "Focus Energy"
+      },
+      {
+        "name": "Focus Punch"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Growl"
+      },
+      {
+        "name": "Heat Crash"
+      },
+      {
+        "name": "Heat Wave"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Knock Off"
+      },
+      {
+        "name": "Last Resort"
+      },
+      {
+        "name": "Low Kick"
+      },
+      {
+        "name": "Low Sweep"
+      },
+      {
+        "name": "Mud-Slap"
+      },
+      {
+        "name": "Night Slash"
+      },
+      {
+        "name": "Overheat"
+      },
+      {
+        "name": "Peck"
+      },
+      {
+        "name": "Poison Jab"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Quick Attack"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Reversal"
+      },
+      {
+        "name": "Roar"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Rock Tomb"
+      },
+      {
+        "name": "Sand Attack"
+      },
+      {
+        "name": "Scorching Sands"
+      },
+      {
+        "name": "Scratch"
+      },
+      {
+        "name": "Shadow Claw"
+      },
+      {
+        "name": "Slash"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Solar Beam"
+      },
+      {
+        "name": "Stone Edge"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Swift"
+      },
+      {
+        "name": "Swords Dance"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Temper Flare"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Thief"
+      },
+      {
+        "name": "Thunder Punch"
+      },
+      {
+        "name": "U-turn"
+      },
+      {
+        "name": "Upper Hand"
+      },
+      {
+        "name": "Uproar"
+      },
+      {
+        "name": "Vacuum Wave"
+      },
+      {
+        "name": "Will-O-Wisp"
+      }
+    ]
+  },
+  "Swampert": {
+    "moves": [
+      {
+        "name": "Amnesia"
+      },
+      {
+        "name": "Ancient Power"
+      },
+      {
+        "name": "Avalanche"
+      },
+      {
+        "name": "Bite"
+      },
+      {
+        "name": "Blizzard"
+      },
+      {
+        "name": "Body Press"
+      },
+      {
+        "name": "Body Slam"
+      },
+      {
+        "name": "Brick Break"
+      },
+      {
+        "name": "Bulk Up"
+      },
+      {
+        "name": "Bulldoze"
+      },
+      {
+        "name": "Chilling Water"
+      },
+      {
+        "name": "Counter"
+      },
+      {
+        "name": "Curse"
+      },
+      {
+        "name": "Dig"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Earth Power"
+      },
+      {
+        "name": "Earthquake"
+      },
+      {
+        "name": "Endeavor"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Fling"
+      },
+      {
+        "name": "Flip Turn"
+      },
+      {
+        "name": "Focus Blast"
+      },
+      {
+        "name": "Focus Punch"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Growl"
+      },
+      {
+        "name": "Hammer Arm"
+      },
+      {
+        "name": "Hard Press"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "High Horsepower"
+      },
+      {
+        "name": "Hydro Cannon"
+      },
+      {
+        "name": "Hydro Pump"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Ice Beam"
+      },
+      {
+        "name": "Ice Punch"
+      },
+      {
+        "name": "Icy Wind"
+      },
+      {
+        "name": "Knock Off"
+      },
+      {
+        "name": "Liquidation"
+      },
+      {
+        "name": "Low Kick"
+      },
+      {
+        "name": "Mirror Coat"
+      },
+      {
+        "name": "Mud Shot"
+      },
+      {
+        "name": "Mud-Slap"
+      },
+      {
+        "name": "Muddy Water"
+      },
+      {
+        "name": "Outrage"
+      },
+      {
+        "name": "Poison Jab"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Roar"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Rock Smash"
+      },
+      {
+        "name": "Rock Throw"
+      },
+      {
+        "name": "Rock Tomb"
+      },
+      {
+        "name": "Sand Tomb"
+      },
+      {
+        "name": "Scary Face"
+      },
+      {
+        "name": "Screech"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Sludge"
+      },
+      {
+        "name": "Sludge Wave"
+      },
+      {
+        "name": "Smack Down"
+      },
+      {
+        "name": "Stealth Rock"
+      },
+      {
+        "name": "Stomp"
+      },
+      {
+        "name": "Stomping Tantrum"
+      },
+      {
+        "name": "Stone Edge"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Supersonic"
+      },
+      {
+        "name": "Surf"
+      },
+      {
+        "name": "Tackle"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Uproar"
+      },
+      {
+        "name": "Water Gun"
+      },
+      {
+        "name": "Water Pledge"
+      },
+      {
+        "name": "Water Pulse"
+      },
+      {
+        "name": "Waterfall"
+      },
+      {
+        "name": "Weather Ball"
+      },
+      {
+        "name": "Whirlpool"
+      },
+      {
+        "name": "Wide Guard"
+      },
+      {
+        "name": "Yawn"
+      }
+    ]
+  },
+  "Mawile": {
+    "moves": [
+      {
+        "name": "Ancient Power"
+      },
+      {
+        "name": "Assurance"
+      },
+      {
+        "name": "Astonish"
+      },
+      {
+        "name": "Attract"
+      },
+      {
+        "name": "Baton Pass"
+      },
+      {
+        "name": "Bite"
+      },
+      {
+        "name": "Body Slam"
+      },
+      {
+        "name": "Brick Break"
+      },
+      {
+        "name": "Brutal Swing"
+      },
+      {
+        "name": "Captivate"
+      },
+      {
+        "name": "Charge Beam"
+      },
+      {
+        "name": "Confide"
+      },
+      {
+        "name": "Counter"
+      },
+      {
+        "name": "Crunch"
+      },
+      {
+        "name": "Dark Pulse"
+      },
+      {
+        "name": "Double Team"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Draining Kiss"
+      },
+      {
+        "name": "Dynamic Punch"
+      },
+      {
+        "name": "Embargo"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Fairy Wind"
+      },
+      {
+        "name": "Fake Tears"
+      },
+      {
+        "name": "False Swipe"
+      },
+      {
+        "name": "Feint Attack"
+      },
+      {
+        "name": "Fire Blast"
+      },
+      {
+        "name": "Fire Fang"
+      },
+      {
+        "name": "Flamethrower"
+      },
+      {
+        "name": "Flash Cannon"
+      },
+      {
+        "name": "Fling"
+      },
+      {
+        "name": "Focus Blast"
+      },
+      {
+        "name": "Focus Punch"
+      },
+      {
+        "name": "Foul Play"
+      },
+      {
+        "name": "Frustration"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Grass Knot"
+      },
+      {
+        "name": "Growl"
+      },
+      {
+        "name": "Guard Swap"
+      },
+      {
+        "name": "Headbutt"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "Hidden Power"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Ice Beam"
+      },
+      {
+        "name": "Ice Fang"
+      },
+      {
+        "name": "Ice Punch"
+      },
+      {
+        "name": "Icy Wind"
+      },
+      {
+        "name": "Incinerate"
+      },
+      {
+        "name": "Iron Defense"
+      },
+      {
+        "name": "Iron Head"
+      },
+      {
+        "name": "Knock Off"
+      },
+      {
+        "name": "Laser Focus"
+      },
+      {
+        "name": "Last Resort"
+      },
+      {
+        "name": "Magnet Rise"
+      },
+      {
+        "name": "Mega Kick"
+      },
+      {
+        "name": "Mega Punch"
+      },
+      {
+        "name": "Metal Burst"
+      },
+      {
+        "name": "Mimic"
+      },
+      {
+        "name": "Misty Terrain"
+      },
+      {
+        "name": "Mud-Slap"
+      },
+      {
+        "name": "Natural Gift"
+      },
+      {
+        "name": "Pain Split"
+      },
+      {
+        "name": "Payback"
+      },
+      {
+        "name": "Play Rough"
+      },
+      {
+        "name": "Poison Fang"
+      },
+      {
+        "name": "Power-Up Punch"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Psych Up"
+      },
+      {
+        "name": "Psychic Fangs"
+      },
+      {
+        "name": "Punishment"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Return"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Rock Smash"
+      },
+      {
+        "name": "Rock Tomb"
+      },
+      {
+        "name": "Round"
+      },
+      {
+        "name": "Sandstorm"
+      },
+      {
+        "name": "Secret Power"
+      },
+      {
+        "name": "Seismic Toss"
+      },
+      {
+        "name": "Shadow Ball"
+      },
+      {
+        "name": "Sing"
+      },
+      {
+        "name": "Slam"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Sludge Bomb"
+      },
+      {
+        "name": "Snatch"
+      },
+      {
+        "name": "Snore"
+      },
+      {
+        "name": "Solar Beam"
+      },
+      {
+        "name": "Spit Up"
+      },
+      {
+        "name": "Stealth Rock"
+      },
+      {
+        "name": "Steel Beam"
+      },
+      {
+        "name": "Stockpile"
+      },
+      {
+        "name": "Stone Edge"
+      },
+      {
+        "name": "Strength"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sucker Punch"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Super Fang"
+      },
+      {
+        "name": "Swagger"
+      },
+      {
+        "name": "Swallow"
+      },
+      {
+        "name": "Sweet Scent"
+      },
+      {
+        "name": "Swords Dance"
+      },
+      {
+        "name": "Taunt"
+      },
+      {
+        "name": "Thunder Fang"
+      },
+      {
+        "name": "Thunder Punch"
+      },
+      {
+        "name": "Tickle"
+      },
+      {
+        "name": "Torment"
+      },
+      {
+        "name": "Toxic"
+      }
+    ]
+  },
+  "Metagross": {
+    "moves": [
+      {
+        "name": "Aerial Ace"
+      },
+      {
+        "name": "Agility"
+      },
+      {
+        "name": "Body Press"
+      },
+      {
+        "name": "Body Slam"
+      },
+      {
+        "name": "Brick Break"
+      },
+      {
+        "name": "Bulldoze"
+      },
+      {
+        "name": "Bullet Punch"
+      },
+      {
+        "name": "Confusion"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Earthquake"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Expanding Force"
+      },
+      {
+        "name": "Explosion"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Flash Cannon"
+      },
+      {
+        "name": "Focus Punch"
+      },
+      {
+        "name": "Future Sight"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Grass Knot"
+      },
+      {
+        "name": "Gravity"
+      },
+      {
+        "name": "Gyro Ball"
+      },
+      {
+        "name": "Hammer Arm"
+      },
+      {
+        "name": "Hard Press"
+      },
+      {
+        "name": "Heavy Slam"
+      },
+      {
+        "name": "Hone Claws"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Ice Punch"
+      },
+      {
+        "name": "Icy Wind"
+      },
+      {
+        "name": "Iron Defense"
+      },
+      {
+        "name": "Iron Head"
+      },
+      {
+        "name": "Knock Off"
+      },
+      {
+        "name": "Light Screen"
+      },
+      {
+        "name": "Magnet Rise"
+      },
+      {
+        "name": "Metal Claw"
+      },
+      {
+        "name": "Meteor Beam"
+      },
+      {
+        "name": "Meteor Mash"
+      },
+      {
+        "name": "Mud-Slap"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Psych Up"
+      },
+      {
+        "name": "Psychic"
+      },
+      {
+        "name": "Psychic Fangs"
+      },
+      {
+        "name": "Psychic Noise"
+      },
+      {
+        "name": "Psyshock"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Reflect"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Rock Tomb"
+      },
+      {
+        "name": "Sandstorm"
+      },
+      {
+        "name": "Scary Face"
+      },
+      {
+        "name": "Shadow Ball"
+      },
+      {
+        "name": "Shadow Claw"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Sludge Bomb"
+      },
+      {
+        "name": "Stealth Rock"
+      },
+      {
+        "name": "Steel Beam"
+      },
+      {
+        "name": "Stomping Tantrum"
+      },
+      {
+        "name": "Stone Edge"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Swift"
+      },
+      {
+        "name": "Tackle"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Thunder Punch"
+      },
+      {
+        "name": "Trailblaze"
+      },
+      {
+        "name": "Trick"
+      },
+      {
+        "name": "Zen Headbutt"
+      }
+    ]
+  },
+  "Staraptor": {
+    "moves": [
+      {
+        "name": "Acrobatics"
+      },
+      {
+        "name": "Aerial Ace"
+      },
+      {
+        "name": "Agility"
+      },
+      {
+        "name": "Air Cutter"
+      },
+      {
+        "name": "Air Slash"
+      },
+      {
+        "name": "Brave Bird"
+      },
+      {
+        "name": "Close Combat"
+      },
+      {
+        "name": "Double Team"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Dual Wingbeat"
+      },
+      {
+        "name": "Endeavor"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Feather Dance"
+      },
+      {
+        "name": "Final Gambit"
+      },
+      {
+        "name": "Fly"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Growl"
+      },
+      {
+        "name": "Heat Wave"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "Hurricane"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Quick Attack"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Struggle Bug"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Swift"
+      },
+      {
+        "name": "Tackle"
+      },
+      {
+        "name": "Tailwind"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Thief"
+      },
+      {
+        "name": "U-turn"
+      },
+      {
+        "name": "Uproar"
+      },
+      {
+        "name": "Whirlwind"
+      },
+      {
+        "name": "Wing Attack"
+      }
+    ]
+  },
+  "Musharna": {
+    "moves": [
+      {
+        "name": "After You"
+      },
+      {
+        "name": "Ally Switch"
+      },
+      {
+        "name": "Amnesia"
+      },
+      {
+        "name": "Attract"
+      },
+      {
+        "name": "Calm Mind"
+      },
+      {
+        "name": "Charge Beam"
+      },
+      {
+        "name": "Confide"
+      },
+      {
+        "name": "Dazzling Gleam"
+      },
+      {
+        "name": "Defense Curl"
+      },
+      {
+        "name": "Double Team"
+      },
+      {
+        "name": "Dream Eater"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Energy Ball"
+      },
+      {
+        "name": "Expanding Force"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Flash"
+      },
+      {
+        "name": "Frustration"
+      },
+      {
+        "name": "Future Sight"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Gravity"
+      },
+      {
+        "name": "Guard Swap"
+      },
+      {
+        "name": "Gyro Ball"
+      },
+      {
+        "name": "Heal Bell"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "Hidden Power"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Hypnosis"
+      },
+      {
+        "name": "Imprison"
+      },
+      {
+        "name": "Light Screen"
+      },
+      {
+        "name": "Lucky Chant"
+      },
+      {
+        "name": "Magic Coat"
+      },
+      {
+        "name": "Misty Explosion"
+      },
+      {
+        "name": "Moonblast"
+      },
+      {
+        "name": "Moonlight"
+      },
+      {
+        "name": "Pain Split"
+      },
+      {
+        "name": "Power Swap"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Psybeam"
+      },
+      {
+        "name": "Psych Up"
+      },
+      {
+        "name": "Psychic"
+      },
+      {
+        "name": "Psychic Terrain"
+      },
+      {
+        "name": "Psyshock"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Reflect"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Return"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Rock Tomb"
+      },
+      {
+        "name": "Round"
+      },
+      {
+        "name": "Safeguard"
+      },
+      {
+        "name": "Secret Power"
+      },
+      {
+        "name": "Shadow Ball"
+      },
+      {
+        "name": "Shock Wave"
+      },
+      {
+        "name": "Signal Beam"
+      },
+      {
+        "name": "Skill Swap"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Snore"
+      },
+      {
+        "name": "Stored Power"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Swagger"
+      },
+      {
+        "name": "Swift"
+      },
+      {
+        "name": "Telekinesis"
+      },
+      {
+        "name": "Thunder Wave"
+      },
+      {
+        "name": "Torment"
+      },
+      {
+        "name": "Toxic"
+      },
+      {
+        "name": "Trick"
+      },
+      {
+        "name": "Trick Room"
+      },
+      {
+        "name": "Wonder Room"
+      },
+      {
+        "name": "Worry Seed"
+      },
+      {
+        "name": "Yawn"
+      },
+      {
+        "name": "Zen Headbutt"
+      }
+    ]
+  },
+  "Scolipede": {
+    "moves": [
+      {
+        "name": "Agility"
+      },
+      {
+        "name": "Aqua Tail"
+      },
+      {
+        "name": "Assurance"
+      },
+      {
+        "name": "Attract"
+      },
+      {
+        "name": "Baton Pass"
+      },
+      {
+        "name": "Bug Bite"
+      },
+      {
+        "name": "Bulldoze"
+      },
+      {
+        "name": "Confide"
+      },
+      {
+        "name": "Cross Poison"
+      },
+      {
+        "name": "Cut"
+      },
+      {
+        "name": "Defense Curl"
+      },
+      {
+        "name": "Dig"
+      },
+      {
+        "name": "Double Team"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Earthquake"
+      },
+      {
+        "name": "Endeavor"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Frustration"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Gyro Ball"
+      },
+      {
+        "name": "Hex"
+      },
+      {
+        "name": "Hidden Power"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Infestation"
+      },
+      {
+        "name": "Iron Defense"
+      },
+      {
+        "name": "Iron Tail"
+      },
+      {
+        "name": "Megahorn"
+      },
+      {
+        "name": "Payback"
+      },
+      {
+        "name": "Pin Missile"
+      },
+      {
+        "name": "Poison Jab"
+      },
+      {
+        "name": "Poison Sting"
+      },
+      {
+        "name": "Poison Tail"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Pursuit"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Return"
+      },
+      {
+        "name": "Rock Climb"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Rock Smash"
+      },
+      {
+        "name": "Rock Tomb"
+      },
+      {
+        "name": "Rollout"
+      },
+      {
+        "name": "Round"
+      },
+      {
+        "name": "Screech"
+      },
+      {
+        "name": "Secret Power"
+      },
+      {
+        "name": "Signal Beam"
+      },
+      {
+        "name": "Skitter Smack"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Sludge Bomb"
+      },
+      {
+        "name": "Smart Strike"
+      },
+      {
+        "name": "Snatch"
+      },
+      {
+        "name": "Snore"
+      },
+      {
+        "name": "Solar Beam"
+      },
+      {
+        "name": "Spikes"
+      },
+      {
+        "name": "Steamroller"
+      },
+      {
+        "name": "Steel Roller"
+      },
+      {
+        "name": "Stomping Tantrum"
+      },
+      {
+        "name": "Strength"
+      },
+      {
+        "name": "Struggle Bug"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Superpower"
+      },
+      {
+        "name": "Swagger"
+      },
+      {
+        "name": "Swords Dance"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Throat Chop"
+      },
+      {
+        "name": "Toxic"
+      },
+      {
+        "name": "Toxic Spikes"
+      },
+      {
+        "name": "Venom Drench"
+      },
+      {
+        "name": "Venoshock"
+      },
+      {
+        "name": "X-Scissor"
+      }
+    ]
+  },
+  "Scrafty": {
+    "moves": [
+      {
+        "name": "Acid Spray"
+      },
+      {
+        "name": "Amnesia"
+      },
+      {
+        "name": "Beat Up"
+      },
+      {
+        "name": "Body Slam"
+      },
+      {
+        "name": "Brick Break"
+      },
+      {
+        "name": "Bulk Up"
+      },
+      {
+        "name": "Close Combat"
+      },
+      {
+        "name": "Coaching"
+      },
+      {
+        "name": "Counter"
+      },
+      {
+        "name": "Crunch"
+      },
+      {
+        "name": "Curse"
+      },
+      {
+        "name": "Dark Pulse"
+      },
+      {
+        "name": "Detect"
+      },
+      {
+        "name": "Dig"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Dragon Claw"
+      },
+      {
+        "name": "Dragon Dance"
+      },
+      {
+        "name": "Dragon Pulse"
+      },
+      {
+        "name": "Dragon Tail"
+      },
+      {
+        "name": "Drain Punch"
+      },
+      {
+        "name": "Encore"
+      },
+      {
+        "name": "Endeavor"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Fake Out"
+      },
+      {
+        "name": "Fake Tears"
+      },
+      {
+        "name": "Fire Punch"
+      },
+      {
+        "name": "Fling"
+      },
+      {
+        "name": "Focus Blast"
+      },
+      {
+        "name": "Focus Punch"
+      },
+      {
+        "name": "Foul Play"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Grass Knot"
+      },
+      {
+        "name": "Head Smash"
+      },
+      {
+        "name": "Headbutt"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "High Jump Kick"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Ice Punch"
+      },
+      {
+        "name": "Iron Defense"
+      },
+      {
+        "name": "Iron Head"
+      },
+      {
+        "name": "Knock Off"
+      },
+      {
+        "name": "Lash Out"
+      },
+      {
+        "name": "Leer"
+      },
+      {
+        "name": "Low Kick"
+      },
+      {
+        "name": "Low Sweep"
+      },
+      {
+        "name": "Metronome"
+      },
+      {
+        "name": "Outrage"
+      },
+      {
+        "name": "Payback"
+      },
+      {
+        "name": "Poison Jab"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Quick Guard"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Reversal"
+      },
+      {
+        "name": "Roar"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Rock Tomb"
+      },
+      {
+        "name": "Sand Attack"
+      },
+      {
+        "name": "Scary Face"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Sludge Bomb"
+      },
+      {
+        "name": "Smack Down"
+      },
+      {
+        "name": "Snarl"
+      },
+      {
+        "name": "Spite"
+      },
+      {
+        "name": "Stone Edge"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Super Fang"
+      },
+      {
+        "name": "Swagger"
+      },
+      {
+        "name": "Swords Dance"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Taunt"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Thief"
+      },
+      {
+        "name": "Throat Chop"
+      },
+      {
+        "name": "Thunder Punch"
+      },
+      {
+        "name": "Torment"
+      },
+      {
+        "name": "Trailblaze"
+      },
+      {
+        "name": "Upper Hand"
+      },
+      {
+        "name": "Uproar"
+      },
+      {
+        "name": "Zen Headbutt"
+      }
+    ]
+  },
+  "Eelektross": {
+    "moves": [
+      {
+        "name": "Acid"
+      },
+      {
+        "name": "Acid Spray"
+      },
+      {
+        "name": "Acrobatics"
+      },
+      {
+        "name": "Body Press"
+      },
+      {
+        "name": "Body Slam"
+      },
+      {
+        "name": "Brick Break"
+      },
+      {
+        "name": "Bulk Up"
+      },
+      {
+        "name": "Bulldoze"
+      },
+      {
+        "name": "Charge"
+      },
+      {
+        "name": "Charge Beam"
+      },
+      {
+        "name": "Close Combat"
+      },
+      {
+        "name": "Coil"
+      },
+      {
+        "name": "Confuse Ray"
+      },
+      {
+        "name": "Crunch"
+      },
+      {
+        "name": "Crush Claw"
+      },
+      {
+        "name": "Discharge"
+      },
+      {
+        "name": "Dragon Claw"
+      },
+      {
+        "name": "Dragon Pulse"
+      },
+      {
+        "name": "Dragon Tail"
+      },
+      {
+        "name": "Drain Punch"
+      },
+      {
+        "name": "Eerie Impulse"
+      },
+      {
+        "name": "Electric Terrain"
+      },
+      {
+        "name": "Electro Ball"
+      },
+      {
+        "name": "Electroweb"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Fire Punch"
+      },
+      {
+        "name": "Flamethrower"
+      },
+      {
+        "name": "Flash Cannon"
+      },
+      {
+        "name": "Focus Punch"
+      },
+      {
+        "name": "Gastro Acid"
+      },
+      {
+        "name": "Giga Drain"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Grass Knot"
+      },
+      {
+        "name": "Headbutt"
+      },
+      {
+        "name": "Heavy Slam"
+      },
+      {
+        "name": "Hex"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Knock Off"
+      },
+      {
+        "name": "Light Screen"
+      },
+      {
+        "name": "Liquidation"
+      },
+      {
+        "name": "Lunge"
+      },
+      {
+        "name": "Outrage"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Rock Tomb"
+      },
+      {
+        "name": "Scary Face"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Stomping Tantrum"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Super Fang"
+      },
+      {
+        "name": "Supercell Slam"
+      },
+      {
+        "name": "Swift"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Thrash"
+      },
+      {
+        "name": "Throat Chop"
+      },
+      {
+        "name": "Thunder"
+      },
+      {
+        "name": "Thunder Fang"
+      },
+      {
+        "name": "Thunder Punch"
+      },
+      {
+        "name": "Thunder Wave"
+      },
+      {
+        "name": "Thunderbolt"
+      },
+      {
+        "name": "U-turn"
+      },
+      {
+        "name": "Volt Switch"
+      },
+      {
+        "name": "Wild Charge"
+      },
+      {
+        "name": "Zap Cannon"
+      },
+      {
+        "name": "Zen Headbutt"
+      }
+    ]
+  },
+  "Malamar": {
+    "moves": [
+      {
+        "name": "Acupressure"
+      },
+      {
+        "name": "Aerial Ace"
+      },
+      {
+        "name": "Baton Pass"
+      },
+      {
+        "name": "Calm Mind"
+      },
+      {
+        "name": "Dark Pulse"
+      },
+      {
+        "name": "Destiny Bond"
+      },
+      {
+        "name": "Disable"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Expanding Force"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Fake Tears"
+      },
+      {
+        "name": "Flamethrower"
+      },
+      {
+        "name": "Fling"
+      },
+      {
+        "name": "Foul Play"
+      },
+      {
+        "name": "Future Sight"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Gravity"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Hypnosis"
+      },
+      {
+        "name": "Knock Off"
+      },
+      {
+        "name": "Lash Out"
+      },
+      {
+        "name": "Light Screen"
+      },
+      {
+        "name": "Liquidation"
+      },
+      {
+        "name": "Lunge"
+      },
+      {
+        "name": "Nasty Plot"
+      },
+      {
+        "name": "Night Slash"
+      },
+      {
+        "name": "Payback"
+      },
+      {
+        "name": "Peck"
+      },
+      {
+        "name": "Pluck"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Psybeam"
+      },
+      {
+        "name": "Psych Up"
+      },
+      {
+        "name": "Psychic"
+      },
+      {
+        "name": "Psychic Noise"
+      },
+      {
+        "name": "Psycho Cut"
+      },
+      {
+        "name": "Psyshock"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Reflect"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Reversal"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Scary Face"
+      },
+      {
+        "name": "Skill Swap"
+      },
+      {
+        "name": "Slash"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Spite"
+      },
+      {
+        "name": "Stored Power"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Superpower"
+      },
+      {
+        "name": "Swagger"
+      },
+      {
+        "name": "Swift"
+      },
+      {
+        "name": "Switcheroo"
+      },
+      {
+        "name": "Tackle"
+      },
+      {
+        "name": "Taunt"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Thief"
+      },
+      {
+        "name": "Throat Chop"
+      },
+      {
+        "name": "Thunderbolt"
+      },
+      {
+        "name": "Topsy-Turvy"
+      },
+      {
+        "name": "Trailblaze"
+      },
+      {
+        "name": "Trick"
+      },
+      {
+        "name": "Trick Room"
+      },
+      {
+        "name": "Wrap"
+      }
+    ]
+  },
+  "Barbaracle": {
+    "moves": [
+      {
+        "name": "Aerial Ace"
+      },
+      {
+        "name": "Ancient Power"
+      },
+      {
+        "name": "Assurance"
+      },
+      {
+        "name": "Attract"
+      },
+      {
+        "name": "Beat Up"
+      },
+      {
+        "name": "Blizzard"
+      },
+      {
+        "name": "Brick Break"
+      },
+      {
+        "name": "Brutal Swing"
+      },
+      {
+        "name": "Bulk Up"
+      },
+      {
+        "name": "Bulldoze"
+      },
+      {
+        "name": "Clamp"
+      },
+      {
+        "name": "Confide"
+      },
+      {
+        "name": "Cross Chop"
+      },
+      {
+        "name": "Cut"
+      },
+      {
+        "name": "Dig"
+      },
+      {
+        "name": "Dive"
+      },
+      {
+        "name": "Double Team"
+      },
+      {
+        "name": "Dragon Claw"
+      },
+      {
+        "name": "Dual Chop"
+      },
+      {
+        "name": "Earth Power"
+      },
+      {
+        "name": "Earthquake"
+      },
+      {
+        "name": "Embargo"
+      },
+      {
+        "name": "Endeavor"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "False Swipe"
+      },
+      {
+        "name": "Fling"
+      },
+      {
+        "name": "Focus Blast"
+      },
+      {
+        "name": "Frustration"
+      },
+      {
+        "name": "Fury Cutter"
+      },
+      {
+        "name": "Fury Swipes"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Grass Knot"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "Hidden Power"
+      },
+      {
+        "name": "Hone Claws"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Ice Beam"
+      },
+      {
+        "name": "Icy Wind"
+      },
+      {
+        "name": "Infestation"
+      },
+      {
+        "name": "Iron Defense"
+      },
+      {
+        "name": "Laser Focus"
+      },
+      {
+        "name": "Liquidation"
+      },
+      {
+        "name": "Low Kick"
+      },
+      {
+        "name": "Meteor Beam"
+      },
+      {
+        "name": "Mud Shot"
+      },
+      {
+        "name": "Mud-Slap"
+      },
+      {
+        "name": "Muddy Water"
+      },
+      {
+        "name": "Nature Power"
+      },
+      {
+        "name": "Night Slash"
+      },
+      {
+        "name": "Payback"
+      },
+      {
+        "name": "Poison Jab"
+      },
+      {
+        "name": "Power-Up Punch"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Razor Shell"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Return"
+      },
+      {
+        "name": "Rock Blast"
+      },
+      {
+        "name": "Rock Polish"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Rock Smash"
+      },
+      {
+        "name": "Rock Tomb"
+      },
+      {
+        "name": "Round"
+      },
+      {
+        "name": "Safeguard"
+      },
+      {
+        "name": "Sand Attack"
+      },
+      {
+        "name": "Sandstorm"
+      },
+      {
+        "name": "Scald"
+      },
+      {
+        "name": "Scratch"
+      },
+      {
+        "name": "Screech"
+      },
+      {
+        "name": "Secret Power"
+      },
+      {
+        "name": "Shadow Claw"
+      },
+      {
+        "name": "Shell Smash"
+      },
+      {
+        "name": "Skull Bash"
+      },
+      {
+        "name": "Slash"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Sludge Bomb"
+      },
+      {
+        "name": "Sludge Wave"
+      },
+      {
+        "name": "Smack Down"
+      },
+      {
+        "name": "Snore"
+      },
+      {
+        "name": "Stealth Rock"
+      },
+      {
+        "name": "Stone Edge"
+      },
+      {
+        "name": "Strength"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Superpower"
+      },
+      {
+        "name": "Surf"
+      },
+      {
+        "name": "Swagger"
+      },
+      {
+        "name": "Swords Dance"
+      },
+      {
+        "name": "Taunt"
+      },
+      {
+        "name": "Thief"
+      },
+      {
+        "name": "Torment"
+      },
+      {
+        "name": "Toxic"
+      },
+      {
+        "name": "Uproar"
+      },
+      {
+        "name": "Water Gun"
+      },
+      {
+        "name": "Water Pulse"
+      },
+      {
+        "name": "Whirlpool"
+      },
+      {
+        "name": "Withdraw"
+      },
+      {
+        "name": "X-Scissor"
+      }
+    ]
+  },
+  "Dragalge": {
+    "moves": [
+      {
+        "name": "Acid"
+      },
+      {
+        "name": "Acid Spray"
+      },
+      {
+        "name": "Aqua Tail"
+      },
+      {
+        "name": "Chilling Water"
+      },
+      {
+        "name": "Double Team"
+      },
+      {
+        "name": "Draco Meteor"
+      },
+      {
+        "name": "Dragon Pulse"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Flip Turn"
+      },
+      {
+        "name": "Focus Blast"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Gunk Shot"
+      },
+      {
+        "name": "Haze"
+      },
+      {
+        "name": "Hydro Pump"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Icy Wind"
+      },
+      {
+        "name": "Liquidation"
+      },
+      {
+        "name": "Mud Shot"
+      },
+      {
+        "name": "Mud-Slap"
+      },
+      {
+        "name": "Muddy Water"
+      },
+      {
+        "name": "Outrage"
+      },
+      {
+        "name": "Play Rough"
+      },
+      {
+        "name": "Poison Tail"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Scald"
+      },
+      {
+        "name": "Scale Shot"
+      },
+      {
+        "name": "Scary Face"
+      },
+      {
+        "name": "Shadow Ball"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Sludge Bomb"
+      },
+      {
+        "name": "Sludge Wave"
+      },
+      {
+        "name": "Smokescreen"
+      },
+      {
+        "name": "Snowscape"
+      },
+      {
+        "name": "Spite"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Surf"
+      },
+      {
+        "name": "Tackle"
+      },
+      {
+        "name": "Tail Whip"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Thief"
+      },
+      {
+        "name": "Thunder"
+      },
+      {
+        "name": "Thunderbolt"
+      },
+      {
+        "name": "Toxic"
+      },
+      {
+        "name": "Toxic Spikes"
+      },
+      {
+        "name": "Venoshock"
+      },
+      {
+        "name": "Water Gun"
+      },
+      {
+        "name": "Water Pulse"
+      },
+      {
+        "name": "Waterfall"
+      },
+      {
+        "name": "Whirlpool"
+      }
+    ]
+  },
+  "Grimmsnarl": {
+    "moves": [
+      {
+        "name": "Assurance"
+      },
+      {
+        "name": "Bite"
+      },
+      {
+        "name": "Body Press"
+      },
+      {
+        "name": "Body Slam"
+      },
+      {
+        "name": "Brick Break"
+      },
+      {
+        "name": "Bulk Up"
+      },
+      {
+        "name": "Burning Jealousy"
+      },
+      {
+        "name": "Chilling Water"
+      },
+      {
+        "name": "Confide"
+      },
+      {
+        "name": "Crunch"
+      },
+      {
+        "name": "Dark Pulse"
+      },
+      {
+        "name": "Dazzling Gleam"
+      },
+      {
+        "name": "Drain Punch"
+      },
+      {
+        "name": "Draining Kiss"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Fake Out"
+      },
+      {
+        "name": "Fake Tears"
+      },
+      {
+        "name": "False Surrender"
+      },
+      {
+        "name": "Fire Punch"
+      },
+      {
+        "name": "Flatter"
+      },
+      {
+        "name": "Fling"
+      },
+      {
+        "name": "Focus Blast"
+      },
+      {
+        "name": "Focus Punch"
+      },
+      {
+        "name": "Foul Play"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Hammer Arm"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Ice Punch"
+      },
+      {
+        "name": "Imprison"
+      },
+      {
+        "name": "Lash Out"
+      },
+      {
+        "name": "Leech Life"
+      },
+      {
+        "name": "Light Screen"
+      },
+      {
+        "name": "Low Kick"
+      },
+      {
+        "name": "Low Sweep"
+      },
+      {
+        "name": "Metronome"
+      },
+      {
+        "name": "Misty Terrain"
+      },
+      {
+        "name": "Nasty Plot"
+      },
+      {
+        "name": "Play Rough"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Reflect"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Scary Face"
+      },
+      {
+        "name": "Shadow Claw"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Spirit Break"
+      },
+      {
+        "name": "Stomping Tantrum"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sucker Punch"
+      },
+      {
+        "name": "Swagger"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Taunt"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Thief"
+      },
+      {
+        "name": "Throat Chop"
+      },
+      {
+        "name": "Thunder Punch"
+      },
+      {
+        "name": "Thunder Wave"
+      },
+      {
+        "name": "Torment"
+      },
+      {
+        "name": "Trailblaze"
+      },
+      {
+        "name": "Trick"
+      }
+    ]
+  },
+  "Falinks": {
+    "moves": [
+      {
+        "name": "Agility"
+      },
+      {
+        "name": "Body Press"
+      },
+      {
+        "name": "Body Slam"
+      },
+      {
+        "name": "Brick Break"
+      },
+      {
+        "name": "Bulk Up"
+      },
+      {
+        "name": "Close Combat"
+      },
+      {
+        "name": "Coaching"
+      },
+      {
+        "name": "Counter"
+      },
+      {
+        "name": "Endeavor"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "False Swipe"
+      },
+      {
+        "name": "First Impression"
+      },
+      {
+        "name": "Focus Blast"
+      },
+      {
+        "name": "Focus Energy"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Headbutt"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "High Horsepower"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Iron Defense"
+      },
+      {
+        "name": "Iron Head"
+      },
+      {
+        "name": "Knock Off"
+      },
+      {
+        "name": "Lunge"
+      },
+      {
+        "name": "Megahorn"
+      },
+      {
+        "name": "No Retreat"
+      },
+      {
+        "name": "Poison Jab"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Psych Up"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Reversal"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Rock Smash"
+      },
+      {
+        "name": "Rock Tomb"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Smart Strike"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Swords Dance"
+      },
+      {
+        "name": "Tackle"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Throat Chop"
+      },
+      {
+        "name": "Trailblaze"
+      },
+      {
+        "name": "Upper Hand"
+      },
+      {
+        "name": "Uproar"
+      },
+      {
+        "name": "Zen Headbutt"
+      }
+    ]
+  },
+  "Overqwil": {
+    "moves": [
+      {
+        "name": "Acupressure"
+      },
+      {
+        "name": "Agility"
+      },
+      {
+        "name": "Barb Barrage"
+      },
+      {
+        "name": "Bite"
+      },
+      {
+        "name": "Blizzard"
+      },
+      {
+        "name": "Brine"
+      },
+      {
+        "name": "Chilling Water"
+      },
+      {
+        "name": "Crunch"
+      },
+      {
+        "name": "Curse"
+      },
+      {
+        "name": "Dark Pulse"
+      },
+      {
+        "name": "Destiny Bond"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Fell Stinger"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Gunk Shot"
+      },
+      {
+        "name": "Gyro Ball"
+      },
+      {
+        "name": "Harden"
+      },
+      {
+        "name": "Haze"
+      },
+      {
+        "name": "Hydro Pump"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Ice Beam"
+      },
+      {
+        "name": "Icy Wind"
+      },
+      {
+        "name": "Lash Out"
+      },
+      {
+        "name": "Liquidation"
+      },
+      {
+        "name": "Minimize"
+      },
+      {
+        "name": "Mud Shot"
+      },
+      {
+        "name": "Pain Split"
+      },
+      {
+        "name": "Pin Missile"
+      },
+      {
+        "name": "Poison Jab"
+      },
+      {
+        "name": "Poison Sting"
+      },
+      {
+        "name": "Poison Tail"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Reversal"
+      },
+      {
+        "name": "Scale Shot"
+      },
+      {
+        "name": "Scary Face"
+      },
+      {
+        "name": "Shadow Ball"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Sludge Bomb"
+      },
+      {
+        "name": "Sludge Wave"
+      },
+      {
+        "name": "Smart Strike"
+      },
+      {
+        "name": "Spikes"
+      },
+      {
+        "name": "Spit Up"
+      },
+      {
+        "name": "Spite"
+      },
+      {
+        "name": "Stockpile"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Surf"
+      },
+      {
+        "name": "Swords Dance"
+      },
+      {
+        "name": "Tackle"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Taunt"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Throat Chop"
+      },
+      {
+        "name": "Toxic"
+      },
+      {
+        "name": "Toxic Spikes"
+      },
+      {
+        "name": "Venoshock"
+      },
+      {
+        "name": "Waterfall"
+      }
+    ]
+  },
+  "Houndstone": {
+    "moves": [
+      {
+        "name": "Bite"
+      },
+      {
+        "name": "Body Press"
+      },
+      {
+        "name": "Bulldoze"
+      },
+      {
+        "name": "Charm"
+      },
+      {
+        "name": "Confuse Ray"
+      },
+      {
+        "name": "Crunch"
+      },
+      {
+        "name": "Dig"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Endeavor"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Fire Fang"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Growl"
+      },
+      {
+        "name": "Headbutt"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "Hex"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Ice Fang"
+      },
+      {
+        "name": "Last Respects"
+      },
+      {
+        "name": "Lick"
+      },
+      {
+        "name": "Mud Shot"
+      },
+      {
+        "name": "Mud-Slap"
+      },
+      {
+        "name": "Night Shade"
+      },
+      {
+        "name": "Pain Split"
+      },
+      {
+        "name": "Phantom Force"
+      },
+      {
+        "name": "Play Rough"
+      },
+      {
+        "name": "Poltergeist"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Psychic Fangs"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Roar"
+      },
+      {
+        "name": "Sandstorm"
+      },
+      {
+        "name": "Scary Face"
+      },
+      {
+        "name": "Shadow Ball"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Snarl"
+      },
+      {
+        "name": "Stomping Tantrum"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Tackle"
+      },
+      {
+        "name": "Tail Whip"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Thief"
+      },
+      {
+        "name": "Thunder Fang"
+      },
+      {
+        "name": "Trick"
+      },
+      {
+        "name": "Uproar"
+      },
+      {
+        "name": "Will-O-Wisp"
+      }
+    ]
+  },
+  "Annihilape": {
+    "moves": [
+      {
+        "name": "Acrobatics"
+      },
+      {
+        "name": "Assurance"
+      },
+      {
+        "name": "Body Slam"
+      },
+      {
+        "name": "Brick Break"
+      },
+      {
+        "name": "Bulk Up"
+      },
+      {
+        "name": "Bulldoze"
+      },
+      {
+        "name": "Close Combat"
+      },
+      {
+        "name": "Coaching"
+      },
+      {
+        "name": "Counter"
+      },
+      {
+        "name": "Cross Chop"
+      },
+      {
+        "name": "Curse"
+      },
+      {
+        "name": "Dig"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Drain Punch"
+      },
+      {
+        "name": "Earthquake"
+      },
+      {
+        "name": "Encore"
+      },
+      {
+        "name": "Endeavor"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Final Gambit"
+      },
+      {
+        "name": "Fire Punch"
+      },
+      {
+        "name": "Fling"
+      },
+      {
+        "name": "Focus Blast"
+      },
+      {
+        "name": "Focus Energy"
+      },
+      {
+        "name": "Focus Punch"
+      },
+      {
+        "name": "Fury Swipes"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Gunk Shot"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Ice Punch"
+      },
+      {
+        "name": "Lash Out"
+      },
+      {
+        "name": "Leer"
+      },
+      {
+        "name": "Low Kick"
+      },
+      {
+        "name": "Low Sweep"
+      },
+      {
+        "name": "Metronome"
+      },
+      {
+        "name": "Night Shade"
+      },
+      {
+        "name": "Outrage"
+      },
+      {
+        "name": "Overheat"
+      },
+      {
+        "name": "Phantom Force"
+      },
+      {
+        "name": "Poison Jab"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Rage Fist"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Reversal"
+      },
+      {
+        "name": "Rock Slide"
+      },
+      {
+        "name": "Rock Tomb"
+      },
+      {
+        "name": "Scary Face"
+      },
+      {
+        "name": "Scratch"
+      },
+      {
+        "name": "Screech"
+      },
+      {
+        "name": "Seed Bomb"
+      },
+      {
+        "name": "Seismic Toss"
+      },
+      {
+        "name": "Shadow Ball"
+      },
+      {
+        "name": "Shadow Claw"
+      },
+      {
+        "name": "Shadow Punch"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Smack Down"
+      },
+      {
+        "name": "Spite"
+      },
+      {
+        "name": "Stealth Rock"
+      },
+      {
+        "name": "Stomping Tantrum"
+      },
+      {
+        "name": "Stone Edge"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Swagger"
+      },
+      {
+        "name": "Swift"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Taunt"
+      },
+      {
+        "name": "Thief"
+      },
+      {
+        "name": "Thrash"
+      },
+      {
+        "name": "Throat Chop"
+      },
+      {
+        "name": "Thunder"
+      },
+      {
+        "name": "Thunder Punch"
+      },
+      {
+        "name": "Thunderbolt"
+      },
+      {
+        "name": "U-turn"
+      },
+      {
+        "name": "Uproar"
+      },
+      {
+        "name": "Vacuum Wave"
+      }
+    ]
+  },
+  "Gholdengo": {
+    "moves": [
+      {
+        "name": "Astonish"
+      },
+      {
+        "name": "Charge Beam"
+      },
+      {
+        "name": "Confuse Ray"
+      },
+      {
+        "name": "Dazzling Gleam"
+      },
+      {
+        "name": "Electro Ball"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Flash Cannon"
+      },
+      {
+        "name": "Fling"
+      },
+      {
+        "name": "Focus Blast"
+      },
+      {
+        "name": "Focus Punch"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Heavy Slam"
+      },
+      {
+        "name": "Hex"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Iron Head"
+      },
+      {
+        "name": "Light Screen"
+      },
+      {
+        "name": "Low Kick"
+      },
+      {
+        "name": "Low Sweep"
+      },
+      {
+        "name": "Make It Rain"
+      },
+      {
+        "name": "Memento"
+      },
+      {
+        "name": "Metal Sound"
+      },
+      {
+        "name": "Nasty Plot"
+      },
+      {
+        "name": "Night Shade"
+      },
+      {
+        "name": "Poltergeist"
+      },
+      {
+        "name": "Power Gem"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Psychic"
+      },
+      {
+        "name": "Psyshock"
+      },
+      {
+        "name": "Recover"
+      },
+      {
+        "name": "Reflect"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Sandstorm"
+      },
+      {
+        "name": "Shadow Ball"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Steel Beam"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Tackle"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Thief"
+      },
+      {
+        "name": "Thunder"
+      },
+      {
+        "name": "Thunder Punch"
+      },
+      {
+        "name": "Thunder Wave"
+      },
+      {
+        "name": "Thunderbolt"
+      },
+      {
+        "name": "Trick"
+      }
+    ]
+  },
+  "Pyroar": {
+    "moves": [
+      {
+        "name": "Acrobatics"
+      },
+      {
+        "name": "Body Slam"
+      },
+      {
+        "name": "Bulldoze"
+      },
+      {
+        "name": "Burning Jealousy"
+      },
+      {
+        "name": "Crunch"
+      },
+      {
+        "name": "Dark Pulse"
+      },
+      {
+        "name": "Dig"
+      },
+      {
+        "name": "Double-Edge"
+      },
+      {
+        "name": "Echoed Voice"
+      },
+      {
+        "name": "Ember"
+      },
+      {
+        "name": "Endeavor"
+      },
+      {
+        "name": "Endure"
+      },
+      {
+        "name": "Facade"
+      },
+      {
+        "name": "Fire Blast"
+      },
+      {
+        "name": "Fire Fang"
+      },
+      {
+        "name": "Fire Spin"
+      },
+      {
+        "name": "Flame Charge"
+      },
+      {
+        "name": "Flamethrower"
+      },
+      {
+        "name": "Flare Blitz"
+      },
+      {
+        "name": "Giga Impact"
+      },
+      {
+        "name": "Headbutt"
+      },
+      {
+        "name": "Heat Wave"
+      },
+      {
+        "name": "Helping Hand"
+      },
+      {
+        "name": "Hyper Beam"
+      },
+      {
+        "name": "Hyper Voice"
+      },
+      {
+        "name": "Incinerate"
+      },
+      {
+        "name": "Leer"
+      },
+      {
+        "name": "Mud-Slap"
+      },
+      {
+        "name": "Noble Roar"
+      },
+      {
+        "name": "Overheat"
+      },
+      {
+        "name": "Protect"
+      },
+      {
+        "name": "Psychic Fangs"
+      },
+      {
+        "name": "Rain Dance"
+      },
+      {
+        "name": "Rest"
+      },
+      {
+        "name": "Roar"
+      },
+      {
+        "name": "Sleep Talk"
+      },
+      {
+        "name": "Snarl"
+      },
+      {
+        "name": "Solar Beam"
+      },
+      {
+        "name": "Substitute"
+      },
+      {
+        "name": "Sunny Day"
+      },
+      {
+        "name": "Swift"
+      },
+      {
+        "name": "Tackle"
+      },
+      {
+        "name": "Take Down"
+      },
+      {
+        "name": "Taunt"
+      },
+      {
+        "name": "Temper Flare"
+      },
+      {
+        "name": "Tera Blast"
+      },
+      {
+        "name": "Thief"
+      },
+      {
+        "name": "Thunder Fang"
+      },
+      {
+        "name": "Trailblaze"
+      },
+      {
+        "name": "Wild Charge"
+      },
+      {
+        "name": "Will-O-Wisp"
+      },
+      {
+        "name": "Work Up"
+      }
+    ]
+  }
+}

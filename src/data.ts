@@ -1,6 +1,7 @@
 import type { RosterEntry, BaseStats, Move, Nature, ChampionsData, LearnsetEntry } from './types';
 import seasonMb from './data/season-mb.json';
 import seasonMbMegas from './data/season-mb-megas.json';
+import seasonMbLearnsets from './data/season-mb-learnsets.json';
 
 const BASE_URL =
   'https://raw.githubusercontent.com/otterlyclueless/pokemon-champions-data/main';
@@ -16,6 +17,8 @@ const MB_BASE_STATS = [
   ...(seasonMb as MbData).baseStats,
   ...(seasonMbMegas as unknown as MbData).baseStats,
 ];
+// MB追加ポケモンの覚え技（PokeAPI由来・SV優先、SV未収録は全世代和集合）。上流 learnsets 未収録分を補完。
+const MB_LEARNSETS = seasonMbLearnsets as unknown as Record<string, LearnsetEntry>;
 
 let cache: ChampionsData | null = null;
 
@@ -42,6 +45,12 @@ export async function loadData(): Promise<ChampionsData> {
   const baseStatsNames = new Set(baseStats.map(b => b.name));
   for (const entry of MB_BASE_STATS) {
     if (!baseStatsNames.has(entry.name)) baseStats.push(entry);
+  }
+
+  // ローカル補完: MB追加ポケモンの learnset（上流 learnsets 未収録）を追記。
+  // この後のメガ継承がベース種の learnset を参照するため、メガ継承より前に実行する。
+  for (const [name, entry] of Object.entries(MB_LEARNSETS)) {
+    if (!learnsets[name]) learnsets[name] = entry;
   }
 
   // ローカル技上書き: 上流が未反映/古い値の技を Champions 仕様に補正
