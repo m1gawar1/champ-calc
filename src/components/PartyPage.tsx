@@ -224,9 +224,9 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
             )}
           </div>
 
-          {/* 持ち物 + 特性 */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <div>
+          {/* 持ち物 + 特性（長い持ち物名で列が膨らみ特性欄が縮むのを防ぐため minmax(0,1fr) で均等固定） */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
+            <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4, fontWeight: 600 }}>持ち物</div>
               {build.isMega ? (() => {
                 // メガ時は持ち物をメガストーンに固定表示
