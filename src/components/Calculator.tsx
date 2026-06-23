@@ -648,10 +648,14 @@ function ResultCard({ data, attacker, defender, moveEnName, cond, swapped }: {
   const t = useTheme();
   const isDark = useThemeName() === 'dark';
   const [expanded, setExpanded] = useState(false);
-  const [reverseMode, setReverseMode] = useState<'dmg' | 'pct'>('dmg');
+  // 逆算の入力単位: ダメージを受ける側（defender）が相手なら%、自分なら実数値を初期値に。
+  // 未入替なら defender=相手→%、入替なら defender=自分→実数値。
+  const [reverseMode, setReverseMode] = useState<'dmg' | 'pct'>(swapped ? 'dmg' : 'pct');
   const [reverseDmg, setReverseDmg] = useState('');
   const [reversePct, setReversePct] = useState('');
   const [reverseResult, setReverseResult] = useState<ReturnType<typeof reverseCalcDefense>>(null);
+  // 攻守入替で「受ける側」が相手/自分に切り替わったら初期単位も追従させる
+  useEffect(() => { setReverseMode(swapped ? 'dmg' : 'pct'); setReverseResult(null); }, [swapped]);
   // 可変威力技（おはかまいり/ふんどのこぶし）の選択威力
   const varPowerSpec = VARIABLE_POWER_MOVES[moveEnName] ?? null;
   const [chosenPower, setChosenPower] = useState(varPowerSpec?.default ?? 0);
