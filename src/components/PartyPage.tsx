@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { NatureModal } from './NatureModal';
 import { Glass } from './Glass';
 import { SpSlider } from './Glass';
@@ -519,12 +520,12 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
         >+ ポケモンを追加</button>
       )}
 
-      {/* ボックスから個体を選ぶピッカーモーダル */}
-      {showBoxPicker && (
+      {/* ボックスから個体を選ぶピッカーモーダル（タブバーより前面に出すため body 直下へ portal） */}
+      {showBoxPicker && createPortal(
         <div
           onClick={() => setShowBoxPicker(false)}
           style={{
-            position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)',
+            position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
           }}
         >
@@ -532,7 +533,7 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
             onClick={e => e.stopPropagation()}
             style={{ width: '100%', height: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' } as React.CSSProperties}
           >
-            <Glass tint={t.glassTint} radius={0} padding={16}>
+            <Glass tint={t.glassTint} radius={0} padding={16} style={{ minHeight: '100%' }}>
               {/* ヘッダー（ノッチ対策で上端にセーフエリア余白） */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingTop: 'env(safe-area-inset-top)' }}>
                 <div style={{ fontSize: 11, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4 }}>
@@ -598,15 +599,16 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
               </div>
             </Glass>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
-      {/* メンバー編集の全画面シート（ボックスの個体編集シートと同形式） */}
-      {editingIndex !== null && draft.members[editingIndex] && (
+      {/* メンバー編集の全画面シート（ボックスの個体編集シートと同形式。タブバーより前面に出すため body 直下へ portal） */}
+      {editingIndex !== null && draft.members[editingIndex] && createPortal(
         <div
           onClick={() => setEditingIndex(null)}
           style={{
-            position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)',
+            position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
           }}
         >
@@ -614,7 +616,7 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
             onClick={e => e.stopPropagation()}
             style={{ width: '100%', height: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' } as React.CSSProperties}
           >
-            <Glass tint={t.glassTint} radius={0} padding={16}>
+            <Glass tint={t.glassTint} radius={0} padding={16} style={{ minHeight: '100%' }}>
               {/* ヘッダー（ノッチ対策で上端にセーフエリア余白） */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingTop: 'env(safe-area-inset-top)' }}>
                 <div style={{ fontSize: 11, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4 }}>
@@ -636,7 +638,8 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
               />
             </Glass>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {/* 下タブバー（固定）と重ならないようセーフエリア分の余白を確保 */}
