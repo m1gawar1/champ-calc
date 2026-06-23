@@ -74,15 +74,39 @@ export function SpSlider({ label, value, onChange, actual }: {
     return Math.max(0, Math.min(32, Math.round(ratio * 32)));
   }
 
+  // ドラッグ判定の状態。縦移動が勝ればページスクロールに譲り、横移動のときだけ値を動かす。
+  const drag = useRef({ id: -1, sx: 0, sy: 0, active: false, moved: false });
+
   function handlePointerDown(e: ReactPointerEvent<HTMLDivElement>) {
-    e.preventDefault();
-    e.currentTarget.setPointerCapture(e.pointerId);
-    onChange(valueFromClientX(e.clientX));
+    // ここではキャプチャも値変更もしない（縦スクロールを妨げないため）。横ドラッグ確定時に初めて掴む。
+    drag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, active: false, moved: false };
   }
 
   function handlePointerMove(e: ReactPointerEvent<HTMLDivElement>) {
-    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+    const d = drag.current;
+    if (d.id !== e.pointerId) return; // 押下中の同一ポインタのみ
+    if (!d.active) {
+      const dx = Math.abs(e.clientX - d.sx);
+      const dy = Math.abs(e.clientY - d.sy);
+      if (dy > dx && dy > 6) { d.id = -1; return; } // 縦方向 → スクロールに譲る
+      if (dx > 4) {
+        d.active = true; d.moved = true;
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* 無視 */ }
+      } else {
+        return; // まだ方向が定まらない
+      }
+    }
+    e.preventDefault();
     onChange(valueFromClientX(e.clientX));
+  }
+
+  function handlePointerUp(e: ReactPointerEvent<HTMLDivElement>) {
+    const d = drag.current;
+    if (d.id === e.pointerId && !d.moved) {
+      // 単純タップ → その位置に設定（横ドラッグせずに値を決めたいケース）
+      onChange(valueFromClientX(e.clientX));
+    }
+    drag.current.id = -1;
   }
 
   const pct = (value / 32) * 100;
@@ -123,9 +147,11 @@ export function SpSlider({ label, value, onChange, actual }: {
           ref={trackRef}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
           style={{
             position: 'relative', flex: 1, height: 22, display: 'flex', alignItems: 'center',
-            touchAction: 'none', cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none',
+            touchAction: 'pan-y', cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none',
           }}
         >
           {/* トラック */}
