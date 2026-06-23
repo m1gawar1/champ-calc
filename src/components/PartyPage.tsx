@@ -600,7 +600,7 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
             </Glass>
           </div>
         </div>,
-        document.body,
+        document.getElementById('root')!,
       )}
 
       {/* メンバー編集の全画面シート（ボックスの個体編集シートと同形式。タブバーより前面に出すため body 直下へ portal） */}
@@ -639,7 +639,7 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
             </Glass>
           </div>
         </div>,
-        document.body,
+        document.getElementById('root')!,
       )}
 
       {/* 下タブバー（固定）と重ならないようセーフエリア分の余白を確保 */}
