@@ -3,15 +3,17 @@ import { Glass } from './Glass';
 import { useTheme, useThemeName } from '../theme';
 import type { ChampionsData, PokemonBuild } from '../types';
 import type { BoxPokemon } from '../store';
-import { findBaseStats } from '../data';
+import { findBaseStats, getMegaForms } from '../data';
 import { computeStats } from '../engine/stats';
 import {
   finalSpeed, speedPresets, compareSpeed,
   DEFAULT_SPEED_CONDITIONS,
   type SpeedConditions,
+  type SpeedPresetKey,
   detectSpeedAbility,
   type SpeedAbilityInfo,
 } from '../engine/speed';
+import { PokemonSelectModal } from './PokemonSelectModal';
 import { displayPokemonName, abilityJaName } from '../i18n';
 import { getSpriteUrl, getFallbackSpriteUrl, getMegaSpriteUrl } from '../sprites';
 
@@ -132,10 +134,202 @@ function verdictRim(verdict: 'faster' | 'tie' | 'slower', isDark: boolean): stri
   return isDark ? 'rgba(255,90,90,0.6)' : 'rgba(200,30,30,0.6)';
 }
 
+// ─── 自由比較スロット ───
+// 好きなポケモンを1体選び、プリセット or 実数値手入力で素早さを指定する。
+interface FreeSlot {
+  rosterName: string;
+  isMega: boolean;
+  megaFormName: string;
+  preset: SpeedPresetKey | null; // null = 実数値手入力モード
+  manualStat: string;            // 手入力の素早さ実数値（preset=null のとき有効）
+  cond: SpeedConditions;
+  abilityOn: boolean;
+}
+
+const EMPTY_FREE_SLOT: FreeSlot = {
+  rosterName: '', isMega: false, megaFormName: '',
+  preset: 'fast', manualStat: '',
+  cond: { ...DEFAULT_SPEED_CONDITIONS }, abilityOn: false,
+};
+
+// スロットの素早さ実数値（補正前）。プリセット選択時はそのライン、手入力時は入力値。
+function slotBaseStat(data: ChampionsData, slot: FreeSlot): number | null {
+  if (!slot.rosterName) return null;
+  const bs = findBaseStats(data.baseStats, slot.rosterName, slot.isMega, slot.megaFormName);
+  if (!bs) return null;
+  if (slot.preset) {
+    const p = speedPresets(bs.spe).find(x => x.key === slot.preset);
+    return p?.stat ?? null;
+  }
+  const v = parseInt(slot.manualStat, 10);
+  return Number.isFinite(v) && v > 0 ? v : null;
+}
+
+// スロットの素早さ特性（メガ時はメガフォームのエントリを参照）
+function slotSpeedAbility(data: ChampionsData, slot: FreeSlot): { en: string; info: SpeedAbilityInfo } | null {
+  const entryName = slot.isMega && slot.megaFormName ? slot.megaFormName : slot.rosterName;
+  const entry = data.roster.find(r => r.name === entryName);
+  return detectSpeedAbility(entry?.abilities ?? {});
+}
+
+// スロットの最終素早さ（補正・特性込み）
+function slotFinalSpeed(data: ChampionsData, slot: FreeSlot): number | null {
+  const stat = slotBaseStat(data, slot);
+  if (stat === null) return null;
+  const ab = slot.abilityOn ? slotSpeedAbility(data, slot) : null;
+  const cond: SpeedConditions = ab
+    ? { ...slot.cond, abilityMod: ab.info.mod, ignoreParaSpeed: ab.info.ignorePara }
+    : slot.cond;
+  return finalSpeed(stat, cond);
+}
+
+// ─── 自由比較の1スロットカード ───
+function FreeSlotCard({ data, slot, onChange, accent, label, myPartyMembers, opponentMembers }: {
+  data: ChampionsData; slot: FreeSlot; onChange: (s: FreeSlot) => void;
+  accent: string; label: string;
+  myPartyMembers: (PokemonBuild | null)[]; opponentMembers: PokemonBuild[];
+}) {
+  const t = useTheme();
+  const [showModal, setShowModal] = useState(false);
+
+  const bs = slot.rosterName ? findBaseStats(data.baseStats, slot.rosterName, slot.isMega, slot.megaFormName) : null;
+  const presets = bs ? speedPresets(bs.spe) : [];
+  const megaForms = useMemo(() => slot.rosterName ? getMegaForms(data.baseStats, slot.rosterName) : [], [data.baseStats, slot.rosterName]);
+  const ability = slot.rosterName ? slotSpeedAbility(data, slot) : null;
+  const finalSp = slotFinalSpeed(data, slot);
+
+  const rosterEntry = data.roster.find(r => r.name === slot.rosterName);
+  const spriteName = slot.isMega && slot.megaFormName ? slot.megaFormName : slot.rosterName;
+  const dispName = slot.isMega && slot.megaFormName
+    ? displayPokemonName(slot.megaFormName)
+    : slot.rosterName ? displayPokemonName(slot.rosterName) : '';
+
+  // メガON/OFF（素早さ計算用：ベース種族値と特性が変わる）
+  function toggleMega(megaName: string, on: boolean) {
+    onChange({ ...slot, isMega: on, megaFormName: on ? megaName : '', abilityOn: false });
+  }
+
+  return (
+    <Glass tint={t.glassTint} radius={20} padding={14} style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ fontSize: 10, fontWeight: 800, color: accent, letterSpacing: 1.2, marginBottom: 8 }}>{label}</div>
+
+      {/* ポケモン選択ボタン */}
+      <button
+        onClick={() => setShowModal(true)}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', gap: 8,
+          background: t.glassChip, border: `0.5px solid ${t.rim}`, borderRadius: 12,
+          padding: '8px 10px', cursor: 'pointer', textAlign: 'left',
+        }}
+      >
+        {rosterEntry && (
+          <img
+            src={slot.isMega && slot.megaFormName ? getMegaSpriteUrl(rosterEntry.dexNumber, slot.megaFormName) : getSpriteUrl(spriteName)}
+            onError={e => {
+              const img = e.target as HTMLImageElement;
+              if (img.dataset.fellBack) { img.style.opacity = '0'; return; }
+              img.dataset.fellBack = '1';
+              img.src = getFallbackSpriteUrl(rosterEntry.dexNumber);
+            }}
+            alt="" style={{ width: 32, height: 32, imageRendering: 'pixelated', flexShrink: 0 }}
+          />
+        )}
+        <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 700, color: slot.rosterName ? t.text : t.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {dispName || 'ポケモンを選択...'}
+        </span>
+        {bs && <span style={{ fontSize: 11, color: t.textMuted, flexShrink: 0 }}>種族値S {bs.spe}</span>}
+      </button>
+
+      {/* メガトグル */}
+      {megaForms.length > 0 && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+          {megaForms.map(mf => {
+            const suffix = mf.name.replace(`Mega ${slot.rosterName}`, '').trim() || 'メガ';
+            const sel = slot.isMega && slot.megaFormName === mf.name;
+            return (
+              <ToggleChip key={mf.name} label={`メガ${suffix === 'メガ' ? '' : ' ' + suffix}`}
+                active={sel} onClick={() => toggleMega(mf.name, !sel)} />
+            );
+          })}
+        </div>
+      )}
+
+      {bs && (
+        <>
+          {/* プリセット4ライン */}
+          <div style={{ marginTop: 12 }}>
+            <div style={{ fontSize: 11, color: t.textMuted, fontWeight: 600, marginBottom: 6 }}>素早さライン</div>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {presets.map(p => (
+                <ToggleChip key={p.key}
+                  label={`${p.label} ${p.stat}`}
+                  active={slot.preset === p.key}
+                  onClick={() => onChange({ ...slot, preset: p.key })} />
+              ))}
+            </div>
+            {/* 実数値手入力（入力すると手入力モードに切替） */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+              <span style={{ fontSize: 11, color: slot.preset === null ? accent : t.textMuted, fontWeight: 700 }}>実数値</span>
+              <input
+                type="number" inputMode="numeric"
+                value={slot.manualStat}
+                onChange={e => onChange({ ...slot, preset: null, manualStat: e.target.value })}
+                onFocus={() => { if (slot.preset !== null) onChange({ ...slot, preset: null }); }}
+                placeholder="手入力"
+                style={{
+                  width: 90, background: t.inputBg, color: t.text,
+                  border: `1px solid ${slot.preset === null ? accent : t.rim}`, borderRadius: 10,
+                  padding: '6px 10px', fontSize: 13, fontWeight: 700, outline: 'none',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* 補正 */}
+          <div style={{ marginTop: 12 }}>
+            <CondControls cond={slot.cond} onChange={c => onChange({ ...slot, cond: c })} />
+            {ability && (
+              <div style={{ marginTop: 8 }}>
+                <ToggleChip
+                  label={`${abilityJaName(ability.en)}（${ability.info.label}）`}
+                  active={slot.abilityOn}
+                  onClick={() => onChange({ ...slot, abilityOn: !slot.abilityOn })}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* 最終素早さ */}
+          <div style={{ marginTop: 12, textAlign: 'center', padding: '10px 0 2px', borderTop: `0.5px solid ${t.track}` }}>
+            <div style={{ fontSize: 10, color: t.textMuted, letterSpacing: 0.4, marginBottom: 2 }}>最終素早さ</div>
+            <div style={{ fontSize: 34, fontWeight: 900, color: accent, lineHeight: 1 }}>{finalSp ?? '—'}</div>
+          </div>
+        </>
+      )}
+
+      {showModal && (
+        <PokemonSelectModal
+          data={data} pokemonHistory={[]}
+          myPartyMembers={myPartyMembers} opponentMembers={opponentMembers}
+          currentName={slot.rosterName}
+          onSelect={name => { onChange({ ...EMPTY_FREE_SLOT, rosterName: name }); setShowModal(false); }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+    </Glass>
+  );
+}
+
 // ─── SpeedPage 本体 ───
 export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props) {
   const t = useTheme();
   const isDark = useThemeName() === 'dark';
+
+  // モード: 'battle'=対戦用（パーティ/ボックス vs 登録した相手）, 'free'=自由比較（任意の2体）
+  const [mode, setMode] = useState<'battle' | 'free'>('battle');
+  // 自由比較の2スロット（A=自分側カラー, B=相手側カラー）
+  const [slotA, setSlotA] = useState<FreeSlot>(EMPTY_FREE_SLOT);
+  const [slotB, setSlotB] = useState<FreeSlot>(EMPTY_FREE_SLOT);
 
   // 自分側の補正
   const [myCond, setMyCond] = useState<SpeedConditions>(DEFAULT_SPEED_CONDITIONS);
@@ -255,6 +449,62 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
         <div style={{ fontSize: 13, fontWeight: 600, color: t.textMuted, letterSpacing: 0.4, marginBottom: 2 }}>SPEED CHECK</div>
         <div style={{ fontSize: 30, fontWeight: 800, color: t.text, letterSpacing: 0.2, lineHeight: 1.1 }}>素早さ比較</div>
       </div>
+
+      {/* ── モード切替（対戦 / 自由比較）── */}
+      <Glass tint={t.tabTint} radius={14} padding={4} style={{ marginBottom: 14 }}>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {([['battle', '対戦'], ['free', '自由比較']] as const).map(([m, lbl]) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              style={{
+                flex: 1, padding: '9px 0', textAlign: 'center', borderRadius: 11,
+                background: mode === m ? t.tabActiveBg : 'transparent',
+                boxShadow: mode === m ? t.tabActiveShadow : 'none',
+                color: mode === m ? t.text : t.tabInactive,
+                fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+            >{lbl}</button>
+          ))}
+        </div>
+      </Glass>
+
+      {/* ── 自由比較モード ── */}
+      {mode === 'free' && (() => {
+        const aFinal = slotFinalSpeed(data, slotA);
+        const bFinal = slotFinalSpeed(data, slotB);
+        const verdict = aFinal !== null && bFinal !== null ? compareSpeed(aFinal, bFinal) : null;
+        return (
+          <>
+            <p style={{ fontSize: 12, color: t.textMuted, margin: '0 0 12px' }}>
+              好きなポケモン2体を選んで素早さを比較できます（プリセット or 実数値手入力）。調整の確認用。
+            </p>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 12 }}>
+              <FreeSlotCard data={data} slot={slotA} onChange={setSlotA} accent={t.accentAtk} label="ポケモン A"
+                myPartyMembers={myPartyMembers} opponentMembers={opponentMembers} />
+              <FreeSlotCard data={data} slot={slotB} onChange={setSlotB} accent={t.accentDef} label="ポケモン B"
+                myPartyMembers={myPartyMembers} opponentMembers={opponentMembers} />
+            </div>
+            {/* 判定バナー（A視点） */}
+            {verdict && (
+              <Glass tint={verdictBg(verdict, isDark)} radius={16} padding={14} style={{ marginBottom: 12 }}>
+                <div style={{ textAlign: 'center' }}>
+                  <span style={{ fontSize: 18, fontWeight: 900, color: verdictColor(verdict, isDark) }}>
+                    A は {verdict === 'faster' ? '抜ける' : verdict === 'tie' ? '同速' : '抜かれる'}
+                  </span>
+                  <div style={{ fontSize: 12, color: t.textMuted, marginTop: 4 }}>
+                    A {aFinal} ／ B {bFinal}
+                  </div>
+                </div>
+              </Glass>
+            )}
+          </>
+        );
+      })()}
+
+      {/* ── 対戦モード ── */}
+      {mode === 'battle' && (<>
 
       {/* ── 自分側カード ── */}
       <Glass tint={t.glassTint} radius={22} padding={16} style={{ marginBottom: 12 }}>
@@ -522,6 +772,8 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
           ))}
         </div>
       )}
+
+      </>)}
     </div>
   );
 }
