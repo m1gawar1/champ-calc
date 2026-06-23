@@ -5,7 +5,7 @@ import { getSelectableRoster, getMegaForms } from '../data';
 import { displayPokemonName, getPokemonJaList, TYPE_JA } from '../i18n';
 import { Glass, GlassLayers } from './Glass';
 import { useTheme, TYPE_COLORS } from '../theme';
-import { getSpriteUrl, getFallbackSpriteUrl } from '../sprites';
+import { getSpriteUrl, getFallbackSpriteUrl, KEY_STONE_ICON } from '../sprites';
 
 // タイプ絞り込みバーの並び順（標準18タイプ）
 const TYPE_ORDER = [
@@ -217,13 +217,18 @@ export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, oppon
           <button
             onClick={() => setMegaOnly(v => !v)}
             style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
               padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none',
               background: megaOnly ? 'rgba(255,180,50,0.28)' : t.glassChip2,
               color: megaOnly ? '#f5a623' : t.textMuted,
               boxShadow: `inset 0 0 0 0.5px ${megaOnly ? 'rgba(245,166,35,0.7)' : t.rim}`,
               transition: 'all 0.15s',
             }}
-          >⚡ メガのみ</button>
+          >
+            <img src={KEY_STONE_ICON} alt="" onError={e => { e.currentTarget.style.display = 'none'; }}
+              style={{ width: 16, height: 16, objectFit: 'contain', imageRendering: 'pixelated', flexShrink: 0 }} />
+            メガのみ
+          </button>
         </div>
 
         {/* リスト（下端にセーフエリア余白） */}
