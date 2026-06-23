@@ -13,7 +13,7 @@ import { newParty, opponentBuild, addPokemonToHistory, addBattleHistory, addBoxP
 import { getMegaForms, getSelectableRoster, getPokemonLearnset, findBaseStats } from '../data';
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { getPokemonJaList, displayPokemonName, moveJa, NATURE_JA, STAT_JA, TYPE_JA } from '../i18n';
-import { getSpriteUrl, getFallbackSpriteUrl, getBaseSpriteFromName, getMegaSpriteUrl, KEY_STONE_ICON } from '../sprites';
+import { getSpriteUrl, getFallbackSpriteUrl, getBaseSpriteFromName, getMegaSpriteUrl, getItemSpriteUrl, KEY_STONE_ICON } from '../sprites';
 import { getAbilityItems, getAllItemItems, resolveItem, ITEM_CATEGORIES } from '../engine/competitive';
 import { getMegaStone, getMegaStoneLabel } from '../data/megaStones';
 
@@ -48,6 +48,17 @@ function TypePill({ type, size = 10 }: { type: string; size?: number }) {
 function KeyStone({ size = 14 }: { size?: number }) {
   return (
     <img src={KEY_STONE_ICON} alt="" onError={e => { e.currentTarget.style.display = 'none'; }}
+      style={{ width: size, height: size, objectFit: 'contain', imageRendering: 'pixelated', flexShrink: 0 }} />
+  );
+}
+
+// 個体別メガストーンのアイコン。公式ストーンがあればその絵、無い独自メガは汎用キーストーンにフォールバック。
+function MegaStoneIcon({ megaName, size = 14 }: { megaName: string; size?: number }) {
+  const stone = getMegaStone(megaName);
+  const src = stone ? getItemSpriteUrl(stone.en) : KEY_STONE_ICON;
+  return (
+    <img src={src} alt="" loading="lazy"
+      onError={e => { e.currentTarget.src = KEY_STONE_ICON; }}
       style={{ width: size, height: size, objectFit: 'contain', imageRendering: 'pixelated', flexShrink: 0 }} />
   );
 }
@@ -205,7 +216,7 @@ function MemberEditor({ build, onChange, onRemove, data, index, store, onUpdateH
                       background: build.isMega ? 'linear-gradient(180deg, rgba(190,130,255,0.9), rgba(140,90,220,0.8))' : t.glassChip,
                       boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
                       color: build.isMega ? '#fff' : t.textMuted, border: 'none', cursor: 'pointer',
-                    }}><KeyStone size={24} /></button>
+                    }}><MegaStoneIcon megaName={megaForms[0].name} size={24} /></button>
                 ) : megaForms.map(mf => {
                   const suffix = mf.name.replace(`Mega ${build.rosterName}`, '').trim();
                   const sel = build.isMega && build.megaFormName === mf.name;
