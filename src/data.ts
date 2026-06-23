@@ -28,8 +28,10 @@ const MB_LEARNSETS = seasonMbLearnsets as unknown as Record<string, LearnsetEntr
 const LEARNSET_PATCHES: Record<string, { add?: string[]; remove?: string[] }> = {
   // サーフゴー: ゴールドラッシュ・なみのりを習得、でんじは（Champions非対応）を除外
   Gholdengo: { add: ['Make It Rain', 'Surf'], remove: ['Thunder Wave'] },
-  // オーロンゲ: でんじは（Champions非対応）を除外
-  Grimmsnarl: { remove: ['Thunder Wave'] },
+  // オーロンゲ: すてゼリフを習得、でんじは（Champions非対応）を除外
+  Grimmsnarl: { add: ['Parting Shot'], remove: ['Thunder Wave'] },
+  // ガメノデス: インファイトを習得（上流 learnset 未収録）
+  Barbaracle: { add: ['Close Combat'] },
 };
 
 let cache: ChampionsData | null = null;
