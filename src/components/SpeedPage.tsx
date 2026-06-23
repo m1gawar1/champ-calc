@@ -1,15 +1,14 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Glass } from './Glass';
+import { Glass, SpSlider } from './Glass';
 import { useTheme, useThemeName } from '../theme';
 import type { ChampionsData, PokemonBuild } from '../types';
 import type { BoxPokemon } from '../store';
 import { findBaseStats, getMegaForms } from '../data';
-import { computeStats } from '../engine/stats';
+import { computeStats, calcStat } from '../engine/stats';
 import {
   finalSpeed, speedPresets, compareSpeed,
   DEFAULT_SPEED_CONDITIONS,
   type SpeedConditions,
-  type SpeedPresetKey,
   detectSpeedAbility,
   type SpeedAbilityInfo,
 } from '../engine/speed';
@@ -135,34 +134,29 @@ function verdictRim(verdict: 'faster' | 'tie' | 'slower', isDark: boolean): stri
 }
 
 // ─── 自由比較スロット ───
-// 好きなポケモンを1体選び、プリセット or 実数値手入力で素早さを指定する。
+// 好きなポケモンを1体選び、SP振り＋性格補正から素早さ実数値を算出して指定する。
 interface FreeSlot {
   rosterName: string;
   isMega: boolean;
   megaFormName: string;
-  preset: SpeedPresetKey | null; // null = 実数値手入力モード
-  manualStat: string;            // 手入力の素早さ実数値（preset=null のとき有効）
+  sp: number;          // 素早さへの SP 振り（0〜32）
+  natureMult: number;  // 性格補正: 0.9=下降 / 1.0=無補正 / 1.1=上昇
   cond: SpeedConditions;
   abilityOn: boolean;
 }
 
 const EMPTY_FREE_SLOT: FreeSlot = {
   rosterName: '', isMega: false, megaFormName: '',
-  preset: 'fast', manualStat: '',
+  sp: 32, natureMult: 1.0,
   cond: { ...DEFAULT_SPEED_CONDITIONS }, abilityOn: false,
 };
 
-// スロットの素早さ実数値（補正前）。プリセット選択時はそのライン、手入力時は入力値。
+// スロットの素早さ実数値（補正前）。IV31固定・SP振り・性格補正から算出。
 function slotBaseStat(data: ChampionsData, slot: FreeSlot): number | null {
   if (!slot.rosterName) return null;
   const bs = findBaseStats(data.baseStats, slot.rosterName, slot.isMega, slot.megaFormName);
   if (!bs) return null;
-  if (slot.preset) {
-    const p = speedPresets(bs.spe).find(x => x.key === slot.preset);
-    return p?.stat ?? null;
-  }
-  const v = parseInt(slot.manualStat, 10);
-  return Number.isFinite(v) && v > 0 ? v : null;
+  return calcStat(bs.spe, 31, slot.sp, slot.natureMult);
 }
 
 // スロットの素早さ特性（メガ時はメガフォームのエントリを参照）
@@ -193,9 +187,9 @@ function FreeSlotCard({ data, slot, onChange, accent, label, myPartyMembers, opp
   const [showModal, setShowModal] = useState(false);
 
   const bs = slot.rosterName ? findBaseStats(data.baseStats, slot.rosterName, slot.isMega, slot.megaFormName) : null;
-  const presets = bs ? speedPresets(bs.spe) : [];
   const megaForms = useMemo(() => slot.rosterName ? getMegaForms(data.baseStats, slot.rosterName) : [], [data.baseStats, slot.rosterName]);
   const ability = slot.rosterName ? slotSpeedAbility(data, slot) : null;
+  const baseStat = slotBaseStat(data, slot); // SP振り＋性格補正からの実数値
   const finalSp = slotFinalSpeed(data, slot);
 
   const rosterEntry = data.roster.find(r => r.name === slot.rosterName);
@@ -256,32 +250,18 @@ function FreeSlotCard({ data, slot, onChange, accent, label, myPartyMembers, opp
 
       {bs && (
         <>
-          {/* プリセット4ライン */}
+          {/* 性格補正 + SP振り → 実数値を算出（IV31固定） */}
           <div style={{ marginTop: 12 }}>
-            <div style={{ fontSize: 11, color: t.textMuted, fontWeight: 600, marginBottom: 6 }}>素早さライン</div>
+            <div style={{ fontSize: 11, color: t.textMuted, fontWeight: 600, marginBottom: 6 }}>性格補正</div>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {presets.map(p => (
-                <ToggleChip key={p.key}
-                  label={`${p.label} ${p.stat}`}
-                  active={slot.preset === p.key}
-                  onClick={() => onChange({ ...slot, preset: p.key })} />
+              {([[0.9, '下降'], [1.0, '無補正'], [1.1, '上昇']] as const).map(([mult, lbl]) => (
+                <ToggleChip key={lbl} label={lbl}
+                  active={slot.natureMult === mult}
+                  onClick={() => onChange({ ...slot, natureMult: mult })} />
               ))}
             </div>
-            {/* 実数値手入力（入力すると手入力モードに切替） */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-              <span style={{ fontSize: 11, color: slot.preset === null ? accent : t.textMuted, fontWeight: 700 }}>実数値</span>
-              <input
-                type="number" inputMode="numeric"
-                value={slot.manualStat}
-                onChange={e => onChange({ ...slot, preset: null, manualStat: e.target.value })}
-                onFocus={() => { if (slot.preset !== null) onChange({ ...slot, preset: null }); }}
-                placeholder="手入力"
-                style={{
-                  width: 90, background: t.inputBg, color: t.text,
-                  border: `1px solid ${slot.preset === null ? accent : t.rim}`, borderRadius: 10,
-                  padding: '6px 10px', fontSize: 13, fontWeight: 700, outline: 'none',
-                }}
-              />
+            <div style={{ marginTop: 10 }}>
+              <SpSlider label="SP振り" value={slot.sp} onChange={v => onChange({ ...slot, sp: v })} actual={baseStat ?? undefined} />
             </div>
           </div>
 
