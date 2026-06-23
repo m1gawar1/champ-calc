@@ -414,6 +414,31 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
   }));
   // 全画面シートで編集中のメンバーインデックス（null なら一覧表示）
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  // 編集開始時のスナップショット。既存編集なら編集前の個体、新規追加なら null（キャンセルで枠ごと削除）
+  const [editSnapshot, setEditSnapshot] = useState<PokemonBuild | null>(null);
+
+  // 既存メンバーの編集を開く（キャンセルで編集前に戻せるようスナップショット保存）
+  function openEditExisting(i: number) {
+    const m = draft.members[i];
+    setEditSnapshot(m ? structuredClone(m) : null);
+    setEditingIndex(i);
+  }
+  // 新規追加した枠の編集を開く（キャンセルで枠ごと削除）
+  function openEditNew(i: number) {
+    setEditSnapshot(null);
+    setEditingIndex(i);
+  }
+  // 保存＝変更を確定して閉じる（パーティ全体の保存は下部の「保存」で永続化）
+  function doneEdit() { setEditingIndex(null); setEditSnapshot(null); }
+  // キャンセル／✕／外タップ＝変更を破棄。既存は編集前に戻し、新規は枠を削除
+  function cancelEdit() {
+    if (editingIndex !== null) {
+      if (editSnapshot) setMember(editingIndex, editSnapshot);
+      else removeMember(editingIndex);
+    }
+    setEditingIndex(null);
+    setEditSnapshot(null);
+  }
 
   function setMember(i: number, build: PokemonBuild) {
     const next = [...draft.members] as (PokemonBuild | null)[];
@@ -472,7 +497,7 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
             <Glass key={i} tint={t.glassTint2} radius={16} padding={0} style={{ overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px' }}>
                 <button
-                  onClick={() => setEditingIndex(i)}
+                  onClick={() => openEditExisting(i)}
                   style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
                 >
                   {rosterEntry ? (
@@ -508,7 +533,7 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
               setShowBoxPicker(true);
             } else {
               const idx = addSlot();
-              if (idx !== null) setEditingIndex(idx);
+              if (idx !== null) openEditNew(idx);
             }
           }}
           style={{
@@ -548,7 +573,7 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
 
               {/* 空の個体を追加ボタン */}
               <button
-                onClick={() => { const idx = addSlot(); setShowBoxPicker(false); if (idx !== null) setEditingIndex(idx); }}
+                onClick={() => { const idx = addSlot(); setShowBoxPicker(false); if (idx !== null) openEditNew(idx); }}
                 style={{
                   width: '100%', padding: '10px 0', marginBottom: 12,
                   border: `1px dashed ${t.dashedRim}`, borderRadius: 12,
@@ -564,7 +589,7 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
                   const spriteName = b.build.isMega && b.build.megaFormName ? b.build.megaFormName : b.build.rosterName;
                   return (
                     <Glass key={b.id} tint={t.glassTint} radius={16} padding={10}
-                      onClick={() => { const idx = addFromBox(b.build); setShowBoxPicker(false); if (idx !== null) setEditingIndex(idx); }}
+                      onClick={() => { const idx = addFromBox(b.build); setShowBoxPicker(false); if (idx !== null) openEditNew(idx); }}
                       style={{ cursor: 'pointer' }}>
                       <div style={{
                         width: '100%', aspectRatio: '1', borderRadius: 12, background: t.glassChip,
@@ -606,7 +631,7 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
       {/* メンバー編集の全画面シート（ボックスの個体編集シートと同形式。タブバーより前面に出すため body 直下へ portal） */}
       {editingIndex !== null && draft.members[editingIndex] && createPortal(
         <div
-          onClick={() => setEditingIndex(null)}
+          onClick={cancelEdit}
           style={{
             position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
@@ -623,7 +648,7 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
                   ポケモンを編集
                 </div>
                 <button
-                  onClick={() => setEditingIndex(null)}
+                  onClick={cancelEdit}
                   aria-label="閉じる"
                   style={{ color: t.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, padding: '0 4px', lineHeight: 1 }}
                 >✕</button>
@@ -631,11 +656,33 @@ function PartyEditor({ party, data, onSave, onCancel, store, onUpdateHistory }: 
               <MemberEditor
                 build={draft.members[editingIndex]!}
                 onChange={b => setMember(editingIndex!, b)}
-                onRemove={() => { removeMember(editingIndex!); setEditingIndex(null); }}
+                onRemove={() => { removeMember(editingIndex!); doneEdit(); }}
                 data={data} index={editingIndex!}
                 store={store} onUpdateHistory={onUpdateHistory}
                 defaultOpen hideIndex
               />
+              {/* 保存／キャンセル（ボックス編集と同形式） */}
+              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                <button
+                  disabled={!draft.members[editingIndex]!.rosterName}
+                  onClick={doneEdit}
+                  style={{
+                    flex: 1, padding: '11px 0', borderRadius: 12, border: 'none',
+                    cursor: draft.members[editingIndex]!.rosterName ? 'pointer' : 'not-allowed',
+                    background: draft.members[editingIndex]!.rosterName ? 'linear-gradient(180deg, rgba(90,200,250,0.8), rgba(60,160,220,0.7))' : t.glassChip,
+                    color: draft.members[editingIndex]!.rosterName ? '#fff' : t.textWeak, fontSize: 14, fontWeight: 800,
+                    opacity: draft.members[editingIndex]!.rosterName ? 1 : 0.6,
+                  }}
+                >保存</button>
+                <button
+                  onClick={cancelEdit}
+                  style={{
+                    flex: 1, padding: '11px 0', borderRadius: 12, background: t.glassChip,
+                    boxShadow: `inset 0 0 0 0.5px ${t.rim}`, color: t.textMuted,
+                    fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer',
+                  }}
+                >キャンセル</button>
+              </div>
             </Glass>
           </div>
         </div>,
