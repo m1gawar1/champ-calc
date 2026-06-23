@@ -1154,12 +1154,12 @@ export function PartyPage({ data, store, onUpdate }: Props) {
             育成個体のプール。ここに貯めた個体を、今後パーティから選べるようにしていきます。
           </p>
 
-          {/* 追加中の個体エディタ（別画面シート） */}
-          {boxDraft && (
+          {/* 追加中の個体エディタ（別画面シート。タブバーより前面に出すため #root へ portal） */}
+          {boxDraft && createPortal(
             <div
               onClick={() => { setBoxDraft(null); setEditingBoxId(null); }}
               style={{
-                position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)',
+                position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
               }}
             >
@@ -1167,7 +1167,7 @@ export function PartyPage({ data, store, onUpdate }: Props) {
                 onClick={e => e.stopPropagation()}
                 style={{ width: '100%', height: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' } as React.CSSProperties}
               >
-                <Glass tint={t.glassTint} radius={0} padding={16}>
+                <Glass tint={t.glassTint} radius={0} padding={16} style={{ minHeight: '100%' }}>
                   {/* ヘッダー（ノッチ対策で上端にセーフエリア余白） */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingTop: 'env(safe-area-inset-top)' }}>
                     <div style={{ fontSize: 11, fontWeight: 800, color: t.textMuted, letterSpacing: 1.4 }}>
@@ -1229,7 +1229,8 @@ export function PartyPage({ data, store, onUpdate }: Props) {
                   )}
                 </Glass>
               </div>
-            </div>
+            </div>,
+            document.getElementById('root')!,
           )}
 
           {/* 個体を追加ボタン */}
