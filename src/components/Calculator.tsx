@@ -60,10 +60,11 @@ function koColor(ko1Chance: number, guaranteed2HKO: boolean, isDark: boolean, te
 }
 
 // パーティクイック選択バー
-function PartyQuickBar({ label, accentColor, members, selectedName, onSelect, roster }: {
+function PartyQuickBar({ label, accentColor, members, selectedName, onSelect, onDeselect, roster }: {
   label: string; accentColor: string;
   members: (PokemonBuild | null)[];
   selectedName: string; onSelect: (b: PokemonBuild) => void;
+  onDeselect: () => void; // 選択中の個体を再タップしたときの選択解除
   roster: import('../types').RosterEntry[];
 }) {
   const t = useTheme();
@@ -85,7 +86,7 @@ function PartyQuickBar({ label, accentColor, members, selectedName, onSelect, ro
           // メガ時は Serebii アート用に dexNumber を取得
           const dex = roster.find(r => r.name === m.rosterName)?.dexNumber;
           return (
-            <button key={i} onClick={() => onSelect(m)} title={jaName}
+            <button key={i} onClick={() => isSelected ? onDeselect() : onSelect(m)} title={jaName}
               style={{
                 width: '100%', aspectRatio: '1', padding: 0, borderRadius: 12,
                 background: isSelected ? selBg : t.glassChip,
@@ -1215,6 +1216,9 @@ export function Calculator({ data, myPartyMembers = [], opponentMembers = [], po
   function loadIntoDefender(build: PokemonBuild) {
     setDefender(build);
   }
+  // 選択中の個体を再タップ → 空（未選択）に戻す
+  function clearAttacker() { setAttacker(defaultBuild()); setMoveSlots(['', '', '', '']); }
+  function clearDefender() { setDefender(defaultBuild()); }
   function swap() {
     const [a, d] = [attacker, defender];
     setAttacker(d); setDefender(a);
@@ -1258,10 +1262,12 @@ export function Calculator({ data, myPartyMembers = [], opponentMembers = [], po
             <PartyQuickBar label="自" accentColor={t.accentAtk} members={myPartyMembers}
               selectedName={swapped ? defender.rosterName : attacker.rosterName}
               onSelect={swapped ? loadIntoDefender : loadIntoAttacker}
+              onDeselect={swapped ? clearDefender : clearAttacker}
               roster={data.roster} />
             <PartyQuickBar label="相" accentColor={t.accentDef} members={opponentMembers}
               selectedName={swapped ? attacker.rosterName : defender.rosterName}
               onSelect={swapped ? loadIntoAttacker : loadIntoDefender}
+              onDeselect={swapped ? clearAttacker : clearDefender}
               roster={data.roster} />
           </div>
         </Glass>
