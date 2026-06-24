@@ -684,7 +684,7 @@ function ResultCard({ data, attacker, defender, moveEnName, cond, swapped }: {
     const isWB = move.name === 'Weather Ball' && (cond.weather ?? null) !== null;
     const dispType = isWB ? getWeatherBallType(cond.weather) : move.type;
     const dispPower = isWB ? move.power * 2 : move.power;
-    const effectiveness = getTypeEffectiveness(dispType, defTypes);
+    const effectiveness = getTypeEffectiveness(dispType, defTypes, move.name);
     const rolls = calcDamageRolls(atkStats, defStats, atkTypes, defTypes, move, cond, attacker.item, defender.item, attacker.ability, defender.ability);
     const result = buildResult(rolls, defStats.hp, effectiveness, moveEnName, dispType, dispPower, move.category);
     const isPhysical = move.category === 'Physical';
@@ -1156,7 +1156,7 @@ function ResultsSection({ data, attacker, defender, moveSlots, cond, onCalcHisto
         : getSelectableRoster(data.roster).find(r => r.name === defender.rosterName);
       const atkTypes = atkEntry?.types ?? [];
       const defTypes = defEntry?.types ?? [];
-      const effectiveness = getTypeEffectiveness(move.type, defTypes);
+      const effectiveness = getTypeEffectiveness(move.type, defTypes, move.name);
       const rolls = calcDamageRolls(atkStats, defStats, atkTypes, defTypes, move, cond, attacker.item, defender.item, attacker.ability, defender.ability);
       return buildResult(rolls, defStats.hp, effectiveness, moveEnName, move.type, move.power, move.category);
     }).filter(Boolean) as ReturnType<typeof buildResult>[];

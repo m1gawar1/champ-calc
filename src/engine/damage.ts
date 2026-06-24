@@ -55,7 +55,7 @@ export function calcDamageRolls(
   const isPhysical = move.category === 'Physical';
 
   // ── 防御側特性による無効チェック ──
-  if (defenderAbility === 'Wonder Guard' && getTypeEffectiveness(effType, defenderTypes) <= 1) return Array(16).fill(0);
+  if (defenderAbility === 'Wonder Guard' && getTypeEffectiveness(effType, defenderTypes, move.name) <= 1) return Array(16).fill(0);
   if (defenderAbility === 'Levitate'     && effType === 'Ground')   return Array(16).fill(0);
   if (defenderAbility === 'Flash Fire'   && effType === 'Fire')     return Array(16).fill(0);
   if (defenderAbility === 'Water Absorb' && effType === 'Water')    return Array(16).fill(0);
@@ -66,7 +66,7 @@ export function calcDamageRolls(
   if (defenderAbility === 'Motor Drive'  && effType === 'Electric') return Array(16).fill(0);
 
   // タイプ相性
-  const effectiveness = getTypeEffectiveness(effType, defenderTypes);
+  const effectiveness = getTypeEffectiveness(effType, defenderTypes, move.name);
   if (effectiveness === 0) return Array(16).fill(0);
 
   // ── ランク補正後の実数値 ──

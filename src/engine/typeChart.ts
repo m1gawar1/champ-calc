@@ -23,11 +23,16 @@ const CHART: Record<string, Record<string, number>> = {
   Fairy:    { Fire: 0.5, Fighting: 2, Poison: 0.5, Dragon: 2, Dark: 2, Steel: 0.5 },
 };
 
-export function getTypeEffectiveness(attackType: string, defenderTypes: string[]): number {
+export function getTypeEffectiveness(attackType: string, defenderTypes: string[], moveName?: string): number {
   let mult = 1;
   const row = CHART[attackType];
   if (!row) return 1;
   for (const defType of defenderTypes) {
+    // フリーズドライ: こおり技だがみずタイプに効果抜群（0.5→2）
+    if (moveName === 'Freeze-Dry' && defType === 'Water') {
+      mult *= 2;
+      continue;
+    }
     if (defType in row) mult *= row[defType];
   }
   return mult;
