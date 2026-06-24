@@ -657,6 +657,12 @@ function ResultCard({ data, attacker, defender, moveEnName, cond, swapped }: {
   const [reverseResult, setReverseResult] = useState<ReturnType<typeof reverseCalcDefense>>(null);
   // 攻守入替で「受ける側」が相手/自分に切り替わったら初期単位も追従させる
   useEffect(() => { setReverseMode(swapped ? 'dmg' : 'pct'); setReverseResult(null); }, [swapped]);
+  // ポケモンを変更したら逆算の入力値・結果をリセット（別マッチアップの数値が残らないように）
+  useEffect(() => {
+    setReverseDmg('');
+    setReversePct('');
+    setReverseResult(null);
+  }, [attacker.rosterName, defender.rosterName]);
   // 可変威力技（おはかまいり/ふんどのこぶし）の選択威力
   const varPowerSpec = VARIABLE_POWER_MOVES[moveEnName] ?? null;
   const [chosenPower, setChosenPower] = useState(varPowerSpec?.default ?? 0);
