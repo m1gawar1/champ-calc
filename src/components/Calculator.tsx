@@ -8,7 +8,7 @@ import { DEFAULT_IVS, DEFAULT_SP, DEFAULT_CONDITIONS } from '../types';
 import type { CalcHistoryEntry } from '../store';
 import { findBaseStats, getMegaForms, getSelectableRoster, getPokemonLearnset } from '../data';
 import { computeStats, getNatureMult } from '../engine/stats';
-import { calcDamageRolls, buildResult, calcHazardDamage, getWeatherBallType } from '../engine/damage';
+import { calcDamageRolls, buildResult, calcHazardDamage, getWeatherBallType, getSpeedBasedPower } from '../engine/damage';
 import { reverseCalcDefense, reverseCalcAttack } from '../engine/reverseCalc';
 import { getTypeEffectiveness, effectivenessLabel } from '../engine/typeChart';
 import { getPokemonJaList, getMoveJaList, displayPokemonName, moveJa, TYPE_JA } from '../i18n';
@@ -122,7 +122,7 @@ function PartyQuickBar({ label, accentColor, members, selectedName, onSelect, on
 }
 
 // ─── ポケモンパネル ───
-function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondChange, pokemonHistory = [], myPartyMembers = [], opponentMembers = [], onHistoryAdd = () => {} }: {
+function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondChange, pokemonHistory = [], myPartyMembers = [], opponentMembers = [], onHistoryAdd = () => {}, attackMoves = [] }: {
   title: string; build: PokemonBuild; onChange: (b: PokemonBuild) => void;
   data: ChampionsData; showAtkSp: boolean;
   cond: BattleConditions; onCondChange: (c: BattleConditions) => void;
@@ -130,6 +130,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
   myPartyMembers?: (PokemonBuild | null)[];
   opponentMembers?: PokemonBuild[];
   onHistoryAdd?: (name: string) => void;
+  attackMoves?: string[];
 }) {
   const t = useTheme();
   const [showPokemonModal, setShowPokemonModal] = useState(false);
@@ -335,7 +336,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
           <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600 }}>性格補正</span>
           {/* ランク補正（攻撃側=攻撃ランク / 防御側=防御ランク） */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600 }}>{showAtkSp ? '攻撃ランク' : '防御ランク'}</span>
+            <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 600 }}>{showAtkSp ? (attackMoves.includes('Foul Play') ? '相手のAランク' : '攻撃ランク') : '防御ランク'}</span>
             <button onClick={() => setRank(rankVal - 1)}
               style={{ width: 24, height: 24, borderRadius: 99, background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`, color: t.text, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, lineHeight: 1 }}>−</button>
             <span style={{ width: 26, textAlign: 'center', fontSize: 13, fontWeight: 800, color: rankVal > 0 ? t.accentAtk : rankVal < 0 ? t.accentDef : t.textMuted }}>{rankVal > 0 ? `+${rankVal}` : rankVal}</span>
@@ -683,7 +684,8 @@ function ResultCard({ data, attacker, defender, moveEnName, cond, swapped }: {
     // ウェザーボールは天候で実効タイプ・威力が変わる（表示・相性に反映）
     const isWB = move.name === 'Weather Ball' && (cond.weather ?? null) !== null;
     const dispType = isWB ? getWeatherBallType(cond.weather) : move.type;
-    const dispPower = isWB ? move.power * 2 : move.power;
+    const spPower = getSpeedBasedPower(move.name, atkStats.spe, defStats.spe);
+    const dispPower = isWB ? move.power * 2 : (spPower ?? move.power);
     const effectiveness = getTypeEffectiveness(dispType, defTypes, move.name);
     const rolls = calcDamageRolls(atkStats, defStats, atkTypes, defTypes, move, cond, attacker.item, defender.item, attacker.ability, defender.ability);
     const result = buildResult(rolls, defStats.hp, effectiveness, moveEnName, dispType, dispPower, move.category);
@@ -1158,7 +1160,8 @@ function ResultsSection({ data, attacker, defender, moveSlots, cond, onCalcHisto
       const defTypes = defEntry?.types ?? [];
       const effectiveness = getTypeEffectiveness(move.type, defTypes, move.name);
       const rolls = calcDamageRolls(atkStats, defStats, atkTypes, defTypes, move, cond, attacker.item, defender.item, attacker.ability, defender.ability);
-      return buildResult(rolls, defStats.hp, effectiveness, moveEnName, move.type, move.power, move.category);
+      const spPower = getSpeedBasedPower(move.name, atkStats.spe, defStats.spe);
+      return buildResult(rolls, defStats.hp, effectiveness, moveEnName, move.type, (spPower ?? move.power), move.category);
     }).filter(Boolean) as ReturnType<typeof buildResult>[];
   }, [data, attacker, defender, activeMoves.join(','), cond]);
 
@@ -1282,6 +1285,7 @@ export function Calculator({ data, myPartyMembers = [], opponentMembers = [], po
         cond={cond} onCondChange={setCond}
         pokemonHistory={pokemonHistory} myPartyMembers={myPartyMembers} opponentMembers={opponentMembers}
         onHistoryAdd={onHistoryAdd}
+        attackMoves={moveSlots}
       />
 
       <MoveSlots slots={moveSlots} onChange={setSlot} data={data}

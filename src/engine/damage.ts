@@ -23,6 +23,22 @@ export function getWeatherBallType(weather: BattleConditions['weather']): string
   }
 }
 
+// 素早さ依存で威力が決まる技（ジャイロボール=遅いほど高威力 / エレキボール=速いほど高威力）。
+// atkSpe=使用者の素早さ実数値、defSpe=相手の素早さ実数値。対象外の技は null。
+// 注意: 素早さランク・麻痺・トリックルームは未考慮（実数値ベース）。
+export function getSpeedBasedPower(moveName: string, atkSpe: number, defSpe: number): number | null {
+  if (moveName === 'Gyro Ball') {
+    // 威力 = min(150, max(1, floor(25 × 相手S ÷ 自分S)))
+    return Math.min(150, Math.max(1, Math.floor(25 * defSpe / Math.max(1, atkSpe))));
+  }
+  if (moveName === 'Electro Ball') {
+    // 自分S/相手S の比で威力決定: ≥4倍=150 / ≥3倍=120 / ≥2倍=80 / >1倍=60 / それ以外=40
+    const r = atkSpe / Math.max(1, defSpe);
+    return r >= 4 ? 150 : r >= 3 ? 120 : r >= 2 ? 80 : r > 1 ? 60 : 40;
+  }
+  return null;
+}
+
 // ランク補正（攻撃/防御実数値に直接かける）
 function applyRank(stat: number, rank: number): number {
   if (rank === 0) return stat;
@@ -49,6 +65,10 @@ export function calcDamageRolls(
     effType = getWeatherBallType(cond.weather ?? null);
     effPower = move.power * 2;
   }
+
+  // 素早さ依存威力（ジャイロボール/エレキボール）。実数値から威力を上書き
+  const speedPower = getSpeedBasedPower(move.name, atkStats.spe, defStats.spe);
+  if (speedPower !== null) effPower = speedPower;
 
   if (move.category === 'Status' || effPower <= 0) return Array(16).fill(0);
 
@@ -86,11 +106,11 @@ export function calcDamageRolls(
   let defVal = (isPhysical || usesTargetDef) ? defStats.def : defStats.spd;
 
   // ランク補正
-  // ・通常/ボディプレス: 攻撃側パネルのランク入力(atkRank)を攻撃実数値にそのまま適用
-  //   （ボディプレスは自分の防御を使うが、参照ポケモンは攻撃側=同一なので atkRank で正しい）
-  // ・イカサマ: 攻撃実数値=相手の攻撃。必要なのは相手の攻撃ランクだが専用入力が無いため未適用(0)
+  // ・通常: 攻撃側パネルのランク入力(atkRank)を自分の攻撃に適用
+  // ・ボディプレス: 自分の防御に適用（参照ポケモンは攻撃側=同一なので atkRank で正しい）
+  // ・イカサマ: 攻撃実数値=相手の攻撃。攻撃側パネルのランク入力を「相手の攻撃ランク」として扱い適用する
   // ・サイコショック系: 防御実数値=相手の防御。defRank(防御側パネル)がそのまま防御ランクとして効く
-  atkVal = applyRank(atkVal, usesTargetAtk ? 0 : (cond.atkRank ?? 0));
+  atkVal = applyRank(atkVal, cond.atkRank ?? 0);
   defVal = applyRank(defVal, cond.defRank ?? 0);
 
   // ── 攻撃側特性による攻撃実数値補正（自分の攻撃を使うときのみ） ──
