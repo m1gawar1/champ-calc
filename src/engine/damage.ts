@@ -69,22 +69,37 @@ export function calcDamageRolls(
   const effectiveness = getTypeEffectiveness(effType, defenderTypes, move.name);
   if (effectiveness === 0) return Array(16).fill(0);
 
+  // ── 特殊計算わざ：参照する実数値が通常と異なる ──
+  // イカサマ=相手の攻撃 / ボディプレス=自分の防御 / サイコショック系=相手の防御
+  const usesTargetAtk = move.name === 'Foul Play';                                 // イカサマ
+  const usesOwnDef    = move.name === 'Body Press';                                // ボディプレス
+  const usesTargetDef = ['Psyshock', 'Psystrike', 'Secret Sword'].includes(move.name); // サイコショック/サイコブレイク/しんぴのつるぎ
+  // 自分の攻撃/特攻をそのまま使う通常の物理技か（ちからもち等の補正対象判定に使う）
+  const usesOwnAtkStat = !usesTargetAtk && !usesOwnDef;
+
   // ── ランク補正後の実数値 ──
-  let atkVal = isPhysical ? atkStats.atk : atkStats.spa;
-  let defVal = isPhysical ? defStats.def  : defStats.spd;
-  atkVal = applyRank(atkVal, cond.atkRank ?? 0);
+  let atkVal: number;
+  if (usesTargetAtk)   atkVal = defStats.atk;                      // 相手の攻撃
+  else if (usesOwnDef) atkVal = atkStats.def;                      // 自分の防御
+  else                 atkVal = isPhysical ? atkStats.atk : atkStats.spa;
+  // 防御側：特殊技でもサイコショック系は防御(Def)を参照
+  let defVal = (isPhysical || usesTargetDef) ? defStats.def : defStats.spd;
+
+  // ランク補正：イカサマ/ボディプレスは参照元が攻撃側ランク(atkRank)と一致しないため適用しない（簡略）
+  atkVal = applyRank(atkVal, usesOwnAtkStat ? (cond.atkRank ?? 0) : 0);
   defVal = applyRank(defVal, cond.defRank ?? 0);
 
-  // ── 攻撃側特性による攻撃実数値補正 ──
-  if ((attackerAbility === 'Huge Power' || attackerAbility === 'Pure Power') && isPhysical) {
+  // ── 攻撃側特性による攻撃実数値補正（自分の攻撃を使うときのみ） ──
+  if ((attackerAbility === 'Huge Power' || attackerAbility === 'Pure Power') && isPhysical && usesOwnAtkStat) {
     atkVal *= 2;
   }
-  if (attackerAbility === 'Hustle' && isPhysical) {
+  if (attackerAbility === 'Hustle' && isPhysical && usesOwnAtkStat) {
     atkVal = Math.floor(atkVal * 3 / 2);
   }
 
   // ── 防御側アイテムによる防御実数値補正 ──
-  if (defenderItem === 'Assault Vest' && !isPhysical) {
+  // とつげきチョッキは特防を上げる道具。サイコショック系は防御(Def)参照なので対象外
+  if (defenderItem === 'Assault Vest' && !isPhysical && !usesTargetDef) {
     defVal = Math.floor(defVal * 3 / 2);
   }
   if (defenderItem === 'Eviolite') {
