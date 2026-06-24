@@ -32,6 +32,8 @@ const LEARNSET_PATCHES: Record<string, { add?: string[]; remove?: string[] }> = 
   Grimmsnarl: { add: ['Parting Shot'], remove: ['Thunder Wave'] },
   // ガメノデス: インファイトを習得（上流 learnset 未収録）
   Barbaracle: { add: ['Close Combat'] },
+  // マフォクシー: サイコキネシスを習得（上流 learnset 未収録）
+  Delphox: { add: ['Psychic'] },
 };
 
 let cache: ChampionsData | null = null;
