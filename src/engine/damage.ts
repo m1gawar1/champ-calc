@@ -85,8 +85,12 @@ export function calcDamageRolls(
   // 防御側：特殊技でもサイコショック系は防御(Def)を参照
   let defVal = (isPhysical || usesTargetDef) ? defStats.def : defStats.spd;
 
-  // ランク補正：イカサマ/ボディプレスは参照元が攻撃側ランク(atkRank)と一致しないため適用しない（簡略）
-  atkVal = applyRank(atkVal, usesOwnAtkStat ? (cond.atkRank ?? 0) : 0);
+  // ランク補正
+  // ・通常/ボディプレス: 攻撃側パネルのランク入力(atkRank)を攻撃実数値にそのまま適用
+  //   （ボディプレスは自分の防御を使うが、参照ポケモンは攻撃側=同一なので atkRank で正しい）
+  // ・イカサマ: 攻撃実数値=相手の攻撃。必要なのは相手の攻撃ランクだが専用入力が無いため未適用(0)
+  // ・サイコショック系: 防御実数値=相手の防御。defRank(防御側パネル)がそのまま防御ランクとして効く
+  atkVal = applyRank(atkVal, usesTargetAtk ? 0 : (cond.atkRank ?? 0));
   defVal = applyRank(defVal, cond.defRank ?? 0);
 
   // ── 攻撃側特性による攻撃実数値補正（自分の攻撃を使うときのみ） ──

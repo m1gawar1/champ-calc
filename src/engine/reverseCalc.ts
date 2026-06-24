@@ -51,8 +51,12 @@ export function reverseCalcDefense(
   if (!atkBs || !defBs) return null;
 
   const isPhysical = move.category === 'Physical';
-  const statKey = isPhysical ? 'def' : 'spd';
-  const statLabel = isPhysical ? '防御(B)' : '特防(D)';
+  // イカサマは「相手の攻撃」と「相手の防御」の2変数に依存し耐久逆算が成立しないため非対応
+  if (move.name === 'Foul Play') return null;
+  // サイコショック系は特殊技でも防御(B)で受けるため、走査軸を Def にする
+  const usesTargetDef = ['Psyshock', 'Psystrike', 'Secret Sword'].includes(move.name);
+  const statKey: 'def' | 'spd' = (isPhysical || usesTargetDef) ? 'def' : 'spd';
+  const statLabel = (isPhysical || usesTargetDef) ? '防御(B)' : '特防(D)';
 
   // 攻撃側タイプ取得
   const atkEntry = attacker.isMega && attacker.megaFormName
@@ -95,7 +99,7 @@ export function reverseCalcDefense(
 
       // 観測ダメージがロール範囲に含まれるか
       if (observedDamage >= rolls[0] && observedDamage <= rolls[15]) {
-        const statValue = isPhysical ? defStats.def : defStats.spd;
+        const statValue = defStats[statKey];
         const arr = byStat.get(statValue) ?? [];
         arr.push(sp);
         byStat.set(statValue, arr);
@@ -137,8 +141,12 @@ export function reverseCalcAttack(
   if (!atkBs || !defBs) return null;
 
   const isPhysical = move.category === 'Physical';
-  const statKey = isPhysical ? 'atk' : 'spa';
-  const statLabel = isPhysical ? '攻撃(A)' : '特攻(C)';
+  // イカサマは相手のステータスではなく自分(防御側)の攻撃に依存するため、相手の火力逆算が成立しない
+  if (move.name === 'Foul Play') return null;
+  // ボディプレスは相手の防御(B)で殴ってくるため、走査軸を Def にする
+  const usesOwnDef = move.name === 'Body Press';
+  const statKey: 'atk' | 'spa' | 'def' = usesOwnDef ? 'def' : (isPhysical ? 'atk' : 'spa');
+  const statLabel = usesOwnDef ? '防御(B)' : (isPhysical ? '攻撃(A)' : '特攻(C)');
 
   // タイプ取得
   const atkEntry = attacker.isMega && attacker.megaFormName
@@ -177,7 +185,7 @@ export function reverseCalcAttack(
       );
 
       if (observedDamage >= rolls[0] && observedDamage <= rolls[15]) {
-        const statValue = isPhysical ? atkStats.atk : atkStats.spa;
+        const statValue = atkStats[statKey];
         const arr = byStat.get(statValue) ?? [];
         arr.push(sp);
         byStat.set(statValue, arr);
