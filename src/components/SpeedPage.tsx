@@ -460,7 +460,8 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
             <p style={{ fontSize: 12, color: t.textMuted, margin: '0 0 12px' }}>
               好きなポケモン2体を選んで素早さを比較できます（プリセット or 実数値手入力）。調整の確認用。
             </p>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 12 }}>
+            {/* A/B を縦に並べて1枚ずつ大きく表示（横並びだと見づらいため） */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 12 }}>
               <FreeSlotCard data={data} slot={slotA} onChange={setSlotA} accent={t.accentAtk} label="ポケモン A"
                 myPartyMembers={myPartyMembers} opponentMembers={opponentMembers} />
               <FreeSlotCard data={data} slot={slotB} onChange={setSlotB} accent={t.accentDef} label="ポケモン B"
