@@ -178,10 +178,11 @@ function slotFinalSpeed(data: ChampionsData, slot: FreeSlot): number | null {
 }
 
 // ─── 自由比較の1スロットカード ───
-function FreeSlotCard({ data, slot, onChange, accent, label, myPartyMembers, opponentMembers }: {
+function FreeSlotCard({ data, slot, onChange, accent, label, myPartyMembers, opponentMembers, onRemove }: {
   data: ChampionsData; slot: FreeSlot; onChange: (s: FreeSlot) => void;
   accent: string; label: string;
   myPartyMembers: (PokemonBuild | null)[]; opponentMembers: PokemonBuild[];
+  onRemove?: () => void;
 }) {
   const t = useTheme();
   const [showModal, setShowModal] = useState(false);
@@ -205,7 +206,13 @@ function FreeSlotCard({ data, slot, onChange, accent, label, myPartyMembers, opp
 
   return (
     <Glass tint={t.glassTint} radius={20} padding={14} style={{ flex: 1, minWidth: 0 }}>
-      <div style={{ fontSize: 10, fontWeight: 800, color: accent, letterSpacing: 1.2, marginBottom: 8 }}>{label}</div>
+      {/* ラベル行（削除ボタン付き） */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ fontSize: 10, fontWeight: 800, color: accent, letterSpacing: 1.2 }}>{label}</div>
+        {onRemove && (
+          <button onClick={onRemove} style={{ background: 'none', border: 'none', cursor: 'pointer', color: t.textWeak, fontSize: 14, padding: 0 }}>✕</button>
+        )}
+      </div>
 
       {/* ポケモン選択ボタン */}
       <button
@@ -305,11 +312,15 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
   const t = useTheme();
   const isDark = useThemeName() === 'dark';
 
-  // モード: 'battle'=対戦用（パーティ/ボックス vs 登録した相手）, 'free'=自由比較（任意の2体）
+  // モード: 'battle'=対戦用（パーティ/ボックス vs 登録した相手）, 'free'=自由比較（可変複数体）
   const [mode, setMode] = useState<'battle' | 'free'>('battle');
-  // 自由比較の2スロット（A=自分側カラー, B=相手側カラー）
-  const [slotA, setSlotA] = useState<FreeSlot>(EMPTY_FREE_SLOT);
-  const [slotB, setSlotB] = useState<FreeSlot>(EMPTY_FREE_SLOT);
+  // 自由比較スロット（最小2・最大6の可変配列）
+  const [freeSlots, setFreeSlots] = useState<FreeSlot[]>([
+    { ...EMPTY_FREE_SLOT, cond: { ...DEFAULT_SPEED_CONDITIONS } },
+    { ...EMPTY_FREE_SLOT, cond: { ...DEFAULT_SPEED_CONDITIONS } },
+  ]);
+  // 基準ポケモン（このスロットを基準に各行の抜ける/抜かれるを判定）
+  const [refIdx, setRefIdx] = useState(0);
 
   // 自分側の補正
   const [myCond, setMyCond] = useState<SpeedConditions>(DEFAULT_SPEED_CONDITIONS);
@@ -421,6 +432,20 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
   // 自分の最終素早さ
   const myFinalSpeed: number | null = myStatSpe !== null ? finalSpeed(myStatSpe, myCondEff) : null;
 
+  // ── 自由比較スロット操作ヘルパー ──
+  const MAX_FREE_SLOTS = 6;
+  function updateFreeSlot(i: number, s: FreeSlot) {
+    setFreeSlots(prev => prev.map((x, idx) => (idx === i ? s : x)));
+  }
+  function addFreeSlot() {
+    setFreeSlots(prev => (prev.length >= MAX_FREE_SLOTS ? prev : [...prev, { ...EMPTY_FREE_SLOT, cond: { ...DEFAULT_SPEED_CONDITIONS } }]));
+  }
+  function removeFreeSlot(i: number) {
+    setFreeSlots(prev => prev.filter((_, idx) => idx !== i));
+    setRefIdx(prev => (i === prev ? 0 : i < prev ? prev - 1 : prev));
+  }
+  const slotLetter = (i: number) => String.fromCharCode(65 + i);
+
   return (
     <div style={{ padding: '70px 16px 130px', maxWidth: 500, margin: '0 auto' }}>
 
@@ -451,38 +476,133 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
       </Glass>
 
       {/* ── 自由比較モード ── */}
-      {mode === 'free' && (() => {
-        const aFinal = slotFinalSpeed(data, slotA);
-        const bFinal = slotFinalSpeed(data, slotB);
-        const verdict = aFinal !== null && bFinal !== null ? compareSpeed(aFinal, bFinal) : null;
-        return (
-          <>
-            <p style={{ fontSize: 12, color: t.textMuted, margin: '0 0 12px' }}>
-              好きなポケモン2体を選んで素早さを比較できます（プリセット or 実数値手入力）。調整の確認用。
-            </p>
-            {/* A/B を縦に並べて1枚ずつ大きく表示（横並びだと見づらいため） */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 12 }}>
-              <FreeSlotCard data={data} slot={slotA} onChange={setSlotA} accent={t.accentAtk} label="ポケモン A"
-                myPartyMembers={myPartyMembers} opponentMembers={opponentMembers} />
-              <FreeSlotCard data={data} slot={slotB} onChange={setSlotB} accent={t.accentDef} label="ポケモン B"
-                myPartyMembers={myPartyMembers} opponentMembers={opponentMembers} />
-            </div>
-            {/* 判定バナー（A視点） */}
-            {verdict && (
-              <Glass tint={verdictBg(verdict, isDark)} radius={16} padding={14} style={{ marginBottom: 12 }}>
-                <div style={{ textAlign: 'center' }}>
-                  <span style={{ fontSize: 18, fontWeight: 900, color: verdictColor(verdict, isDark) }}>
-                    A は {verdict === 'faster' ? '抜ける' : verdict === 'tie' ? '同速' : '抜かれる'}
-                  </span>
-                  <div style={{ fontSize: 12, color: t.textMuted, marginTop: 4 }}>
-                    A {aFinal} ／ B {bFinal}
-                  </div>
+      {mode === 'free' && (
+        <>
+          <p style={{ fontSize: 12, color: t.textMuted, margin: '0 0 12px' }}>
+            好きなポケモンを並べて素早さを比較できます。基準ポケモンを選ぶと抜ける/抜かれるが色分け表示されます。
+          </p>
+          {/* スロットカード群（縦並び・可変） */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 12 }}>
+            {freeSlots.map((slot, i) => (
+              <FreeSlotCard
+                key={i}
+                data={data}
+                slot={slot}
+                onChange={s => updateFreeSlot(i, s)}
+                label={`ポケモン ${slotLetter(i)}`}
+                accent={i === refIdx ? t.accentAtk : t.accentDef}
+                myPartyMembers={myPartyMembers}
+                opponentMembers={opponentMembers}
+                onRemove={freeSlots.length > 2 ? () => removeFreeSlot(i) : undefined}
+              />
+            ))}
+          </div>
+          {/* ＋ ポケモンを追加ボタン（最大未満のときだけ表示） */}
+          {freeSlots.length < MAX_FREE_SLOTS && (
+            <button
+              onClick={addFreeSlot}
+              style={{
+                width: '100%', padding: '10px 0', borderRadius: 14,
+                background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
+                color: t.textMuted, fontSize: 13, fontWeight: 700,
+                border: 'none', cursor: 'pointer', marginBottom: 12,
+              }}
+            >
+              ＋ ポケモンを追加
+            </button>
+          )}
+          {/* 素早さランキング表（有効スロット2件以上のとき表示） */}
+          {(() => {
+            // 素早さ確定済みスロットだけ抽出して降順ソート
+            const ranked = freeSlots
+              .map((slot, i) => ({ i, slot, final: slotFinalSpeed(data, slot) }))
+              .filter((x): x is { i: number; slot: FreeSlot; final: number } => x.final !== null)
+              .sort((a, b) => b.final - a.final);
+            if (ranked.length < 2) return null;
+            const refFinal = slotFinalSpeed(data, freeSlots[refIdx]);
+            return (
+              <Glass tint={t.glassTint} radius={16} padding={14} style={{ marginBottom: 12 }}>
+                {/* 見出し行 */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: t.textMuted, letterSpacing: 0.8 }}>素早さ順</span>
+                  <span style={{ fontSize: 11, color: t.textMuted }}>基準: {slotLetter(refIdx)}</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {ranked.map(({ i, slot, final }, rank) => {
+                    const isRef = i === refIdx;
+                    const v = !isRef && refFinal !== null ? compareSpeed(final, refFinal) : null;
+                    const re = data.roster.find(r => r.name === slot.rosterName);
+                    // 表示名（メガ時はメガフォーム名）
+                    const dispName = slot.isMega && slot.megaFormName
+                      ? displayPokemonName(slot.megaFormName)
+                      : slot.rosterName ? displayPokemonName(slot.rosterName) : '';
+                    return (
+                      <div
+                        key={i}
+                        onClick={() => setRefIdx(i)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          padding: '8px', borderRadius: 10, cursor: 'pointer',
+                          background: isRef ? t.glassChip2 : 'transparent',
+                          border: isRef ? `1px solid ${t.rimAccent}` : `1px solid ${t.rim}`,
+                        }}
+                      >
+                        {/* 順位 */}
+                        <span style={{ fontSize: 12, color: t.textMuted, width: 16, textAlign: 'center', flexShrink: 0 }}>{rank + 1}</span>
+                        {/* レターバッジ */}
+                        <span style={{
+                          fontSize: 11, fontWeight: 800,
+                          color: isRef ? t.accentAtk : t.textMuted,
+                          background: t.glassChip, borderRadius: 6,
+                          padding: '1px 5px', flexShrink: 0,
+                        }}>{slotLetter(i)}</span>
+                        {/* スプライト（26px） */}
+                        {re && (
+                          <img
+                            src={slot.isMega && slot.megaFormName
+                              ? getMegaSpriteUrl(re.dexNumber, slot.megaFormName)
+                              : getSpriteUrl(slot.isMega && slot.megaFormName ? slot.megaFormName : slot.rosterName)}
+                            onError={e => {
+                              const img = e.target as HTMLImageElement;
+                              if (img.dataset.fellBack) { img.style.opacity = '0'; return; }
+                              img.dataset.fellBack = '1';
+                              img.src = getFallbackSpriteUrl(re.dexNumber);
+                            }}
+                            alt=""
+                            style={{ width: 26, height: 26, imageRendering: 'pixelated', flexShrink: 0 }}
+                          />
+                        )}
+                        {/* 名前（省略表示） */}
+                        <span style={{
+                          flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: t.text,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>{dispName || '—'}</span>
+                        {/* 最終素早さ */}
+                        <span style={{ fontSize: 16, fontWeight: 900, color: t.text, flexShrink: 0 }}>{final}</span>
+                        {/* 判定チップ */}
+                        {isRef ? (
+                          <span style={{
+                            fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 999,
+                            background: t.glassChip, color: t.textMuted,
+                          }}>基準</span>
+                        ) : v ? (
+                          <span style={{
+                            fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 999,
+                            background: verdictBg(v, isDark), color: verdictColor(v, isDark),
+                            boxShadow: `inset 0 0 0 0.5px ${verdictRim(v, isDark)}`,
+                          }}>
+                            {v === 'faster' ? '抜ける' : v === 'tie' ? '同速' : '抜かれる'}
+                          </span>
+                        ) : null}
+                      </div>
+                    );
+                  })}
                 </div>
               </Glass>
-            )}
-          </>
-        );
-      })()}
+            );
+          })()}
+        </>
+      )}
 
       {/* ── 対戦モード ── */}
       {mode === 'battle' && (<>
