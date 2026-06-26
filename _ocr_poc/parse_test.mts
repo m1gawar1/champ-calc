@@ -334,6 +334,7 @@ async function main(): Promise<void> {
   process.stderr.write('\nTesseract ワーカー起動中 (jpn)...\n');
   const worker = await createWorker('jpn', 1, {
     langPath: LANG_PATH,
+    gzip: false, // _ocr_poc には非圧縮 jpn.traineddata がある
     logger: (m: { status: string; progress: number }) => {
       if (m.status === 'recognizing text') {
         process.stderr.write(`\r  [OCR] ${(m.progress * 100).toFixed(0)}%   `);

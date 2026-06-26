@@ -5,7 +5,7 @@
 import type { ChampionsData, PokemonBuild } from '../../types';
 import { DEFAULT_IVS } from '../../types';
 import type { StatReadings } from './statSolve';
-import { solveStats } from './statSolve';
+import { solveStats, pickStatReading } from './statSolve';
 import type { Candidate, MatchResult } from './match';
 import { closestMatch } from './match';
 import { displayPokemonName, moveJa, ABILITY_JA } from '../../i18n';
@@ -242,7 +242,7 @@ export function parseAbilityCard(
 export function parseStatusReadings(card: CardOcr): StatReadings {
   const { left, right } = splitColumns(card.lines);
 
-  /** 行リストの idx 番目から StatReading を抽出 */
+  /** 行リストの idx 番目から StatReading を抽出（素朴版） */
   function readStat(lines: CardLine[], idx: number): { value: number; sp: number } {
     const line = lines[idx];
     if (!line) return { value: 0, sp: 0 };
@@ -257,6 +257,31 @@ export function parseStatusReadings(card: CardOcr): StatReadings {
     spa: readStat(right, 0),
     spd: readStat(right, 1),
     spe: readStat(right, 2),
+  };
+}
+
+/** 1ステータス位置ぶんの「生の数字列」（列マージ対策に式で選別するため値を絞らない） */
+export interface StatRawNumbers {
+  hp: number[]; atk: number[]; def: number[];
+  spa: number[]; spd: number[]; spe: number[];
+}
+
+/**
+ * ステータスカードから「各位置の生数字列」を取り出す。
+ * ラベル誤読が多いので位置で割り当て（左列上から HP/こうげき/ぼうぎょ、右列上から とくこう/とくぼう/すばやさ）。
+ * value/sp の確定は base 既知後に pickStatReading で式ベース選別する。
+ */
+export function parseStatusRawNumbers(card: CardOcr): StatRawNumbers {
+  const { left, right } = splitColumns(card.lines);
+  const nums = (lines: CardLine[], idx: number) =>
+    lines[idx] ? extractNumbers(lines[idx].text) : [];
+  return {
+    hp:  nums(left,  0),
+    atk: nums(left,  1),
+    def: nums(left,  2),
+    spa: nums(right, 0),
+    spd: nums(right, 1),
+    spe: nums(right, 2),
   };
 }
 
@@ -277,7 +302,6 @@ export function parseTeam(
 
   for (let i = 0; i < len; i++) {
     const ar = parseAbilityCard(abilityCards[i], data);
-    const readings = parseStatusReadings(statusCards[i]);
 
     const base = findBaseStats(
       data.baseStats,
@@ -290,6 +314,16 @@ export function parseTeam(
     let sp = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
 
     if (base) {
+      // 種族値が分かったので、生数字列から式に一致する実数値/SPを選別（列マージに強い）
+      const raw = parseStatusRawNumbers(statusCards[i]);
+      const readings: StatReadings = {
+        hp:  pickStatReading(base.hp,  raw.hp,  true),
+        atk: pickStatReading(base.atk, raw.atk, false),
+        def: pickStatReading(base.def, raw.def, false),
+        spa: pickStatReading(base.spa, raw.spa, false),
+        spd: pickStatReading(base.spd, raw.spd, false),
+        spe: pickStatReading(base.spe, raw.spe, false),
+      };
       const solved = solveStats(base, readings, data.natures);
       nature = solved.nature;
       sp = solved.sp;

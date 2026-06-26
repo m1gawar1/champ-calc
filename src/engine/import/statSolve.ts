@@ -37,6 +37,35 @@ export interface StatReadings {
   spe: StatReading;
 }
 
+// OCR で1ステータス行から拾った複数の数字から「実数値」と「SP」を式で特定する。
+// 列マージ（例: [14,6,181,20] のように隣ステータスの数字が混入）に強い:
+// 「種族値・IV31 から計算式に厳密一致する value（とその直後/総当たりの sp）」だけを採用する。
+export function pickStatReading(base: number, nums: number[], isHp: boolean): StatReading {
+  const mults = isHp ? [1.0] : [1.0, 1.1, 0.9];
+  const calc = (sp: number, m: number) => (isHp ? calcHp(base, 31, sp) : calcStat(base, 31, sp, m));
+
+  // 1) 隣接ペア (value=nums[i], sp=nums[i+1]) が式に厳密一致するものを優先
+  for (let i = 0; i < nums.length; i++) {
+    const value = nums[i];
+    const next = nums[i + 1];
+    if (next === undefined || next < 0 || next > 32) continue;
+    for (const m of mults) {
+      if (calc(next, m) === value) return { value, sp: next };
+    }
+  }
+  // 2) 隣接で決まらなければ、value 候補（大きい数字＝実数値の可能性大）を降順で試し sp を総当たり
+  const desc = [...nums].sort((a, b) => b - a);
+  for (const value of desc) {
+    for (let sp = 0; sp <= 32; sp++) {
+      for (const m of mults) {
+        if (calc(sp, m) === value) return { value, sp };
+      }
+    }
+  }
+  // 3) 何も一致しなければ素朴に先頭2数
+  return { value: nums[0] ?? 0, sp: nums[1] ?? 0 };
+}
+
 export interface StatSolveResult {
   sp: SpAlloc;
   nature: string;                 // 解決した性格名（英語）。決まらなければ 'Hardy'
