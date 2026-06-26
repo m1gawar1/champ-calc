@@ -481,37 +481,7 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
           <p style={{ fontSize: 12, color: t.textMuted, margin: '0 0 12px' }}>
             好きなポケモンを並べて素早さを比較できます。基準ポケモンを選ぶと抜ける/抜かれるが色分け表示されます。
           </p>
-          {/* スロットカード群（縦並び・可変） */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 12 }}>
-            {freeSlots.map((slot, i) => (
-              <FreeSlotCard
-                key={i}
-                data={data}
-                slot={slot}
-                onChange={s => updateFreeSlot(i, s)}
-                label={`ポケモン ${slotLetter(i)}`}
-                accent={i === refIdx ? t.accentAtk : t.accentDef}
-                myPartyMembers={myPartyMembers}
-                opponentMembers={opponentMembers}
-                onRemove={freeSlots.length > 2 ? () => removeFreeSlot(i) : undefined}
-              />
-            ))}
-          </div>
-          {/* ＋ ポケモンを追加ボタン（最大未満のときだけ表示） */}
-          {freeSlots.length < MAX_FREE_SLOTS && (
-            <button
-              onClick={addFreeSlot}
-              style={{
-                width: '100%', padding: '10px 0', borderRadius: 14,
-                background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
-                color: t.textMuted, fontSize: 13, fontWeight: 700,
-                border: 'none', cursor: 'pointer', marginBottom: 12,
-              }}
-            >
-              ＋ ポケモンを追加
-            </button>
-          )}
-          {/* 素早さランキング表（有効スロット2件以上のとき表示） */}
+          {/* 素早さランキング表（有効スロット2件以上のとき表示）— 一番上に表示 */}
           {(() => {
             // 素早さ確定済みスロットだけ抽出して降順ソート
             const ranked = freeSlots
@@ -601,6 +571,36 @@ export function SpeedPage({ data, myPartyMembers, box, opponentMembers }: Props)
               </Glass>
             );
           })()}
+          {/* スロットカード群（縦並び・可変） */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 12 }}>
+            {freeSlots.map((slot, i) => (
+              <FreeSlotCard
+                key={i}
+                data={data}
+                slot={slot}
+                onChange={s => updateFreeSlot(i, s)}
+                label={`ポケモン ${slotLetter(i)}`}
+                accent={i === refIdx ? t.accentAtk : t.accentDef}
+                myPartyMembers={myPartyMembers}
+                opponentMembers={opponentMembers}
+                onRemove={freeSlots.length > 2 ? () => removeFreeSlot(i) : undefined}
+              />
+            ))}
+          </div>
+          {/* ＋ ポケモンを追加ボタン（最大未満のときだけ表示） */}
+          {freeSlots.length < MAX_FREE_SLOTS && (
+            <button
+              onClick={addFreeSlot}
+              style={{
+                width: '100%', padding: '10px 0', borderRadius: 14,
+                background: t.glassChip, boxShadow: `inset 0 0 0 0.5px ${t.rim}`,
+                color: t.textMuted, fontSize: 13, fontWeight: 700,
+                border: 'none', cursor: 'pointer', marginBottom: 12,
+              }}
+            >
+              ＋ ポケモンを追加
+            </button>
+          )}
         </>
       )}
 
