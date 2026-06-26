@@ -135,6 +135,79 @@ export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, oppon
           <button onClick={onClose} style={{ color: t.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, padding: '0 4px' }}>✕</button>
         </div>
 
+        {/* 相手パーティ連続入力進捗バー（keepOpenOnSelect 時のみ表示） */}
+        {keepOpenOnSelect && (() => {
+          const filledCount = opponentMembers.filter(m => m.rosterName).length;
+          const nextIndex = Math.min(filledCount, 5);
+          const allFilled = filledCount >= 6;
+          return (
+            <div style={{ position: 'relative', zIndex: 3, padding: '0 12px 10px' }}>
+              {/* ラベル行 */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: t.textMuted }}>相手パーティ</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: t.accentDef }}>
+                  {allFilled ? '6体すべて選択済み' : `${nextIndex + 1}体目を選択中`}
+                </span>
+              </div>
+              {/* 6マスのセル行 */}
+              <div style={{ display: 'flex', gap: 6 }}>
+                {[...Array(6)].map((_, i) => {
+                  const member = opponentMembers[i];
+                  const filled = !!member?.rosterName;
+                  const isNext = !filled && i === nextIndex;
+                  return (
+                    <div
+                      key={i}
+                      style={{
+                        flex: 1,
+                        aspectRatio: '1',
+                        height: 40,
+                        borderRadius: 8,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        // 登録済み: 薄いアクセント背景
+                        background: filled
+                          ? 'rgba(220,80,80,0.15)'
+                          : isNext
+                          ? 'rgba(220,80,80,0.08)'
+                          : t.glassNest,
+                        border: filled
+                          ? `1px solid ${t.rim}`
+                          : isNext
+                          ? `1.5px solid ${t.rimAccent}`
+                          : `1px solid ${t.rim}`,
+                        boxShadow: isNext ? '0 0 0 2px rgba(255,120,120,0.5)' : 'none',
+                        overflow: 'hidden',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {filled ? (
+                        // 登録済み: スプライト画像
+                        <img
+                          src={getSpriteUrl(member.rosterName)}
+                          onError={e => {
+                            const dex = dexMap[member.rosterName];
+                            if (dex) (e.target as HTMLImageElement).src = getFallbackSpriteUrl(dex);
+                          }}
+                          alt={displayPokemonName(member.rosterName)}
+                          style={{ width: 28, height: 28, imageRendering: 'pixelated' }}
+                        />
+                      ) : isNext ? (
+                        // 次に埋まる枠: 番号をアクセント色で強調
+                        <span style={{ fontSize: 13, fontWeight: 800, color: t.accentDef }}>{i + 1}</span>
+                      ) : (
+                        // 空き枠: 薄い番号
+                        <span style={{ fontSize: 12, fontWeight: 700, color: t.textWeak }}>{i + 1}</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* 検索バー */}
         <div style={{ position: 'relative', zIndex: 3, padding: '0 12px 10px' }}>
           <div style={{ position: 'relative' }}>
