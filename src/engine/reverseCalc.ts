@@ -65,8 +65,8 @@ export function reverseCalcDefense(
   const defEntry = defender.isMega && defender.megaFormName
     ? data.roster.find(r => r.name === defender.megaFormName)
     : getSelectableRoster(data.roster).find(r => r.name === defender.rosterName);
-  const atkTypes = atkEntry?.types ?? [];
-  const defTypes = defEntry?.types ?? [];
+  const atkTypes = attacker.typeOverride?.length ? attacker.typeOverride : (atkEntry?.types ?? []);
+  const defTypes = defender.typeOverride?.length ? defender.typeOverride : (defEntry?.types ?? []);
 
   // 攻撃側の実数値（逆算中は固定）
   const atkNature = data.natures.find(n => n.name === attacker.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
@@ -155,8 +155,8 @@ export function reverseCalcAttack(
   const defEntry = defender.isMega && defender.megaFormName
     ? data.roster.find(r => r.name === defender.megaFormName)
     : getSelectableRoster(data.roster).find(r => r.name === defender.rosterName);
-  const atkTypes = atkEntry?.types ?? [];
-  const defTypes = defEntry?.types ?? [];
+  const atkTypes = attacker.typeOverride?.length ? attacker.typeOverride : (atkEntry?.types ?? []);
+  const defTypes = defender.typeOverride?.length ? defender.typeOverride : (defEntry?.types ?? []);
 
   // 防御側（自分）の実数値は固定
   const defNature = data.natures.find(n => n.name === defender.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };

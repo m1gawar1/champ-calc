@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { PokemonSelectModal } from './PokemonSelectModal';
 import { SelectModal } from './SelectModal';
+import { TypeSelectModal } from './TypeSelectModal';
 import { Glass, GlassLayers, SpSlider } from './Glass';
 import { useTheme, useThemeName, TYPE_COLORS } from '../theme';
 import type { ChampionsData, PokemonBuild, SpAlloc, BattleConditions } from '../types';
@@ -135,6 +136,7 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
   const t = useTheme();
   const [showPokemonModal, setShowPokemonModal] = useState(false);
   const [showItemModal, setShowItemModal] = useState(false);
+  const [showTypeModal, setShowTypeModal] = useState(false);
   const roster = useMemo(() => getSelectableRoster(data.roster), [data.roster]);
   const megaForms = useMemo(() => build.rosterName ? getMegaForms(data.baseStats, build.rosterName) : [], [data.baseStats, build.rosterName]);
   const rosterEntry = useMemo(() => roster.find(r => r.name === build.rosterName), [roster, build.rosterName]);
@@ -142,7 +144,10 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
     ? data.roster.find(r => r.name === build.megaFormName) ?? null : null,
     [data.roster, build.isMega, build.megaFormName]);
   const activeEntry = megaRosterEntry ?? rosterEntry;
-  const activeTypes = activeEntry?.types ?? rosterEntry?.types ?? [];
+  const baseTypes = activeEntry?.types ?? rosterEntry?.types ?? [];
+  // タイプ上書き中ならそれを表示・計算に使う（へんげんじざい変化後等）
+  const isTypeOverridden = (build.typeOverride?.length ?? 0) > 0;
+  const activeTypes = isTypeOverridden ? build.typeOverride! : baseTypes;
   const bs = useMemo(() => findBaseStats(data.baseStats, build.rosterName, build.isMega, build.megaFormName),
     [data.baseStats, build.rosterName, build.isMega, build.megaFormName]);
   const nature = data.natures.find(n => n.name === build.nature) ?? { name: 'Hardy', increasedStat: null, decreasedStat: null };
@@ -173,7 +178,8 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
     const autoAbility = isOn && entry ? Object.values(entry.abilities)[0] ?? '' : (rosterEntry ? Object.values(rosterEntry.abilities)[0] ?? '' : '');
     // メガシンカ時は持ち物を対応メガストーンに。解除時は外す。
     const item = isOn ? (getMegaStone(megaName)?.en ?? '') : '';
-    onChange({ ...build, isMega: isOn, megaFormName: isOn ? megaName : '', ability: autoAbility, item });
+    // メガでタイプが変わるためタイプ上書きは解除
+    onChange({ ...build, isMega: isOn, megaFormName: isOn ? megaName : '', ability: autoAbility, item, typeOverride: undefined });
   }
 
   const displayName = build.isMega && build.megaFormName
@@ -280,11 +286,23 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
         })}
       </div>
 
-      {/* タイプバッジ */}
-      {activeTypes.length > 0 && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+      {/* タイプバッジ（タップでタイプ上書き編集） */}
+      {baseTypes.length > 0 && (
+        <button
+          onClick={() => setShowTypeModal(true)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12,
+            background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+          }}
+        >
           {activeTypes.map(type => <TypePill key={type} type={type} />)}
-        </div>
+          {isTypeOverridden && (
+            <span style={{ fontSize: 9, fontWeight: 700, color: t.accentAtk, padding: '2px 6px', borderRadius: 99, background: 'rgba(90,200,250,0.18)', boxShadow: `inset 0 0 0 0.5px ${t.rimAccent}` }}>
+              変更中
+            </span>
+          )}
+          <span style={{ fontSize: 11, color: t.textWeak, marginLeft: 2 }}>✎</span>
+        </button>
       )}
 
       {/* 持ち物 + 特性 */}
@@ -424,6 +442,14 @@ function PokemonPanel({ title, build, onChange, data, showAtkSp, cond, onCondCha
           value={build.item}
           onSelect={v => onChange({ ...build, item: v })}
           onClose={() => setShowItemModal(false)}
+        />
+      )}
+      {showTypeModal && (
+        <TypeSelectModal
+          baseTypes={baseTypes}
+          current={activeTypes}
+          onApply={types => onChange({ ...build, typeOverride: types ?? undefined })}
+          onClose={() => setShowTypeModal(false)}
         />
       )}
     </Glass>
@@ -685,8 +711,9 @@ function ResultCard({ data, attacker, defender, moveEnName, cond, swapped }: {
     const defEntry = defender.isMega && defender.megaFormName
       ? data.roster.find(r => r.name === defender.megaFormName)
       : getSelectableRoster(data.roster).find(r => r.name === defender.rosterName);
-    const atkTypes = atkEntry?.types ?? [];
-    const defTypes = defEntry?.types ?? [];
+    // タイプ上書き（へんげんじざい変化後等）があればそれを優先
+    const atkTypes = attacker.typeOverride?.length ? attacker.typeOverride : (atkEntry?.types ?? []);
+    const defTypes = defender.typeOverride?.length ? defender.typeOverride : (defEntry?.types ?? []);
     // ウェザーボールは天候で実効タイプ・威力が変わる（表示・相性に反映）
     const isWB = move.name === 'Weather Ball' && (cond.weather ?? null) !== null;
     const dispType = isWB ? getWeatherBallType(cond.weather) : move.type;
@@ -1162,8 +1189,8 @@ function ResultsSection({ data, attacker, defender, moveSlots, cond, onCalcHisto
       const defEntry = defender.isMega && defender.megaFormName
         ? data.roster.find(r => r.name === defender.megaFormName)
         : getSelectableRoster(data.roster).find(r => r.name === defender.rosterName);
-      const atkTypes = atkEntry?.types ?? [];
-      const defTypes = defEntry?.types ?? [];
+      const atkTypes = attacker.typeOverride?.length ? attacker.typeOverride : (atkEntry?.types ?? []);
+      const defTypes = defender.typeOverride?.length ? defender.typeOverride : (defEntry?.types ?? []);
       const effectiveness = getTypeEffectiveness(move.type, defTypes, move.name);
       const rolls = calcDamageRolls(atkStats, defStats, atkTypes, defTypes, move, cond, attacker.item, defender.item, attacker.ability, defender.ability);
       const spPower = getSpeedBasedPower(move.name, atkStats.spe, defStats.spe);

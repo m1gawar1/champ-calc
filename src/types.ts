@@ -65,6 +65,9 @@ export interface PokemonBuild {
   // 計算タブ用: ステータス別の性格補正倍率（0.9/1.0/1.1）を直接指定。
   // 未指定のステータスは nature から算出（後方互換）。相手の性格不明時の予測計算用。
   statMult?: Partial<Record<keyof Omit<SpAlloc, 'hp'>, number>>;
+  // タイプ手動上書き（英語名1〜2個）。へんげんじざい変化後・テラスタル・みずびたし等の
+  // タイプ変化を再現するための任意指定。未指定なら素タイプを使用（後方互換）。
+  typeOverride?: string[];
 }
 
 // バトル状況（計算オプション）

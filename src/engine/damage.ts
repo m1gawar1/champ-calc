@@ -184,7 +184,10 @@ export function calcDamageRolls(
     d = Math.floor(d * r / 100);
 
     // ── STAB ──
-    if (attackerTypes.includes(effType)) {
+    // へんげんじざい/リベロは使った技のタイプに変化するため、常にタイプ一致扱い
+    const hasStab = attackerTypes.includes(effType)
+      || attackerAbility === 'Protean' || attackerAbility === 'Libero';
+    if (hasStab) {
       d = chain(d, attackerAbility === 'Adaptability' ? 8192 : 6144);
     }
 
