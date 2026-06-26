@@ -899,7 +899,18 @@ function OpponentEditor({ members, data, onChange, store, onUpdateHistory }: {
           myPartyMembers={store.myParties.find(p => p.id === store.activePartyId)?.members ?? []}
           opponentMembers={store.opponentParty}
           currentName={slots[modalIndex].rosterName}
-          onSelect={name => { setSlot(modalIndex, { ...opponentBuild(name) }); onUpdateHistory(name); }}
+          keepOpenOnSelect
+          onSelect={name => {
+            if (modalIndex === null) return;
+            // 現在スロットを埋める
+            const next = [...slots];
+            next[modalIndex] = { ...opponentBuild(name) };
+            onChange(next);
+            onUpdateHistory(name);
+            // 次の空きスロットへ自動で進む。無ければ閉じる。
+            const nextEmpty = next.findIndex(s => !s.rosterName);
+            setModalIndex(nextEmpty === -1 ? null : nextEmpty);
+          }}
           onClose={() => setModalIndex(null)}
         />
       )}
@@ -1174,7 +1185,8 @@ export function PartyPage({ data, store, onUpdate }: Props) {
                         opponentSelectionOrder: e.opponentSelectionOrder,
                         result: e.result,
                       });
-                      onUpdate({ battleHistory: updated.battleHistory });
+                      // 記録したら相手パーティは自動クリア
+                      onUpdate({ battleHistory: updated.battleHistory, opponentParty: [] });
                       setShowRecord(false);
                     }}
                     onClose={() => setShowRecord(false)}

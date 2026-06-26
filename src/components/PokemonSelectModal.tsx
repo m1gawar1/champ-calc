@@ -22,6 +22,8 @@ interface Props {
   onClose: () => void;
   /** 現在選択中ポケモンの英語 rosterName（省略可） */
   currentName?: string;
+  /** 選択しても閉じない連続入力用 */
+  keepOpenOnSelect?: boolean;
 }
 
 type TabType = 'all' | 'history' | 'party';
@@ -30,7 +32,7 @@ function toKatakana(str: string) {
   return str.replace(/[\u3041-\u3096]/g, m => String.fromCharCode(m.charCodeAt(0) + 0x60));
 }
 
-export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, opponentMembers, onSelect, onClose }: Props) {
+export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, opponentMembers, onSelect, onClose, keepOpenOnSelect }: Props) {
   const t = useTheme();
   const [tab, setTab] = useState<TabType>('all');
   // 再選択時も検索欄は空で開く（既存名は表示しない）
@@ -242,7 +244,7 @@ export function PokemonSelectModal({ data, pokemonHistory, myPartyMembers, oppon
               {activeItems.map(item => (
                 <button
                   key={item.value}
-                  onClick={() => { onSelect(item.value); onClose(); }}
+                  onClick={() => { onSelect(item.value); if (!keepOpenOnSelect) onClose(); }}
                   style={{
                     width: '100%', textAlign: 'left',
                     display: 'flex', alignItems: 'center', gap: 8,

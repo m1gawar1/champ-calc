@@ -85,8 +85,8 @@ export function saveStore(store: AppStore): void {
 
 export function addPokemonToHistory(store: AppStore, rosterName: string): AppStore {
   if (!rosterName) return store;
-  // 重複を削除し、先頭に追加。最大15件。
-  const newHistory = [rosterName, ...store.pokemonHistory.filter(name => name !== rosterName)].slice(0, 15);
+  // 重複を削除し、先頭に追加。最大100件。
+  const newHistory = [rosterName, ...store.pokemonHistory.filter(name => name !== rosterName)].slice(0, 100);
   return { ...store, pokemonHistory: newHistory };
 }
 
