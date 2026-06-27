@@ -47,5 +47,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>パーティのスクリーンショットを撮影してポケモンを自動で読み取るためにカメラを使用します。</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>パーティのスクリーンショットを選択してポケモンを自動で読み取るために写真ライブラリにアクセスします。</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>撮影した画像を写真ライブラリに保存するためにアクセスします。</string>
 </dict>
 </plist>
