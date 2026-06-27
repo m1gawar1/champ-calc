@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { NatureModal } from './NatureModal';
 import { Glass } from './Glass';
+import { ImportPartyModal } from './ImportPartyModal';
 import { SpSlider } from './Glass';
 import { computeStats } from '../engine/stats';
 import { useTheme, TYPE_COLORS } from '../theme';
@@ -1043,6 +1044,7 @@ export function PartyPage({ data, store, onUpdate }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [section, setSection] = useState<'my' | 'opponent' | 'box'>('my');
   const [showRecord, setShowRecord] = useState(false);
+  const [showImport, setShowImport] = useState(false); // スクショ取り込みモーダル表示フラグ
   const [boxDraft, setBoxDraft] = useState<PokemonBuild | null>(null); // ボックス追加/編集中の個体
   const [editingBoxId, setEditingBoxId] = useState<string | null>(null); // 編集中のボックスID（nullなら新規追加）
 
@@ -1126,6 +1128,17 @@ export function PartyPage({ data, store, onUpdate }: Props) {
           ))}
           {!editingId && (
             <button
+              onClick={() => setShowImport(true)}
+              style={{
+                width: '100%', padding: '14px 0',
+                border: `1px dashed ${t.dashedRim}`, borderRadius: 22,
+                color: t.textMuted, fontSize: 14, fontWeight: 600,
+                background: 'transparent', cursor: 'pointer',
+              }}
+            >📷 スクショから取り込み</button>
+          )}
+          {!editingId && (
+            <button
               onClick={createNew}
               style={{
                 width: '100%', padding: '14px 0',
@@ -1134,6 +1147,25 @@ export function PartyPage({ data, store, onUpdate }: Props) {
                 background: 'transparent', cursor: 'pointer',
               }}
             >＋ 新しいパーティを作成</button>
+          )}
+
+          {/* スクショ取り込みモーダル */}
+          {showImport && (
+            <ImportPartyModal
+              data={data}
+              onClose={() => setShowImport(false)}
+              onImported={builds => {
+                // OCR で読み取った6体を新規マイパーティとして作成し、編集画面を開く
+                const members = Array(6).fill(null).map((_, i) =>
+                  builds[i] && builds[i].rosterName ? builds[i] : null
+                ) as (PokemonBuild | null)[];
+                const p = newParty(`インポート${store.myParties.length + 1}`);
+                const withMembers = { ...p, members };
+                onUpdate({ myParties: [...store.myParties, withMembers] });
+                setEditingId(withMembers.id);
+                setShowImport(false);
+              }}
+            />
           )}
         </div>
       )}
